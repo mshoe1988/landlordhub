@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { getProperties, getMaintenanceTasks, getExpenses, updateMaintenanceTask, createExpense, getCurrentMonthRentStatus } from '@/lib/database'
+import { getProperties, getMaintenanceTasks, getExpenses, updateMaintenanceTask, createExpense, getCurrentMonthRentStatus, getRentPayments } from '@/lib/database'
 import { Property, MaintenanceTask, Expense, RentPayment } from '@/lib/types'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
@@ -51,6 +51,7 @@ export default function DashboardPage() {
   const [maintenance, setMaintenance] = useState<MaintenanceTask[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [rentPayments, setRentPayments] = useState<Record<string, RentPayment | null>>({})
+  const [allRentPayments, setAllRentPayments] = useState<RentPayment[]>([])
   const [loading, setLoading] = useState(true)
   const [showCostModal, setShowCostModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<MaintenanceTask | null>(null)
@@ -65,17 +66,19 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     try {
-      const [propertiesData, maintenanceData, expensesData, paymentsData] = await Promise.all([
+      const [propertiesData, maintenanceData, expensesData, paymentsData, allPaymentsData] = await Promise.all([
         getProperties(user!.id),
         getMaintenanceTasks(user!.id),
         getExpenses(user!.id),
-        getCurrentMonthRentStatus(user!.id).catch(() => ({})) // Load rent payments, but don't fail if table doesn't exist
+        getCurrentMonthRentStatus(user!.id).catch(() => ({})), // Load current month status for stats
+        getRentPayments(user!.id).catch(() => []) // Load all rent payments for charts
       ])
       
       setProperties(propertiesData)
       setMaintenance(maintenanceData)
       setExpenses(expensesData)
       setRentPayments(paymentsData)
+      setAllRentPayments(allPaymentsData)
     } catch (error) {
       console.error('Error loading dashboard data:', error)
     } finally {
@@ -347,6 +350,14 @@ export default function DashboardPage() {
         }
       })
       
+      // Check rent payments for earliest date
+      allRentPayments.forEach(payment => {
+        const paymentMonth = new Date(payment.year, payment.month - 1, 1)
+        if (!earliestMonth || paymentMonth < earliestMonth) {
+          earliestMonth = paymentMonth
+        }
+      })
+      
       // If no data exists, default to last 6 months
       if (!earliestMonth) {
         earliestMonth = new Date(now.getFullYear(), now.getMonth() - 5, 1)
@@ -384,20 +395,31 @@ export default function DashboardPage() {
       }
     })
     
-    // Add income from properties (only from when they were created)
-    properties.forEach(property => {
-      const createdDate = new Date(property.created_at)
-      const createdMonth = createdDate.toISOString().slice(0, 7) // YYYY-MM
+    // Add income from actual rent payments (only paid payments)
+    const paidPayments = allRentPayments.filter(payment => payment.status === 'paid')
+    
+    paidPayments.forEach(payment => {
+      // Create month key from payment year and month (1-12)
+      const monthKey = `${payment.year}-${String(payment.month).padStart(2, '0')}`
       
-      monthlyMap.forEach((value, monthKey) => {
-        // Only add income from the month the property was created onwards
-        if (monthKey >= createdMonth) {
-          // If date range is set, also check if the month is within range
-          if (!lineChartDateRange || (monthKey >= lineChartDateRange.start.slice(0, 7) && monthKey <= lineChartDateRange.end.slice(0, 7))) {
-            value.income += property.monthly_rent
-          }
+      // If date range is set, filter payments within range
+      if (lineChartDateRange) {
+        const paymentDate = new Date(payment.year, payment.month - 1, 1)
+        const startDate = new Date(lineChartDateRange.start)
+        const endDate = new Date(lineChartDateRange.end)
+        
+        if (paymentDate < startDate || paymentDate > endDate) {
+          return // Skip payments outside the range
         }
-      })
+      }
+      
+      const existingMonth = monthlyMap.get(monthKey)
+      if (existingMonth) {
+        existingMonth.income += payment.amount
+      } else {
+        // If month not in map, add it
+        monthlyMap.set(monthKey, { income: payment.amount, expenses: 0 })
+      }
     })
     
     const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
