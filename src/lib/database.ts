@@ -536,11 +536,15 @@ export const markRentAsUnpaid = async (
 
   if (existing) {
     // Update existing record
-    return updateRentPayment(existing.id, {
+    // Build update object without payment_date if we want to clear it
+    const updates: any = {
       status: 'unpaid',
-      payment_date: null,
       notes: existing.notes
-    })
+    }
+    // Clear payment_date by setting to null (Supabase requires null to clear fields)
+    updates.payment_date = null
+    
+    return updateRentPayment(existing.id, updates)
   } else {
     // Get property to get monthly rent amount
     const { data: property, error: propertyError } = await supabase
