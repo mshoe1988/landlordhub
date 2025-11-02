@@ -123,39 +123,60 @@ export default function ReportsPage() {
   }
 
   const calculateMonthlyData = (): MonthlyData[] => {
-    const filteredExpenses = getFilteredExpenses()
+    // Use all expenses for monthly data, not filtered ones
+    const allExpenses = expenses
     const monthlyMap = new Map<string, { income: number; expenses: number }>()
     
-    // Initialize last 12 months
+    console.log('Properties:', properties)
+    console.log('All expenses for monthly data:', allExpenses)
+    
+    // Initialize last 6 months including current month
     const now = new Date()
-    for (let i = 11; i >= 0; i--) {
+    for (let i = 5; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
       const monthKey = date.toISOString().slice(0, 7) // YYYY-MM
       monthlyMap.set(monthKey, { income: 0, expenses: 0 })
     }
     
-    // Add income from properties
-    properties.forEach(property => {
-      const propertyExpenses = filteredExpenses.filter(expense => expense.property_id === property.id)
-      propertyExpenses.forEach(expense => {
-        const expenseDate = new Date(expense.date)
-        const monthKey = expenseDate.toISOString().slice(0, 7)
-        const current = monthlyMap.get(monthKey) || { income: 0, expenses: 0 }
+    // Add expenses
+    allExpenses.forEach(expense => {
+      const expenseDate = new Date(expense.date)
+      const monthKey = expenseDate.toISOString().slice(0, 7)
+      const current = monthlyMap.get(monthKey)
+      if (current) {
         current.expenses += expense.amount
-        monthlyMap.set(monthKey, current)
-      })
+        console.log(`Added expense ${expense.amount} to ${monthKey}`)
+      }
+    })
+    
+    // Add income from properties (only from when they were created)
+    properties.forEach(property => {
+      console.log(`Property: ${property.address}, Monthly rent: ${property.monthly_rent}, Created: ${property.created_at}`)
       
-      // Add monthly rent income for each month
+      // Get the creation month
+      const createdDate = new Date(property.created_at)
+      const createdMonth = createdDate.toISOString().slice(0, 7) // YYYY-MM
+      console.log(`Property created in month: ${createdMonth}`)
+      
       monthlyMap.forEach((value, monthKey) => {
-        value.income += property.monthly_rent
+        // Only add income from the month the property was created onwards
+        if (monthKey >= createdMonth) {
+          value.income += property.monthly_rent
+          console.log(`Added income ${property.monthly_rent} to ${monthKey} (property created in ${createdMonth})`)
+        } else {
+          console.log(`Skipped income for ${monthKey} (property created in ${createdMonth})`)
+        }
       })
     })
     
-    return Array.from(monthlyMap.entries()).map(([month, data]) => ({
+    const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
       month: new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       income: data.income,
       expenses: data.expenses
     }))
+    
+    console.log('Monthly data result:', result)
+    return result
   }
 
   const calculateTaxSummary = () => {
@@ -207,7 +228,7 @@ export default function ReportsPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="space-y-6">
+        <div className="space-y-6" key={`reports-${Date.now()}`}>
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Financial Reports</h1>
@@ -309,16 +330,16 @@ export default function ReportsPage() {
             {/* Expenses by Category Pie Chart */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Expenses by Category</h2>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-80 md:h-96">
+                <ResponsiveContainer width="100%" height="100%" key={`pie-chart-${Date.now()}`}>
                   <PieChart>
                     <Pie
-                      data={categoryData}
+                      data={categoryData as any}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
-                      outerRadius={80}
+                      outerRadius="70%"
+                      innerRadius="20%"
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -327,6 +348,19 @@ export default function ReportsPage() {
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={60}
+                      wrapperStyle={{ 
+                        fontSize: '14px', 
+                        paddingTop: '15px' 
+                      }}
+                      formatter={(value, entry) => {
+                        const total = categoryData.reduce((sum, item) => sum + item.value, 0)
+                        const percentage = total > 0 ? ((entry.payload?.value || 0) / total * 100).toFixed(1) : '0.0'
+                        return `${value}: ${percentage}%`
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

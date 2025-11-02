@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { getProperties, getMaintenanceTasks, getExpenses } from '@/lib/database'
+import { getProperties, getMaintenanceTasks, getExpenses, updateMaintenanceTask, createExpense } from '@/lib/database'
 import { Property, MaintenanceTask, Expense } from '@/lib/types'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
@@ -10,15 +11,45 @@ import {
   Home, 
   DollarSign, 
   Wrench, 
-  Calendar
+  Calendar,
+  Mail
 } from 'lucide-react'
+import { 
+  PieChart, 
+  Pie, 
+  Cell, 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer 
+} from 'recharts'
+import CostInputModal from '@/components/CostInputModal'
+
+interface CategoryData {
+  name: string
+  value: number
+  percentage: number
+}
+
+interface MonthlyData {
+  month: string
+  income: number
+  expenses: number
+}
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
   const [maintenance, setMaintenance] = useState<MaintenanceTask[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
+  const [showCostModal, setShowCostModal] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<MaintenanceTask | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -58,12 +89,156 @@ export default function DashboardPage() {
 
   // Calculate totals
   const totalMonthlyRent = properties.reduce((sum, p) => sum + p.monthly_rent, 0)
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
+  
+  // Calculate this month's expenses
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+  
+  const thisMonthExpenses = expenses.filter(expense => {
+    const expenseDate = new Date(expense.date)
+    return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear
+  })
+  
+  const totalExpenses = thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0)
   const upcomingTasks = maintenance.filter(m => m.status === 'pending').length
 
   const getExpensesByProperty = (propertyId: string) => {
     return expenses.filter(e => e.property_id === propertyId).reduce((sum, e) => sum + e.amount, 0)
   }
+
+  const handleMarkComplete = async (taskId: string, event: React.MouseEvent) => {
+    event.stopPropagation() // Prevent the click from navigating to maintenance page
+    
+    const task = maintenance.find(t => t.id === taskId)
+    if (!task) return
+
+    // Show cost input modal
+    setSelectedTask(task)
+    setShowCostModal(true)
+  }
+
+  const handleCostConfirm = async (cost: number) => {
+    if (!selectedTask || !user) return
+
+    try {
+      // Update maintenance task status
+      await updateMaintenanceTask(selectedTask.id, { status: 'completed' })
+      
+      // Create expense entry
+      const property = properties.find(p => p.id === selectedTask.property_id)
+      await createExpense({
+        user_id: user.id,
+        property_id: selectedTask.property_id,
+        date: new Date().toISOString().split('T')[0],
+        amount: cost,
+        category: 'Maintenance',
+        description: `${selectedTask.task}${property ? ` - ${property.address}` : ''}`,
+        is_recurring: false,
+        recurring_frequency: undefined
+      })
+
+      // Update local state
+      setMaintenance(prev => 
+        prev.map(task => 
+          task.id === selectedTask.id 
+            ? { ...task, status: 'completed' as const }
+            : task
+        )
+      )
+
+      // Reload expenses to show the new entry
+      const expensesData = await getExpenses(user.id)
+      setExpenses(expensesData)
+
+    } catch (error) {
+      console.error('Error completing task and adding expense:', error)
+      throw error
+    }
+  }
+
+  const handleEmailTenant = (property: Property, event: React.MouseEvent) => {
+    event.stopPropagation() // Prevent the click from navigating to properties page
+    
+    if (!property.tenant_email) {
+      alert('No email address available for this tenant')
+      return
+    }
+
+    const subject = encodeURIComponent(`Regarding ${property.address}`)
+    const body = encodeURIComponent(
+      `Hello ${property.tenant_name || 'Tenant'},\n\n` +
+      `I hope this message finds you well. I'm writing regarding the property at ${property.address}.\n\n`
+    )
+    
+    const mailtoLink = `mailto:${property.tenant_email}?subject=${subject}&body=${body}`
+    window.open(mailtoLink, '_blank')
+  }
+
+  const calculateCategoryData = (): CategoryData[] => {
+    const categoryMap = new Map<string, number>()
+    
+    expenses.forEach(expense => {
+      const current = categoryMap.get(expense.category) || 0
+      categoryMap.set(expense.category, current + expense.amount)
+    })
+    
+    const total = Array.from(categoryMap.values()).reduce((sum, amount) => sum + amount, 0)
+    
+    return Array.from(categoryMap.entries()).map(([name, value]) => ({
+      name,
+      value,
+      percentage: total > 0 ? (value / total) * 100 : 0
+    })).sort((a, b) => b.value - a.value)
+  }
+
+  const calculateMonthlyData = (): MonthlyData[] => {
+    const monthlyMap = new Map<string, { income: number; expenses: number }>()
+    
+    // Initialize last 6 months including current month
+    const now = new Date()
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const monthKey = date.toISOString().slice(0, 7) // YYYY-MM
+      monthlyMap.set(monthKey, { income: 0, expenses: 0 })
+    }
+    
+    // Add expenses
+    expenses.forEach(expense => {
+      const expenseDate = new Date(expense.date)
+      const monthKey = expenseDate.toISOString().slice(0, 7)
+      const current = monthlyMap.get(monthKey)
+      if (current) {
+        current.expenses += expense.amount
+      }
+    })
+    
+    // Add income from properties (only from when they were created)
+    properties.forEach(property => {
+      const createdDate = new Date(property.created_at)
+      const createdMonth = createdDate.toISOString().slice(0, 7) // YYYY-MM
+      
+      monthlyMap.forEach((value, monthKey) => {
+        // Only add income from the month the property was created onwards
+        if (monthKey >= createdMonth) {
+          value.income += property.monthly_rent
+        }
+      })
+    })
+    
+    const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
+      month: new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      income: data.income,
+      expenses: data.expenses
+    }))
+    
+    return result
+  }
+
+  // Calculate chart data
+  const categoryData = calculateCategoryData()
+  const monthlyData = calculateMonthlyData()
+  const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
 
   return (
     <ProtectedRoute>
@@ -71,7 +246,10 @@ export default function DashboardPage() {
         <div className="space-y-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div 
+              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => router.push('/properties')}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm">Total Properties</p>
@@ -81,7 +259,10 @@ export default function DashboardPage() {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow p-6">
+            <div 
+              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => router.push('/reports')}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm">Monthly Rent</p>
@@ -91,17 +272,23 @@ export default function DashboardPage() {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow p-6">
+            <div 
+              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => router.push('/expenses')}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm">Total Expenses</p>
+                  <p className="text-gray-500 text-sm">This Month's Expenses</p>
                   <p className="text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
                 </div>
                 <DollarSign className="w-12 h-12 text-red-500 opacity-20" />
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow p-6">
+            <div 
+              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => router.push('/maintenance')}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm">Upcoming Tasks</p>
@@ -123,11 +310,19 @@ export default function DashboardPage() {
                   const propertyExpenses = getExpensesByProperty(property.id)
                   const netForProperty = property.monthly_rent - propertyExpenses
                   return (
-                    <div key={property.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div 
+                      key={property.id} 
+                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => router.push('/properties')}
+                    >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-800">{property.address}</h3>
                           <p className="text-sm text-gray-500 mt-1">Tenant: {property.tenant_name || 'Vacant'}</p>
+                          {property.tenant_email && (
+                            <p className="text-sm text-gray-500">Email: {property.tenant_email}</p>
+                          )}
+                          <p className="text-sm text-gray-500">Rent Due: {property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st'} of each month</p>
                           <div className="flex gap-4 mt-2 text-sm">
                             <span className="text-green-600">Rent: ${property.monthly_rent}/mo</span>
                             <span className="text-red-600">Expenses: ${propertyExpenses}</span>
@@ -136,6 +331,15 @@ export default function DashboardPage() {
                             </span>
                           </div>
                         </div>
+                        {property.tenant_email && (
+                          <button
+                            onClick={(e) => handleEmailTenant(property, e)}
+                            className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm"
+                          >
+                            <Mail className="w-4 h-4" />
+                            <span>Email Tenant</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   )
@@ -157,13 +361,20 @@ export default function DashboardPage() {
                   {maintenance.filter(m => m.status === 'pending').map(task => {
                     const property = properties.find(p => p.id === task.property_id)
                     return (
-                      <div key={task.id} className="border rounded-lg p-4 flex justify-between items-center">
+                      <div 
+                        key={task.id} 
+                        className="border rounded-lg p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
+                        onClick={() => router.push('/maintenance')}
+                      >
                         <div>
                           <h3 className="font-semibold text-gray-800">{task.task}</h3>
                           <p className="text-sm text-gray-500">{property?.address || 'Unknown Property'}</p>
-                          <p className="text-sm text-orange-600 mt-1">Due: {new Date(task.due_date).toLocaleDateString()}</p>
+                          <p className="text-sm text-orange-600 mt-1">Scheduled: {new Date(task.due_date + 'T00:00:00').toLocaleDateString()}</p>
                         </div>
-                        <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                        <button 
+                          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                          onClick={(e) => handleMarkComplete(task.id, e)}
+                        >
                           Mark Complete
                         </button>
                       </div>
@@ -173,7 +384,91 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Expenses by Category Pie Chart */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Expenses by Category</h2>
+              <div className="h-80 md:h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryData as any}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius="70%"
+                      innerRadius="20%"
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={60}
+                      wrapperStyle={{ 
+                        fontSize: '14px', 
+                        paddingTop: '15px' 
+                      }}
+                      formatter={(value, entry) => {
+                        const total = categoryData.reduce((sum, item) => sum + item.value, 0)
+                        const percentage = total > 0 ? ((entry.payload?.value || 0) / total * 100).toFixed(1) : '0.0'
+                        return `${value}: ${percentage}%`
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Income vs Expenses Line Chart */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Income vs Expenses Over Time</h2>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="income" 
+                      stroke="#10b981" 
+                      strokeWidth={2}
+                      name="Income"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="expenses" 
+                      stroke="#ef4444" 
+                      strokeWidth={2}
+                      name="Expenses"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Cost Input Modal */}
+        <CostInputModal
+          isOpen={showCostModal}
+          onClose={() => {
+            setShowCostModal(false)
+            setSelectedTask(null)
+          }}
+          onConfirm={handleCostConfirm}
+          taskName={selectedTask?.task || ''}
+          propertyAddress={properties.find(p => p.id === selectedTask?.property_id)?.address || ''}
+        />
       </Layout>
     </ProtectedRoute>
   )

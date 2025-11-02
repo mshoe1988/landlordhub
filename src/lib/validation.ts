@@ -17,7 +17,10 @@ export const validateRequired = (value: string | number | null | undefined): boo
   if (typeof value === 'string') {
     return value.trim().length > 0
   }
-  return value !== null && value !== undefined && value !== ''
+  if (typeof value === 'number') {
+    return value !== 0
+  }
+  return value !== null && value !== undefined
 }
 
 export const validateNumber = (value: string | number): boolean => {

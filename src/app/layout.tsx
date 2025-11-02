@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from '@vercel/analytics/react';
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import "./register-sw";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,19 +18,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LandlordHub - Property Management Suite",
+  title: "LandlordHub",
   description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
   keywords: "property management, rental properties, landlord, real estate, tax reporting, expense tracking",
   authors: [{ name: "LandlordHub" }],
   openGraph: {
-    title: "LandlordHub - Property Management Suite",
+    title: "LandlordHub: Simplify Life. Maximize Rentals.",
     description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "LandlordHub - Property Management Suite",
+    title: "LandlordHub: Simplify Life. Maximize Rentals.",
     description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
   },
 };
@@ -40,7 +43,20 @@ export default function RootLayout({
   return (
         <html lang="en">
           <head>
-            <link rel="icon" href="/favicon.ico" />
+            <link rel="icon" href="/favicon.ico?v=9" type="image/x-icon" />
+            <link rel="icon" href="/favicon-16.ico?v=9" sizes="16x16" type="image/x-icon" />
+            <link rel="icon" href="/favicon-32.ico?v=9" sizes="32x32" type="image/x-icon" />
+            <link rel="icon" href="/Favicon.png?v=9" type="image/png" />
+            <link rel="icon" href="/favicon.svg?v=9" type="image/svg+xml" />
+            <link rel="shortcut icon" href="/favicon.ico?v=9" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#3b82f6" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="LandlordHub" />
+        <link rel="apple-touch-icon" href="/Favicon.png?v=9" />
+            {/* Google Search Console Verification */}
+            <meta name="google-site-verification" content="90VRHnRDFeaKUCplraNlwJheZ9hKsuNNzifff2G5N8I" />
           </head>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -71,6 +87,8 @@ export default function RootLayout({
                   },
                 }}
               />
+              <Analytics />
+              <GoogleAnalytics />
             </AuthProvider>
           </body>
         </html>

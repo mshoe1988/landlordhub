@@ -75,9 +75,10 @@ export const exportAllDataToCSV = (
     ID: property.id,
     Address: property.address,
     Monthly_Rent: formatCurrency(property.monthly_rent),
+    Rent_Due_Date: property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st',
     Tenant_Name: property.tenant_name || '',
     Lease_End_Date: property.lease_end_date || '',
-    Purchase_Date: property.purchase_date || '',
+    Lease_Start_Date: property.lease_start_date || '',
     Created_At: property.created_at
   }))
 

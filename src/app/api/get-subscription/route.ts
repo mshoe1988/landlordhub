@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,24 +11,49 @@ export async function GET(request: NextRequest) {
 
     // Get user from token
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user's subscription
-    const { data: subscription, error } = await supabase
+    // Prefer latest ACTIVE, non-free subscription; fallback to most recent row
+    let subscription = null as any
+
+    // 1) Try active and paid
+    const { data: activePaid, error: errActivePaid } = await supabaseAdmin
       .from('subscriptions')
       .select('*')
       .eq('user_id', user.id)
-      .single()
+      .eq('status', 'active')
+      .neq('plan', 'free')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-    if (error && error.code !== 'PGRST116') {
-      throw error
+    if (errActivePaid && errActivePaid.code !== 'PGRST116') {
+      throw errActivePaid
     }
 
-    return NextResponse.json({ 
+    if (activePaid) {
+      subscription = activePaid
+    } else {
+      // 2) Fallback to most recent row
+      const { data: latest, error: errLatest } = await supabaseAdmin
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (errLatest && errLatest.code !== 'PGRST116') {
+        throw errLatest
+      }
+      subscription = latest
+    }
+
+    return NextResponse.json({
       subscription: subscription || { plan: 'free', status: 'active' }
     })
   } catch (error) {

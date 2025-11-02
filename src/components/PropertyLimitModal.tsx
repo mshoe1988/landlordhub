@@ -21,7 +21,7 @@ export default function PropertyLimitModal({
 
   if (!isOpen) return null
 
-  const handleUpgrade = async (plan: 'starter' | 'pro') => {
+  const handleUpgrade = async (plan: 'basic' | 'pro') => {
     setLoading(true)
     try {
       const response = await fetch('/api/create-checkout-session', {
@@ -30,7 +30,7 @@ export default function PropertyLimitModal({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          priceId: plan === 'starter' ? process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
+          priceId: plan === 'basic' ? process.env.NEXT_PUBLIC_STRIPE_BASIC_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
           plan,
         }),
       })
@@ -51,7 +51,7 @@ export default function PropertyLimitModal({
   }
 
   const currentPlanInfo = getPlanInfo(currentPlan)
-  const starterPlan = PRICING_PLANS.starter
+  const basicPlan = PRICING_PLANS.basic
   const proPlan = PRICING_PLANS.pro
 
   return (
@@ -83,21 +83,21 @@ export default function PropertyLimitModal({
 
           <div className="bg-gray-50 px-4 py-3 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Starter Plan */}
+              {/* Basic Plan */}
               <div className="bg-white rounded-lg p-4 border border-gray-200 p-4">
                 <div className="text-center">
-                  <h4 className="text-lg font-semibold text-gray-900">{starterPlan.name}</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">{basicPlan.name}</h4>
                   <div className="mt-2">
-                    <span className="text-3xl font-bold text-gray-900">${starterPlan.price}</span>
+                    <span className="text-3xl font-bold text-gray-900">${basicPlan.price}</span>
                     <span className="text-gray-600">/month</span>
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    Up to {starterPlan.properties} Properties
+                    Up to {basicPlan.properties} Properties
                   </p>
                 </div>
                 
                 <ul className="mt-4 space-y-2">
-                  {starterPlan.features.slice(0, 3).map((feature, index) => (
+                  {basicPlan.features.slice(0, 3).map((feature, index) => (
                     <li key={index} className="flex items-center text-sm text-gray-600">
                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                       {feature}
@@ -106,7 +106,7 @@ export default function PropertyLimitModal({
                 </ul>
 
                 <button
-                  onClick={() => handleUpgrade('starter')}
+                  onClick={() => handleUpgrade('basic')}
                   disabled={loading}
                   className="w-full mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >

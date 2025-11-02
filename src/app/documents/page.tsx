@@ -8,7 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import FileUpload from '@/components/FileUpload'
 import { uploadFile } from '@/lib/storage'
-import { Plus, Trash2, FileText, Download } from 'lucide-react'
+import { Plus, Trash2, FileText, Download, ChevronUp, ChevronDown } from 'lucide-react'
 
 const DOCUMENT_TYPES = [
   'Lease',
@@ -32,6 +32,8 @@ export default function DocumentsPage() {
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [sortField, setSortField] = useState<'name' | 'type' | 'property' | 'upload_date'>('upload_date')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
   useEffect(() => {
     if (user) {
@@ -113,6 +115,56 @@ export default function DocumentsPage() {
   const getPropertyAddress = (propertyId: string) => {
     const property = properties.find(p => p.id === propertyId)
     return property ? property.address : 'Unknown Property'
+  }
+
+  const handleSort = (field: 'name' | 'type' | 'property' | 'upload_date') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+
+  const getSortIcon = (field: 'name' | 'type' | 'property' | 'upload_date') => {
+    if (sortField !== field) {
+      return <ChevronUp className="w-4 h-4 opacity-30" />
+    }
+    return sortDirection === 'asc' ? 
+      <ChevronUp className="w-4 h-4" /> : 
+      <ChevronDown className="w-4 h-4" />
+  }
+
+  const getSortedDocuments = () => {
+    return [...documents].sort((a, b) => {
+      let aValue: string | number
+      let bValue: string | number
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase()
+          bValue = b.name.toLowerCase()
+          break
+        case 'type':
+          aValue = a.type.toLowerCase()
+          bValue = b.type.toLowerCase()
+          break
+        case 'property':
+          aValue = getPropertyAddress(a.property_id).toLowerCase()
+          bValue = getPropertyAddress(b.property_id).toLowerCase()
+          break
+        case 'upload_date':
+          aValue = new Date(a.upload_date).getTime()
+          bValue = new Date(b.upload_date).getTime()
+          break
+        default:
+          return 0
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
   }
 
   if (loading) {
@@ -212,18 +264,51 @@ export default function DocumentsPage() {
           )}
 
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Document Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Property</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Upload Date</th>
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('name')}
+                  >
+                    <div className="flex items-center">
+                      Document Name
+                      {getSortIcon('name')}
+                    </div>
+                  </th>
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('type')}
+                  >
+                    <div className="flex items-center">
+                      Type
+                      {getSortIcon('type')}
+                    </div>
+                  </th>
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('property')}
+                  >
+                    <div className="flex items-center">
+                      Property
+                      {getSortIcon('property')}
+                    </div>
+                  </th>
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('upload_date')}
+                  >
+                    <div className="flex items-center">
+                      Upload Date
+                      {getSortIcon('upload_date')}
+                    </div>
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {documents.map(doc => (
+                {getSortedDocuments().map(doc => (
                   <tr key={doc.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       <div className="flex items-center">
@@ -267,6 +352,7 @@ export default function DocumentsPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </Layout>

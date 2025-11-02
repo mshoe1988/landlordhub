@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LandlordHub Sign-In Debug</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin: 10px 0; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .error { color: red; }
+        .success { color: green; }
+        #result { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>LandlordHub Sign-In Debug</h1>
+    <div id="status">Loading...</div>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label>Email:</label><br>
+            <input type="email" id="email" placeholder="your-email@example.com" required>
+        </div>
+        <div class="form-group">
+            <label>Password:</label><br>
+            <input type="password" id="password" placeholder="your-password" required>
+        </div>
+        <button type="submit">Test Sign In</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <h3>Debug Info:</h3>
+    <div id="debug"></div>
+
+    <script>
+        const supabaseUrl = 'https://xbsxfwazybfypitawnji.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhic3hmd2F6eWJmeXBpdGF3bmppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExMjE0NjUsImV4cCI6MjA3NjY5NzQ2NX0.Rsj86Mo8ncJKThMqjAXDCJiMvkEF9MArk2yrk4ES2p8'
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+        
+        document.getElementById('status').textContent = 'Supabase connected!'
+        
+        // Test basic connection
+        supabase.from('properties').select('count').limit(1).then(({ data, error }) => {
+            if (error) {
+                document.getElementById('debug').innerHTML += `<p class="error">Database Error: ${error.message}</p>`
+            } else {
+                document.getElementById('debug').innerHTML += `<p class="success">Database connection: OK</p>`
+            }
+        })
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+            
+            document.getElementById('result').innerHTML = '<p>Signing in...</p>'
+            
+            try {
+                console.log('Attempting sign in with:', email)
+                
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                })
+                
+                console.log('Sign in result:', { data, error })
+                
+                if (error) {
+                    document.getElementById('result').innerHTML = `<p class="error">Error: ${error.message}</p>`
+                    document.getElementById('debug').innerHTML += `<p class="error">Auth Error: ${JSON.stringify(error)}</p>`
+                } else {
+                    document.getElementById('result').innerHTML = `<p class="success">Success! User: ${data.user?.email}</p>`
+                    document.getElementById('debug').innerHTML += `<p class="success">Auth Success: ${JSON.stringify(data)}</p>`
+                }
+            } catch (err) {
+                console.error('Exception:', err)
+                document.getElementById('result').innerHTML = `<p class="error">Exception: ${err.message}</p>`
+                document.getElementById('debug').innerHTML += `<p class="error">Exception: ${JSON.stringify(err)}</p>`
+            }
+        })
+    </script>
+</body>
+</html>
+
+
+
+
+

@@ -67,8 +67,8 @@ export default function NewExpensePage() {
         date: formData.date,
         amount: parseFloat(formData.amount),
         category: formData.category,
-        description: formData.description || null,
-        receipt_url: null,
+        description: formData.description || undefined,
+        receipt_url: undefined,
       })
       router.push('/expenses')
     } catch (error: any) {
@@ -141,7 +141,7 @@ export default function NewExpensePage() {
                       name="property_id"
                       id="property_id"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.property_id}
                       onChange={handleChange}
                     >
@@ -163,7 +163,7 @@ export default function NewExpensePage() {
                       name="date"
                       id="date"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.date}
                       onChange={handleChange}
                     />
@@ -180,7 +180,7 @@ export default function NewExpensePage() {
                       required
                       min="0"
                       step="0.01"
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.amount}
                       onChange={handleChange}
                       placeholder="150.00"
@@ -195,7 +195,7 @@ export default function NewExpensePage() {
                       name="category"
                       id="category"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.category}
                       onChange={handleChange}
                     >
@@ -216,7 +216,7 @@ export default function NewExpensePage() {
                       name="description"
                       id="description"
                       rows={3}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.description}
                       onChange={handleChange}
                       placeholder="Additional details about this expense..."

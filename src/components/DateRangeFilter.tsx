@@ -99,7 +99,8 @@ export default function DateRangeFilter({ onDateRangeChange, selectedRange }: Da
             onClick={() => handlePredefinedRange(range)}
             className={`px-3 py-2 text-sm rounded-md border transition-colors ${
               selectedRange && 
-              getDateRangeOptions()[range as keyof ReturnType<typeof getDateRangeOptions>]?.start === selectedRange.start
+              getDateRangeOptions()[range as keyof ReturnType<typeof getDateRangeOptions>]?.start === selectedRange.start &&
+              getDateRangeOptions()[range as keyof ReturnType<typeof getDateRangeOptions>]?.end === selectedRange.end
                 ? 'bg-blue-600 text-white border-blue-600'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
             }`}

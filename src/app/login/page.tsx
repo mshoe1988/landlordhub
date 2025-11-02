@@ -2,15 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
+import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import Image from 'next/image'
+import { trackLogin } from '@/lib/analytics'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { signIn } = useAuth()
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,12 +20,21 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await signIn(email, password)
-    
-    if (error) {
-      setError(error.message)
-    } else {
-      router.push('/dashboard')
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        setError(error.message)
+      } else {
+        // Success! Track login and redirect to dashboard
+        trackLogin('email')
+        router.push('/dashboard')
+      }
+    } catch (err: any) {
+      setError(err.message)
     }
     
     setLoading(false)
@@ -34,8 +45,22 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-blue-600">🏠 LandlordHub</h1>
-            <p className="mt-2 text-sm text-gray-600">Property Management Suite</p>
+            <div className="flex justify-center mb-4">
+            <Image
+              src="/landlord-hub-logo.svg?v=21"
+              alt="LandlordHub Logo"
+              width={600}
+              height={240}
+              className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+              priority
+              quality={100}
+              style={{ 
+                background: 'transparent !important',
+                backgroundColor: 'transparent !important',
+                backgroundImage: 'none !important'
+              }}
+            />
+            </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
@@ -74,17 +99,41 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 pr-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800"
+                >
+                  {showPassword ? (
+                    // Heroicons: eye-slash
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 3.6 16.3 2 14c.6-.9 1.6-2.2 3-3.5" />
+                      <path d="M10.58 10.58A2 2 0 1 0 13.42 13.42" />
+                      <path d="M1 1l22 22" />
+                      <path d="M9.88 4.12A10.94 10.94 0 0 1 12 4c5 0 8.4 3.7 10 6-.4.6-.9 1.3-1.6 2" />
+                    </svg>
+                  ) : (
+                    // Heroicons: eye
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 

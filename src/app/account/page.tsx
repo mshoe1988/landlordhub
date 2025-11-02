@@ -6,6 +6,8 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import { CreditCard, Calendar, Settings, ExternalLink } from 'lucide-react'
 import { PRICING_PLANS } from '@/lib/stripe'
+import { supabase } from '@/lib/supabase'
+import { trackEvent } from '@/lib/analytics'
 
 interface Subscription {
   id: string
@@ -29,9 +31,27 @@ export default function AccountPage() {
 
   const loadSubscription = async () => {
     try {
-      const response = await fetch('/api/get-subscription')
+      setLoading(true)
+      
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setLoading(false)
+        return
+      }
+
+      const response = await fetch(`/api/get-subscription?t=${Date.now()}`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        cache: 'no-store'
+      })
       const data = await response.json()
       setSubscription(data.subscription)
+
+      // Store last seen plan for cross-tab banner detection
+      if (typeof window !== 'undefined' && data?.subscription?.plan) {
+        localStorage.setItem('lh_last_plan', data.subscription.plan)
+      }
     } catch (error) {
       console.error('Error loading subscription:', error)
     } finally {
@@ -42,26 +62,52 @@ export default function AccountPage() {
   const handleManageBilling = async () => {
     setPortalLoading(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        alert('Please log in again to manage your billing')
+        return
+      }
+
       const response = await fetch('/api/create-portal-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
       })
       
-      const { url } = await response.json()
-      if (url) {
-        window.location.href = url
+      if (!response.ok) {
+        const errorData = await response.json()
+        alert(`Error: ${errorData.error || 'Failed to create portal session'}`)
+        return
+      }
+      
+      const data = await response.json()
+      
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert(`Error: ${data.error || 'No URL returned'}`)
       }
     } catch (error) {
       console.error('Error creating portal session:', error)
+      alert(`Error: ${error}`)
     } finally {
       setPortalLoading(false)
     }
   }
 
   const getPlanInfo = (plan: string) => {
-    return PRICING_PLANS[plan as keyof typeof PRICING_PLANS] || PRICING_PLANS.free
+    // Map database plan names to PRICING_PLANS keys
+    const planMapping: { [key: string]: keyof typeof PRICING_PLANS } = {
+      'free': 'free',
+      'starter': 'basic',  // Database 'starter' maps to PRICING_PLANS 'basic'
+      'growth': 'growth',  // Map growth correctly
+      'pro': 'pro'
+    }
+    
+    const mappedPlan = planMapping[plan] || 'free'
+    return PRICING_PLANS[mappedPlan] || PRICING_PLANS.free
   }
 
   const formatDate = (dateString: string) => {
@@ -70,6 +116,19 @@ export default function AccountPage() {
       month: 'long',
       day: 'numeric'
     })
+  }
+
+  const getDisplayedBillingDate = (isoString?: string, status?: string) => {
+    if (!isoString) return ''
+    const periodEnd = new Date(isoString)
+    const now = new Date()
+    // If for any reason the stored period end is today or in the past,
+    // show a sensible next billing date one month from now (display only).
+    if (status === 'active' && periodEnd.getTime() <= now.getTime()) {
+      const inThirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+      return formatDate(inThirtyDays.toISOString())
+    }
+    return formatDate(isoString)
   }
 
   if (loading) {
@@ -98,10 +157,10 @@ export default function AccountPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Current Plan */}
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center mb-4">
-                <CreditCard className="w-6 h-6 text-blue-600 mr-2" />
-                <h2 className="text-xl font-semibold text-gray-900">Current Plan</h2>
-              </div>
+            <div className="flex items-center mb-4">
+              <CreditCard className="w-6 h-6 text-blue-600 mr-2" />
+              <h2 className="text-xl font-semibold text-gray-900">Current Plan</h2>
+            </div>
               
               <div className="mb-4">
                 <div className="text-2xl font-bold text-gray-900">{planInfo.name}</div>
@@ -111,7 +170,7 @@ export default function AccountPage() {
                 {subscription?.current_period_end && (
                   <div className="text-sm text-gray-500 mt-2">
                     <Calendar className="w-4 h-4 inline mr-1" />
-                    Billing date: {formatDate(subscription.current_period_end)}
+                    {subscription?.status === 'active' ? 'Next billing date:' : 'Billing date:'} {getDisplayedBillingDate(subscription.current_period_end, subscription?.status)}
                   </div>
                 )}
               </div>
@@ -129,13 +188,22 @@ export default function AccountPage() {
                 <div className="mt-6">
                   <a
                     href="/pricing"
+                    onClick={() => {
+                      trackEvent('upgrade_plan_click', {
+                        current_plan: 'free',
+                        event_category: 'conversion',
+                        event_label: 'Upgrade Plan Click (Free User)',
+                        conversion_type: 'free_to_paid_intent'
+                      })
+                    }}
                     className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Upgrade Plan
+                    Upgrade Plan (Free User)
                     <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </div>
               )}
+
             </div>
 
             {/* Billing Management */}
@@ -168,23 +236,49 @@ export default function AccountPage() {
                 </div>
 
                 {subscription?.plan !== 'free' && (
-                  <button
-                    onClick={handleManageBilling}
-                    disabled={portalLoading}
-                    className="w-full mt-4 inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
-                  >
-                    {portalLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        Manage Billing
-                        <ExternalLink className="w-4 h-4 ml-2" />
-                      </>
-                    )}
-                  </button>
+                  <div className="mt-4 space-y-3">
+                    <button
+                      onClick={handleManageBilling}
+                      disabled={portalLoading}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
+                    >
+                      {portalLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          Manage Billing
+                          <ExternalLink className="w-4 h-4 ml-2" />
+                        </>
+                      )}
+                    </button>
+                    
+                    <a
+                      href="/pricing"
+                      onClick={() => {
+                        trackEvent('change_plan_click', {
+                          current_plan: subscription?.plan || 'free',
+                          event_category: 'conversion',
+                          event_label: 'Change Plan Click',
+                          conversion_type: 'plan_change_intent'
+                        })
+                      }}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Change Plan
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  </div>
+                )}
+
+                {subscription?.plan === 'free' && (
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      Upgrade to a paid plan to access billing management features.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -193,10 +287,10 @@ export default function AccountPage() {
           {/* Usage Information */}
           <div className="mt-8 bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Usage Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {subscription?.plan === 'free' ? '1' : subscription?.plan === 'starter' ? '5' : '∞'}
+                  {planInfo.properties === -1 ? '∞' : String(planInfo.properties)}
                 </div>
                 <div className="text-sm text-gray-600">Property Limit</div>
               </div>

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createClient } from '@supabase/supabase-js'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Only create Resend instance if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -10,6 +11,14 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Resend is configured
+    if (!resend) {
+      return NextResponse.json({ 
+        error: 'Email service not configured. Please set up Resend API key to send email reminders.',
+        configured: false
+      }, { status: 503 })
+    }
+
     // Get all pending maintenance tasks
     const { data: tasks, error: tasksError } = await supabase
       .from('maintenance_tasks')
@@ -46,18 +55,13 @@ export async function POST(request: NextRequest) {
 
     // Get user emails for the tasks
     const userIds = [...new Set(upcomingTasks.map(task => task.properties.user_id))]
-    const { data: users, error: usersError } = await supabase
-      .from('auth.users')
-      .select('id, email')
-      .in('id', userIds)
-
-    if (usersError) {
-      console.error('Error fetching users:', usersError)
-      return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
+    const userEmailMap = new Map()
+    
+    // For now, let's use your verified email address for testing
+    // In production, you'd want to store user emails in your database
+    for (const userId of userIds) {
+      userEmailMap.set(userId, 'mizerikmate@gmail.com')
     }
-
-    // Create user email lookup
-    const userEmailMap = new Map(users.map(user => [user.id, user.email]))
 
     // Send emails for each task
     const emailResults = []
@@ -72,10 +76,11 @@ export async function POST(request: NextRequest) {
 
       try {
         const emailResult = await resend.emails.send({
-          from: 'LandlordHub <noreply@landlordhub.com>',
+          from: 'LandlordHub <onboarding@resend.dev>',
           to: [userEmail],
           subject: `Maintenance Reminder: ${task.task} due in 3 days`,
-          html: generateEmailTemplate(task)
+          html: generateEmailTemplate(task),
+          text: `Maintenance Reminder: ${task.task} is due in 3 days at ${task.properties.address}. Please log in to your LandlordHub account to view details.`
         })
 
         emailResults.push({
@@ -181,6 +186,7 @@ function generateEmailTemplate(task: any) {
 export async function GET() {
   return NextResponse.json({ 
     message: 'Send reminders endpoint is working',
+    emailConfigured: !!resend,
     timestamp: new Date().toISOString()
   })
 }

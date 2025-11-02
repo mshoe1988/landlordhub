@@ -55,7 +55,7 @@ export default function NewMaintenanceTaskPage() {
         task: formData.task,
         due_date: formData.due_date,
         status: 'pending',
-        notes: formData.notes || null,
+        notes: formData.notes || undefined,
       })
       router.push('/maintenance')
     } catch (error: any) {
@@ -128,7 +128,7 @@ export default function NewMaintenanceTaskPage() {
                       name="property_id"
                       id="property_id"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.property_id}
                       onChange={handleChange}
                     >
@@ -150,7 +150,7 @@ export default function NewMaintenanceTaskPage() {
                       name="task"
                       id="task"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.task}
                       onChange={handleChange}
                       placeholder="e.g., Fix leaky faucet in kitchen"
@@ -166,7 +166,7 @@ export default function NewMaintenanceTaskPage() {
                       name="due_date"
                       id="due_date"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.due_date}
                       onChange={handleChange}
                     />
@@ -180,7 +180,7 @@ export default function NewMaintenanceTaskPage() {
                       name="notes"
                       id="notes"
                       rows={3}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.notes}
                       onChange={handleChange}
                       placeholder="Additional details or instructions..."

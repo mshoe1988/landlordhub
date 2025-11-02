@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { createProperty } from '@/lib/database'
+import { canAddProperty } from '@/lib/stripe'
+import { supabase } from '@/lib/supabase'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import { ArrowLeft } from 'lucide-react'
@@ -20,7 +22,8 @@ export default function NewPropertyPage() {
     monthly_rent: '',
     tenant_name: '',
     lease_end_date: '',
-    purchase_date: '',
+    lease_start_date: '',
+    rent_due_date: '1',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,13 +32,42 @@ export default function NewPropertyPage() {
     setError('')
 
     try {
+      // Enforce property limit before creating
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Not authenticated')
+
+      // Get subscription
+      const subRes = await fetch('/api/get-subscription', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        cache: 'no-store'
+      })
+      const subJson = await subRes.json()
+      const dbPlan: string = subJson?.subscription?.plan || 'free' // free|starter|growth|pro
+      const mappedPlan = dbPlan === 'starter' ? 'basic' : dbPlan
+
+      // Get current property count
+      const { count } = await supabase
+        .from('properties')
+        .select('id', { count: 'exact', head: true })
+
+      const currentCount = count || 0
+      if (!canAddProperty(mappedPlan, currentCount)) {
+        setError('Plan limit reached. Please upgrade to add more properties.')
+        // Soft redirect to pricing
+        setTimeout(() => {
+          (window as any).location = '/pricing'
+        }, 300)
+        return
+      }
+
       await createProperty({
         user_id: user!.id,
         address: formData.address,
         monthly_rent: parseFloat(formData.monthly_rent),
-        tenant_name: formData.tenant_name || null,
-        lease_end_date: formData.lease_end_date || null,
-        purchase_date: formData.purchase_date || null,
+        tenant_name: formData.tenant_name || undefined,
+        lease_end_date: formData.lease_end_date || undefined,
+        lease_start_date: formData.lease_start_date || undefined,
+        rent_due_date: parseInt(formData.rent_due_date),
       })
       router.push('/properties')
     } catch (error: any) {
@@ -45,7 +77,7 @@ export default function NewPropertyPage() {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -86,7 +118,7 @@ export default function NewPropertyPage() {
                     name="address"
                     id="address"
                     required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                     value={formData.address}
                     onChange={handleChange}
                     placeholder="123 Main St, City, State 12345"
@@ -104,11 +136,31 @@ export default function NewPropertyPage() {
                     required
                     min="0"
                     step="0.01"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                     value={formData.monthly_rent}
                     onChange={handleChange}
                     placeholder="1500.00"
                   />
+                </div>
+
+                <div>
+                  <label htmlFor="rent_due_date" className="block text-sm font-medium text-gray-700">
+                    Rent Due Date *
+                  </label>
+                  <select
+                    name="rent_due_date"
+                    id="rent_due_date"
+                    required
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                    value={formData.rent_due_date}
+                    onChange={handleChange}
+                  >
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                      <option key={day} value={day}>
+                        {day}{day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : day === 21 ? 'st' : day === 22 ? 'nd' : day === 23 ? 'rd' : day === 31 ? 'st' : 'th'} of the month
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -119,7 +171,7 @@ export default function NewPropertyPage() {
                     type="text"
                     name="tenant_name"
                     id="tenant_name"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                     value={formData.tenant_name}
                     onChange={handleChange}
                     placeholder="John Doe"
@@ -134,22 +186,22 @@ export default function NewPropertyPage() {
                     type="date"
                     name="lease_end_date"
                     id="lease_end_date"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                     value={formData.lease_end_date}
                     onChange={handleChange}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="purchase_date" className="block text-sm font-medium text-gray-700">
-                    Purchase Date
+                  <label htmlFor="lease_start_date" className="block text-sm font-medium text-gray-700">
+                    Lease Start Date
                   </label>
                   <input
                     type="date"
-                    name="purchase_date"
-                    id="purchase_date"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    value={formData.purchase_date}
+                    name="lease_start_date"
+                    id="lease_start_date"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                    value={formData.lease_start_date}
                     onChange={handleChange}
                   />
                 </div>
