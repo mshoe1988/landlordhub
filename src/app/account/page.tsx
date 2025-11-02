@@ -46,6 +46,12 @@ export default function AccountPage() {
         cache: 'no-store'
       })
       const data = await response.json()
+      
+      // Debug logging
+      console.log('Subscription API response:', data)
+      console.log('Subscription plan:', data?.subscription?.plan)
+      console.log('Subscription status:', data?.subscription?.status)
+      
       setSubscription(data.subscription)
 
       // Store last seen plan for cross-tab banner detection
@@ -97,17 +103,27 @@ export default function AccountPage() {
     }
   }
 
-  const getPlanInfo = (plan: string) => {
+  const getPlanInfo = (plan: string | undefined) => {
     // Map database plan names to PRICING_PLANS keys
     const planMapping: { [key: string]: keyof typeof PRICING_PLANS } = {
       'free': 'free',
       'starter': 'basic',  // Database 'starter' maps to PRICING_PLANS 'basic'
-      'growth': 'growth',  // Map growth correctly
+      'basic': 'basic',    // Also handle 'basic' if it exists in database
+      'growth': 'growth',
       'pro': 'pro'
     }
     
-    const mappedPlan = planMapping[plan] || 'free'
-    return PRICING_PLANS[mappedPlan] || PRICING_PLANS.free
+    if (!plan) {
+      console.warn('No plan provided, defaulting to free')
+      return PRICING_PLANS.free
+    }
+    
+    const mappedPlan = planMapping[plan.toLowerCase()] || 'free'
+    const planInfo = PRICING_PLANS[mappedPlan] || PRICING_PLANS.free
+    
+    console.log('Plan mapping:', { original: plan, mapped: mappedPlan, planInfo })
+    
+    return planInfo
   }
 
   const formatDate = (dateString: string) => {

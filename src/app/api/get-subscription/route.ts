@@ -20,13 +20,14 @@ export async function GET(request: NextRequest) {
     // Prefer latest ACTIVE, non-free subscription; fallback to most recent row
     let subscription = null as any
 
-    // 1) Try active and paid
+    // 1) Try active and paid (any paid plan)
+    // Note: Database uses 'starter' but we also check for 'basic' in case it exists
     const { data: activePaid, error: errActivePaid } = await supabaseAdmin
       .from('subscriptions')
       .select('*')
       .eq('user_id', user.id)
       .eq('status', 'active')
-      .neq('plan', 'free')
+      .in('plan', ['starter', 'basic', 'growth', 'pro'])
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
@@ -38,20 +39,41 @@ export async function GET(request: NextRequest) {
     if (activePaid) {
       subscription = activePaid
     } else {
-      // 2) Fallback to most recent row
-      const { data: latest, error: errLatest } = await supabaseAdmin
+      // 2) Try any active subscription (including free)
+      const { data: activeAny, error: errActiveAny } = await supabaseAdmin
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
+        .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
 
-      if (errLatest && errLatest.code !== 'PGRST116') {
-        throw errLatest
+      if (errActiveAny && errActiveAny.code !== 'PGRST116') {
+        throw errActiveAny
       }
-      subscription = latest
+
+      if (activeAny) {
+        subscription = activeAny
+      } else {
+        // 3) Fallback to most recent row regardless of status
+        const { data: latest, error: errLatest } = await supabaseAdmin
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (errLatest && errLatest.code !== 'PGRST116') {
+          throw errLatest
+        }
+        subscription = latest
+      }
     }
+
+    // Log subscription for debugging (remove in production if needed)
+    console.log('Subscription found for user:', user.id, subscription)
 
     return NextResponse.json({
       subscription: subscription || { plan: 'free', status: 'active' }
