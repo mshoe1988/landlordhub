@@ -34,29 +34,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <img
-                src="/landlord-hub-logo.svg?v=23"
-                alt="LandlordHub Logo"
-                className="mr-3 w-auto h-auto max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[400px] drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-                style={{ 
-                  background: 'transparent',
-                  backgroundColor: 'transparent',
-                  backgroundImage: 'none',
-                  maxWidth: '100%',
-                  height: 'auto'
-                }}
-              />
-            </div>
-            {/* Removed header Sign In/Sign Up to avoid duplication with hero CTAs */}
-          </div>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
