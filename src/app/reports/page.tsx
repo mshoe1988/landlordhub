@@ -11,8 +11,6 @@ import {
   PieChart, 
   Pie, 
   Cell, 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -22,6 +20,7 @@ import {
 } from 'recharts'
 import { Download, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import { generateTaxReportPDF } from '@/lib/pdfExport'
+import RentCollectionStatusChart from '@/components/RentCollectionStatusChart'
 
 interface ProfitLossData {
   property: string
@@ -411,35 +410,11 @@ export default function ReportsPage() {
               </div>
             </div>
 
-            {/* Income vs Expenses Line Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Income vs Expenses Over Time</h2>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="income" 
-                      stroke="#10b981" 
-                      strokeWidth={2}
-                      name="Income"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="expenses" 
-                      stroke="#ef4444" 
-                      strokeWidth={2}
-                      name="Expenses"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            {/* Rent Collection Status Chart */}
+            <RentCollectionStatusChart 
+              properties={properties}
+              rentPayments={rentPayments}
+            />
           </div>
         </div>
       </Layout>

@@ -21,8 +21,6 @@ import {
   PieChart, 
   Pie, 
   Cell, 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -31,6 +29,7 @@ import {
   ResponsiveContainer 
 } from 'recharts'
 import CostInputModal from '@/components/CostInputModal'
+import RentCollectionStatusChart from '@/components/RentCollectionStatusChart'
 
 interface CategoryData {
   name: string
@@ -777,76 +776,11 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Income vs Expenses Line Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Income vs Expenses Over Time</h2>
-                <div className="text-sm text-gray-600">
-                  Current: {getCurrentLineChartRangeLabel()}
-                </div>
-              </div>
-              
-              {/* Date Range Filter Buttons */}
-              <div className="mb-4 flex flex-wrap gap-2">
-                <button
-                  onClick={() => handleLineChartDateRange(null)}
-                  className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-                    !lineChartDateRange
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  All Time
-                </button>
-                {Object.keys(getDateRangeOptions()).map((range) => {
-                  const options = getDateRangeOptions()
-                  const rangeData = options[range as keyof typeof options]
-                  const isActive = lineChartDateRange && 
-                    lineChartDateRange.start === rangeData.start && 
-                    lineChartDateRange.end === rangeData.end
-                  
-                  return (
-                    <button
-                      key={range}
-                      onClick={() => handleLineChartDateRange(range)}
-                      className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-                        isActive
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      {range}
-                    </button>
-                  )
-                })}
-              </div>
-              
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="income" 
-                      stroke="#10b981" 
-                      strokeWidth={2}
-                      name="Income"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="expenses" 
-                      stroke="#ef4444" 
-                      strokeWidth={2}
-                      name="Expenses"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            {/* Rent Collection Status Chart */}
+            <RentCollectionStatusChart 
+              properties={properties}
+              rentPayments={allRentPayments}
+            />
           </div>
         </div>
 
