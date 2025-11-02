@@ -224,7 +224,7 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
       <div className="h-80 mb-6">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'bar' ? (
-            <BarChart data={statusData}>
+            <BarChart data={statusData as any}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="status" />
               <YAxis />
@@ -243,15 +243,15 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
           ) : (
             <PieChart>
               <Pie
-                data={statusData}
+                data={statusData as any}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ status, percentage }) => `${status}: ${percentage}%`}
+                label={({ status, percentage }: any) => `${status}: ${percentage}%`}
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="count"
-                onClick={(data, index) => handlePieClick(data, index)}
+                onClick={(data: any, index: number) => handlePieClick(data, index)}
                 cursor="pointer"
               >
                 {statusData.map((entry, index) => (
