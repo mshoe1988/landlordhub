@@ -55,6 +55,7 @@ export default function DashboardPage() {
   const [showCostModal, setShowCostModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<MaintenanceTask | null>(null)
   const [pieChartDateRange, setPieChartDateRange] = useState<{ start: string; end: string } | null>(null)
+  const [lineChartDateRange, setLineChartDateRange] = useState<{ start: string; end: string } | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -255,6 +256,32 @@ export default function DashboardPage() {
     return `Custom: ${pieChartDateRange.start} to ${pieChartDateRange.end}`
   }
 
+  const handleLineChartDateRange = (rangeName: string | null) => {
+    if (rangeName === null) {
+      setLineChartDateRange(null)
+      return
+    }
+    
+    const options = getDateRangeOptions()
+    const range = options[rangeName as keyof typeof options]
+    if (range) {
+      setLineChartDateRange(range)
+    }
+  }
+
+  const getCurrentLineChartRangeLabel = () => {
+    if (!lineChartDateRange) return 'Last 6 Months'
+    
+    const options = getDateRangeOptions()
+    for (const [name, range] of Object.entries(options)) {
+      if (range.start === lineChartDateRange.start && range.end === lineChartDateRange.end) {
+        return name
+      }
+    }
+    
+    return `Custom: ${lineChartDateRange.start} to ${lineChartDateRange.end}`
+  }
+
   const calculateCategoryData = (): CategoryData[] => {
     const categoryMap = new Map<string, number>()
     
@@ -284,18 +311,45 @@ export default function DashboardPage() {
 
   const calculateMonthlyData = (): MonthlyData[] => {
     const monthlyMap = new Map<string, { income: number; expenses: number }>()
-    
-    // Initialize last 6 months including current month
     const now = new Date()
-    for (let i = 5; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
-      const monthKey = date.toISOString().slice(0, 7) // YYYY-MM
-      monthlyMap.set(monthKey, { income: 0, expenses: 0 })
+    
+    // Determine date range for months
+    if (lineChartDateRange) {
+      // Use selected date range
+      const startDate = new Date(lineChartDateRange.start)
+      const endDate = new Date(lineChartDateRange.end)
+      
+      // Generate all months within the date range
+      const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+      const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
+      
+      while (current <= end) {
+        const monthKey = current.toISOString().slice(0, 7) // YYYY-MM
+        monthlyMap.set(monthKey, { income: 0, expenses: 0 })
+        current.setMonth(current.getMonth() + 1)
+      }
+    } else {
+      // Default: last 6 months including current month
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const monthKey = date.toISOString().slice(0, 7) // YYYY-MM
+        monthlyMap.set(monthKey, { income: 0, expenses: 0 })
+      }
     }
     
-    // Add expenses
+    // Add expenses (filtered by date range if set)
     expenses.forEach(expense => {
       const expenseDate = new Date(expense.date)
+      
+      // If date range is set, filter expenses
+      if (lineChartDateRange) {
+        const startDate = new Date(lineChartDateRange.start)
+        const endDate = new Date(lineChartDateRange.end)
+        if (expenseDate < startDate || expenseDate > endDate) {
+          return // Skip expenses outside the range
+        }
+      }
+      
       const monthKey = expenseDate.toISOString().slice(0, 7)
       const current = monthlyMap.get(monthKey)
       if (current) {
@@ -311,7 +365,10 @@ export default function DashboardPage() {
       monthlyMap.forEach((value, monthKey) => {
         // Only add income from the month the property was created onwards
         if (monthKey >= createdMonth) {
-          value.income += property.monthly_rent
+          // If date range is set, also check if the month is within range
+          if (!lineChartDateRange || (monthKey >= lineChartDateRange.start.slice(0, 7) && monthKey <= lineChartDateRange.end.slice(0, 7))) {
+            value.income += property.monthly_rent
+          }
         }
       })
     })
@@ -639,7 +696,48 @@ export default function DashboardPage() {
 
             {/* Income vs Expenses Line Chart */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Income vs Expenses Over Time</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-gray-800">Income vs Expenses Over Time</h2>
+                <div className="text-sm text-gray-600">
+                  Current: {getCurrentLineChartRangeLabel()}
+                </div>
+              </div>
+              
+              {/* Date Range Filter Buttons */}
+              <div className="mb-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => handleLineChartDateRange(null)}
+                  className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                    !lineChartDateRange
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  Last 6 Months
+                </button>
+                {Object.keys(getDateRangeOptions()).map((range) => {
+                  const options = getDateRangeOptions()
+                  const rangeData = options[range as keyof typeof options]
+                  const isActive = lineChartDateRange && 
+                    lineChartDateRange.start === rangeData.start && 
+                    lineChartDateRange.end === rangeData.end
+                  
+                  return (
+                    <button
+                      key={range}
+                      onClick={() => handleLineChartDateRange(range)}
+                      className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {range}
+                    </button>
+                  )
+                })}
+              </div>
+              
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={monthlyData}>
