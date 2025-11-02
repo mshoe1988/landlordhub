@@ -404,22 +404,30 @@ export default function DashboardPage() {
       
       // If date range is set, filter payments within range
       if (lineChartDateRange) {
+        // Create payment date at start of month for comparison
         const paymentDate = new Date(payment.year, payment.month - 1, 1)
         const startDate = new Date(lineChartDateRange.start)
+        // Set end date to end of month for proper comparison
         const endDate = new Date(lineChartDateRange.end)
+        endDate.setHours(23, 59, 59, 999) // Set to end of day for comparison
         
-        if (paymentDate < startDate || paymentDate > endDate) {
+        // Check if payment month is within the range
+        // Compare at month level: payment month must be >= start month and <= end month
+        const paymentMonthStart = new Date(payment.year, payment.month - 1, 1)
+        const paymentMonthEnd = new Date(payment.year, payment.month, 0, 23, 59, 59, 999)
+        
+        if (paymentMonthEnd < startDate || paymentMonthStart > endDate) {
           return // Skip payments outside the range
         }
       }
       
-      const existingMonth = monthlyMap.get(monthKey)
-      if (existingMonth) {
-        existingMonth.income += payment.amount
-      } else {
-        // If month not in map, add it
-        monthlyMap.set(monthKey, { income: payment.amount, expenses: 0 })
+      // Ensure the month is in the map (add it if not already there)
+      if (!monthlyMap.has(monthKey)) {
+        monthlyMap.set(monthKey, { income: 0, expenses: 0 })
       }
+      
+      const existingMonth = monthlyMap.get(monthKey)!
+      existingMonth.income += payment.amount
     })
     
     const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
