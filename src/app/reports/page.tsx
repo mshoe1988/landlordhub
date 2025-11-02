@@ -368,6 +368,40 @@ export default function ReportsPage() {
     )
   }
 
+  // Get consistent color for a category name
+  const getCategoryColor = (categoryName: string): string => {
+    // Predefined colors for common categories
+    const categoryColorMap: Record<string, string> = {
+      'Maintenance': '#3b82f6',      // Blue
+      'Repairs': '#ef4444',           // Red
+      'Utilities': '#10b981',        // Green
+      'Insurance': '#f59e0b',         // Yellow/Orange
+      'Property Tax': '#8b5cf6',     // Purple
+      'Taxes': '#8b5cf6',            // Purple (alternative name)
+      'HOA Fees': '#06b6d4',         // Cyan
+      'Lawn Care': '#84cc16',        // Lime
+      'Pest Control': '#f97316',    // Orange
+      'Legal Fees': '#ec4899',       // Pink
+      'Legal': '#ec4899',            // Pink (alternative name)
+      'Marketing': '#14b8a6',        // Teal
+      'Management Fees': '#6366f1',  // Indigo
+      'Other': '#64748b'             // Gray
+    }
+    
+    // If category has a predefined color, use it
+    if (categoryColorMap[categoryName]) {
+      return categoryColorMap[categoryName]
+    }
+    
+    // For unknown categories, generate a consistent color using hash
+    const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#14b8a6', '#6366f1', '#64748b']
+    let hash = 0
+    for (let i = 0; i < categoryName.length; i++) {
+      hash = categoryName.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return colors[Math.abs(hash) % colors.length]
+  }
+
   const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
 
   if (loading) {
@@ -549,7 +583,7 @@ export default function ReportsPage() {
                       dataKey="value"
                     >
                       {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name)} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
