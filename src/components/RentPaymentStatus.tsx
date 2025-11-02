@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { markRentAsPaid, markRentAsUnpaid, getRentPayment, markMultipleMonthsAsPaid } from '@/lib/database'
 import { RentPayment, Property } from '@/lib/types'
 import { CheckCircle2, XCircle, Loader2, Calendar } from 'lucide-react'
@@ -25,11 +25,17 @@ export default function RentPaymentStatus({
 
   const [updating, setUpdating] = useState(false)
   const [showBulkPaymentModal, setShowBulkPaymentModal] = useState(false)
+  const [showProratedModal, setShowProratedModal] = useState(false)
   const [bulkStartMonth, setBulkStartMonth] = useState(currentMonth)
   const [bulkStartYear, setBulkStartYear] = useState(currentYear)
   const [bulkEndMonth, setBulkEndMonth] = useState(currentMonth)
   const [bulkEndYear, setBulkEndYear] = useState(currentYear)
   const [processingBulk, setProcessingBulk] = useState(false)
+  const [proratedMoveInDate, setProratedMoveInDate] = useState('')
+  const [proratedMoveOutDate, setProratedMoveOutDate] = useState('')
+  const [proratedDays, setProratedDays] = useState('')
+  const [proratedAmount, setProratedAmount] = useState('')
+  const [processingProrated, setProcessingProrated] = useState(false)
 
   const isPaid = currentPayment?.status === 'paid'
   const isPartial = currentPayment?.status === 'partial'
@@ -136,6 +142,83 @@ export default function RentPaymentStatus({
     return monthsCount * property.monthly_rent
   }
 
+  // Calculate prorated rent based on move-in or move-out date
+  const calculateProratedRent = () => {
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate()
+    let daysCovered = daysInMonth
+
+    if (proratedMoveInDate) {
+      // Move-in mid-month: calculate days from move-in to end of month
+      const moveIn = new Date(proratedMoveInDate)
+      if (moveIn.getMonth() + 1 === currentMonth && moveIn.getFullYear() === currentYear) {
+        daysCovered = daysInMonth - moveIn.getDate() + 1 // Include move-in day
+      }
+    } else if (proratedMoveOutDate) {
+      // Move-out mid-month: calculate days from start of month to move-out
+      const moveOut = new Date(proratedMoveOutDate)
+      if (moveOut.getMonth() + 1 === currentMonth && moveOut.getFullYear() === currentYear) {
+        daysCovered = moveOut.getDate() // Days from 1st to move-out date (inclusive)
+      }
+    } else if (proratedDays) {
+      // Manual days entry
+      daysCovered = parseInt(proratedDays)
+    }
+
+    // Calculate prorated amount: (monthly_rent / days_in_month) * days_covered
+    const dailyRate = property.monthly_rent / daysInMonth
+    const amount = dailyRate * daysCovered
+    return { daysCovered, amount: Math.round(amount * 100) / 100 } // Round to 2 decimal places
+  }
+
+  const handleProratedPayment = async () => {
+    const { daysCovered, amount } = calculateProratedRent()
+
+    if (daysCovered <= 0 || daysCovered > 31) {
+      alert('Please enter valid days covered (1-31)')
+      return
+    }
+
+    if (amount <= 0) {
+      alert('Calculated amount must be greater than 0')
+      return
+    }
+
+    setProcessingProrated(true)
+    try {
+      await markRentAsPaid(
+        userId,
+        property.id,
+        currentMonth,
+        currentYear,
+        amount,
+        new Date().toISOString().split('T')[0],
+        `Prorated rent for ${daysCovered} days${proratedMoveInDate ? ` (moved in ${proratedMoveInDate})` : ''}${proratedMoveOutDate ? ` (moved out ${proratedMoveOutDate})` : ''}`,
+        daysCovered,
+        proratedMoveInDate || undefined,
+        proratedMoveOutDate || undefined
+      )
+      setShowProratedModal(false)
+      setProratedMoveInDate('')
+      setProratedMoveOutDate('')
+      setProratedDays('')
+      setProratedAmount('')
+      onPaymentUpdate?.()
+    } catch (error) {
+      console.error('Error processing prorated payment:', error)
+      alert('Failed to process prorated payment')
+    } finally {
+      setProcessingProrated(false)
+    }
+  }
+
+  // Update prorated amount when dates or days change
+  useEffect(() => {
+    if (proratedMoveInDate || proratedMoveOutDate || proratedDays) {
+      const { daysCovered, amount } = calculateProratedRent()
+      setProratedAmount(amount.toFixed(2))
+    }
+  }, [proratedMoveInDate, proratedMoveOutDate, proratedDays, currentMonth, currentYear, property.monthly_rent])
+
   return (
     <>
       <div className="flex items-center gap-3">
@@ -185,6 +268,15 @@ export default function RentPaymentStatus({
         >
           <Calendar className="h-3.5 w-3.5" />
           Pay Multiple
+        </button>
+        <button
+          onClick={() => setShowProratedModal(true)}
+          disabled={updating}
+          className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors bg-purple-100 text-purple-700 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+          title="Record prorated rent (move-in/out mid-month)"
+        >
+          <Calendar className="h-3.5 w-3.5" />
+          Prorated
         </button>
       </div>
 
@@ -275,6 +367,136 @@ export default function RentPaymentStatus({
               <button
                 onClick={() => setShowBulkPaymentModal(false)}
                 disabled={processingBulk}
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Prorated Payment Modal */}
+      {showProratedModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Record Prorated Rent</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              For {monthNames[currentMonth - 1]} {currentYear} • Monthly Rent: ${property.monthly_rent.toLocaleString()}
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Move-In Date (optional)
+                </label>
+                <input
+                  type="date"
+                  value={proratedMoveInDate}
+                  onChange={(e) => {
+                    setProratedMoveInDate(e.target.value)
+                    setProratedMoveOutDate('') // Clear move-out if move-in is set
+                    setProratedDays('') // Clear manual days entry
+                  }}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+                  max={`${currentYear}-${String(currentMonth).padStart(2, '0')}-31`}
+                  min={`${currentYear}-${String(currentMonth).padStart(2, '0')}-01`}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Tenant moved in mid-month (calculates from move-in to end of month)
+                </p>
+              </div>
+
+              <div className="text-center text-sm text-gray-500">OR</div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Move-Out Date (optional)
+                </label>
+                <input
+                  type="date"
+                  value={proratedMoveOutDate}
+                  onChange={(e) => {
+                    setProratedMoveOutDate(e.target.value)
+                    setProratedMoveInDate('') // Clear move-in if move-out is set
+                    setProratedDays('') // Clear manual days entry
+                  }}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+                  max={`${currentYear}-${String(currentMonth).padStart(2, '0')}-31`}
+                  min={`${currentYear}-${String(currentMonth).padStart(2, '0')}-01`}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Tenant moved out mid-month (calculates from start of month to move-out)
+                </p>
+              </div>
+
+              <div className="text-center text-sm text-gray-500">OR</div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Days Covered (manual entry)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="31"
+                  value={proratedDays}
+                  onChange={(e) => {
+                    setProratedDays(e.target.value)
+                    setProratedMoveInDate('')
+                    setProratedMoveOutDate('')
+                  }}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+                  placeholder="Enter days covered (1-31)"
+                />
+              </div>
+
+              <div className="bg-purple-50 rounded p-4 border border-purple-200">
+                <div className="text-sm text-gray-700 mb-2">
+                  <div className="font-medium">Calculation:</div>
+                  {proratedDays || proratedMoveInDate || proratedMoveOutDate ? (
+                    <>
+                      <div className="mt-1">
+                        Days Covered: {calculateProratedRent().daysCovered}
+                      </div>
+                      <div className="mt-1">
+                        Daily Rate: ${(property.monthly_rent / new Date(currentYear, currentMonth, 0).getDate()).toFixed(2)}
+                      </div>
+                      <div className="font-semibold text-purple-800 mt-2 text-base">
+                        Prorated Amount: ${calculateProratedRent().amount.toFixed(2)}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-500">Enter move-in date, move-out date, or days covered to calculate</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleProratedPayment}
+                disabled={processingProrated || (!proratedMoveInDate && !proratedMoveOutDate && !proratedDays)}
+                className="flex-1 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {processingProrated ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Mark as Paid'
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setShowProratedModal(false)
+                  setProratedMoveInDate('')
+                  setProratedMoveOutDate('')
+                  setProratedDays('')
+                  setProratedAmount('')
+                }}
+                disabled={processingProrated}
                 className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel

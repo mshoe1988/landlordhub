@@ -497,19 +497,35 @@ export const markRentAsPaid = async (
   year: number,
   amount: number,
   paymentDate?: string,
-  notes?: string
+  notes?: string,
+  daysCovered?: number,
+  moveInDate?: string,
+  moveOutDate?: string
 ): Promise<RentPayment> => {
   // Check if payment record exists
   const existing = await getRentPayment(userId, propertyId, month, year)
 
+  const paymentData: any = {
+    status: 'paid',
+    amount,
+    payment_date: paymentDate || new Date().toISOString().split('T')[0],
+    notes
+  }
+
+  // Add proration fields if provided
+  if (daysCovered !== undefined) {
+    paymentData.days_covered = daysCovered
+  }
+  if (moveInDate) {
+    paymentData.move_in_date = moveInDate
+  }
+  if (moveOutDate) {
+    paymentData.move_out_date = moveOutDate
+  }
+
   if (existing) {
     // Update existing record
-    return updateRentPayment(existing.id, {
-      status: 'paid',
-      amount,
-      payment_date: paymentDate || new Date().toISOString().split('T')[0],
-      notes
-    })
+    return updateRentPayment(existing.id, paymentData)
   } else {
     // Create new payment record
     return createRentPayment({
@@ -517,10 +533,7 @@ export const markRentAsPaid = async (
       property_id: propertyId,
       month,
       year,
-      amount,
-      status: 'paid',
-      payment_date: paymentDate || new Date().toISOString().split('T')[0],
-      notes
+      ...paymentData
     })
   }
 }

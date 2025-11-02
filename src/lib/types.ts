@@ -76,6 +76,9 @@ export interface RentPayment {
   status: 'paid' | 'unpaid' | 'partial'
   payment_date?: string
   notes?: string
+  days_covered?: number
+  move_in_date?: string
+  move_out_date?: string
   created_at: string
   updated_at: string
 }
