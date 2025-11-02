@@ -21,10 +21,12 @@ interface CollectionStatusData {
 export default function RentCollectionStatusChart({ properties, rentPayments }: RentCollectionStatusChartProps) {
   const [selectedSegment, setSelectedSegment] = useState<'Paid' | 'Pending' | 'Late' | null>(null)
   const [chartType, setChartType] = useState<'bar' | 'donut'>('donut')
-
+  
   const now = new Date()
-  const currentMonth = now.getMonth() + 1
-  const currentYear = now.getFullYear()
+  const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth() + 1)
+  const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear())
+
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
   // Calculate collection status
   const calculateCollectionStatus = (): CollectionStatusData[] => {
@@ -42,11 +44,17 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
     const pending: Array<{ property: string; tenant: string; amount: number }> = []
     const late: Array<{ property: string; tenant: string; amount: number }> = []
 
+    // Determine if the selected month is in the past or future for "Late" calculation
+    const isSelectedMonthPast = selectedYear < now.getFullYear() || 
+      (selectedYear === now.getFullYear() && selectedMonth < now.getMonth() + 1)
+    const isSelectedMonthCurrent = selectedYear === now.getFullYear() && selectedMonth === now.getMonth() + 1
+    const selectedMonthDate = new Date(selectedYear, selectedMonth - 1, 1)
+
     propertiesWithTenants.forEach(property => {
       const payment = rentPayments.find(
         p => p.property_id === property.id && 
-        p.month === currentMonth && 
-        p.year === currentYear
+        p.month === selectedMonth && 
+        p.year === selectedYear
       )
 
       const tenantInfo = {
@@ -58,8 +66,25 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
       if (payment?.status === 'paid') {
         paid.push(tenantInfo)
       } else {
-        // Check if late (past due date)
-        const isLate = property.rent_due_date && now.getDate() > property.rent_due_date
+        // Check if late
+        // For current or past months: check if past due date
+        // For future months: everything is pending
+        let isLate = false
+        if (isSelectedMonthPast || isSelectedMonthCurrent) {
+          // For past months, check if past due date in that month
+          const dueDateInSelectedMonth = property.rent_due_date || 1
+          const lastDayOfSelectedMonth = new Date(selectedYear, selectedMonth, 0).getDate()
+          const dueDateToCheck = Math.min(dueDateInSelectedMonth, lastDayOfSelectedMonth)
+          
+          if (isSelectedMonthPast) {
+            // Past month: if no payment, it's late
+            isLate = true
+          } else if (isSelectedMonthCurrent) {
+            // Current month: check if today is past due date
+            isLate = property.rent_due_date ? now.getDate() > property.rent_due_date : false
+          }
+        }
+        
         if (isLate) {
           late.push(tenantInfo)
         } else {
@@ -153,38 +178,78 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
   }
 
   const totalUnits = statusData.reduce((sum, s) => sum + s.count, 0)
-  const monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const monthName = new Date(selectedYear, selectedMonth - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+
+  // Generate year options (current year - 2 to current year + 1)
+  const getYearOptions = () => {
+    const years = []
+    const currentYear = now.getFullYear()
+    for (let i = currentYear - 2; i <= currentYear + 1; i++) {
+      years.push(i)
+    }
+    return years
+  }
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <div>
+        <div className="flex-1">
           <h2 className="text-xl font-bold text-gray-800">Rent Collection Status</h2>
-          <p className="text-sm text-gray-600 mt-1">{monthName}</p>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setChartType('bar')}
-            className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-              chartType === 'bar'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Bar
-          </button>
-          <button
-            onClick={() => setChartType('donut')}
-            className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-              chartType === 'donut'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Donut
-          </button>
+        <div className="flex gap-2 items-center">
+          {/* Month/Year Selector */}
+          <div className="flex gap-2">
+            <select
+              value={selectedMonth}
+              onChange={(e) => {
+                setSelectedMonth(parseInt(e.target.value))
+                setSelectedSegment(null) // Clear selection when changing month
+              }}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
+            >
+              {monthNames.map((name, index) => (
+                <option key={index + 1} value={index + 1}>{name}</option>
+              ))}
+            </select>
+            <select
+              value={selectedYear}
+              onChange={(e) => {
+                setSelectedYear(parseInt(e.target.value))
+                setSelectedSegment(null) // Clear selection when changing year
+              }}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
+            >
+              {getYearOptions().map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+          {/* Chart Type Toggle */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setChartType('bar')}
+              className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                chartType === 'bar'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              Bar
+            </button>
+            <button
+              onClick={() => setChartType('donut')}
+              className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                chartType === 'donut'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              Donut
+            </button>
+          </div>
         </div>
       </div>
+      <p className="text-sm text-gray-600 mb-4">{monthName}</p>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
