@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     // Get user's subscription to find customer ID
     const { data: subscription, error: subError } = await supabase
       .from('subscriptions')
-      .select('stripe_customer_id, plan, status')
+      .select('stripe_customer_id, stripe_subscription_id, plan, status')
       .eq('user_id', user.id)
       .maybeSingle()
 
