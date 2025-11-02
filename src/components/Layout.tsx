@@ -138,14 +138,16 @@ export default function Layout({ children }: LayoutProps) {
                   key={item.name}
                   href={item.href}
                   data-active={isActive}
-                  className={`py-4 px-2 border-b-2 font-medium transition-colors relative ${
+                  className={`py-4 border-b-2 font-medium transition-colors relative ${
+                    item.isProFeature ? 'px-2 pr-8' : 'px-2'
+                  } ${
                     isActive ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   <Icon className="inline w-5 h-5 mr-2" />
                   {item.name}
                   {item.isProFeature && (
-                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">
+                    <span className="absolute -top-1 right-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap">
                       PRO
                     </span>
                   )}
