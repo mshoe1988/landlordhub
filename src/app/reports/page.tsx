@@ -225,6 +225,47 @@ export default function ReportsPage() {
     return result
   }
 
+  // Calculate monthly net income trend
+  const calculateMonthlyNetIncomeTrend = (): MonthlyNetIncomeData[] => {
+    const monthlyMap = new Map<string, { income: number; expenses: number }>()
+    const now = new Date()
+    
+    // Initialize last 12 months including current month
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const monthKey = date.toISOString().slice(0, 7) // YYYY-MM
+      monthlyMap.set(monthKey, { income: 0, expenses: 0 })
+    }
+    
+    // Add income from actual paid rent payments
+    const paidPayments = rentPayments.filter(payment => payment.status === 'paid')
+    paidPayments.forEach(payment => {
+      const monthKey = `${payment.year}-${String(payment.month).padStart(2, '0')}`
+      const current = monthlyMap.get(monthKey)
+      if (current) {
+        current.income += payment.amount
+      }
+    })
+    
+    // Add expenses by month
+    expenses.forEach(expense => {
+      const expenseDate = new Date(expense.date)
+      const monthKey = expenseDate.toISOString().slice(0, 7)
+      const current = monthlyMap.get(monthKey)
+      if (current) {
+        current.expenses += expense.amount
+      }
+    })
+    
+    // Calculate net income for each month
+    const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
+      month: new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      netIncome: data.income - data.expenses
+    }))
+    
+    return result
+  }
+
   const calculateTaxSummary = () => {
     const filteredExpenses = getFilteredExpenses()
     
