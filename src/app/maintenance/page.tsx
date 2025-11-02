@@ -276,7 +276,7 @@ export default function MaintenancePage() {
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {tasks
               .sort((a, b) => {
                 // Sort by status first (pending tasks first, then completed)
