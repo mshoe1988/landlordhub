@@ -325,7 +325,7 @@ export default function DashboardPage() {
 
           {/* Rent Payment Status Card */}
           {propertiesWithTenants.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-6">
               <div 
                 className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
                 onClick={() => router.push('/properties')}
@@ -352,20 +352,18 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {overdueRentCount > 0 && (
-                <div 
-                  className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300 aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between col-span-2 md:col-span-1"
-                  onClick={() => router.push('/properties')}
-                >
-                  <div className="flex items-start md:items-center justify-between">
-                    <div className="flex-1">
-                      <p className="text-gray-500 text-base md:text-base font-bold">Overdue Payments</p>
-                      <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
-                    </div>
-                    <AlertCircle className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
+              <div 
+                className={`bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between col-span-2 md:col-span-1 ${overdueRentCount > 0 ? 'border-2 border-red-300' : ''}`}
+                onClick={() => router.push('/properties')}
+              >
+                <div className="flex items-start md:items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-gray-500 text-base md:text-base font-bold">Overdue Payments</p>
+                    <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
                   </div>
+                  <AlertCircle className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
-              )}
+              </div>
             </div>
           )}
 
