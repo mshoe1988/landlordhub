@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { getProperties, getExpenses, getMaintenanceTasks } from '@/lib/database'
-import { Property, Expense, MaintenanceTask } from '@/lib/types'
+import { getProperties, getExpenses, getMaintenanceTasks, getRentPayments } from '@/lib/database'
+import { Property, Expense, MaintenanceTask, RentPayment } from '@/lib/types'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import DateRangeFilter from '@/components/DateRangeFilter'
@@ -48,6 +48,7 @@ export default function ReportsPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [maintenanceTasks, setMaintenanceTasks] = useState<MaintenanceTask[]>([])
+  const [rentPayments, setRentPayments] = useState<RentPayment[]>([])
   const [loading, setLoading] = useState(true)
   const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(null)
 
@@ -59,14 +60,16 @@ export default function ReportsPage() {
 
   const loadData = async () => {
     try {
-      const [propertiesData, expensesData, maintenanceData] = await Promise.all([
+      const [propertiesData, expensesData, maintenanceData, paymentsData] = await Promise.all([
         getProperties(user!.id),
         getExpenses(user!.id),
-        getMaintenanceTasks(user!.id)
+        getMaintenanceTasks(user!.id),
+        getRentPayments(user!.id).catch(() => []) // Load rent payments, but don't fail if table doesn't exist
       ])
       setProperties(propertiesData)
       setExpenses(expensesData)
       setMaintenanceTasks(maintenanceData)
+      setRentPayments(paymentsData)
     } catch (error) {
       console.error('Error loading data:', error)
     } finally {
@@ -88,15 +91,51 @@ export default function ReportsPage() {
   const calculateProfitLoss = (): ProfitLossData[] => {
     const filteredExpenses = getFilteredExpenses()
     
+    // Get current month and year for filtering paid rent
+    const now = new Date()
+    const currentMonth = now.getMonth() + 1 // 1-12
+    const currentYear = now.getFullYear()
+    
     return properties.map(property => {
       const propertyExpenses = filteredExpenses.filter(expense => expense.property_id === property.id)
       const totalExpenses = propertyExpenses.reduce((sum, expense) => sum + expense.amount, 0)
-      const netIncome = property.monthly_rent - totalExpenses
+      
+      // Calculate actual paid rent for this property (all time or filtered period)
+      // If date range is set, filter payments within range, otherwise use all paid payments
+      let actualPaidRent = 0
+      if (dateRange) {
+        const startDate = new Date(dateRange.start)
+        const endDate = new Date(dateRange.end)
+        
+        actualPaidRent = rentPayments
+          .filter(payment => 
+            payment.property_id === property.id &&
+            payment.status === 'paid'
+          )
+          .filter(payment => {
+            // Create date from payment year and month
+            const paymentDate = new Date(payment.year, payment.month - 1, 1)
+            return paymentDate >= startDate && paymentDate <= endDate
+          })
+          .reduce((sum, payment) => sum + payment.amount, 0)
+      } else {
+        // If no date range, show all paid rent for this property
+        actualPaidRent = rentPayments
+          .filter(payment => 
+            payment.property_id === property.id &&
+            payment.status === 'paid'
+          )
+          .reduce((sum, payment) => sum + payment.amount, 0)
+      }
+      
+      // Use actual paid rent if available, otherwise fallback to monthly rent
+      const incomeAmount = actualPaidRent > 0 ? actualPaidRent : property.monthly_rent
+      const netIncome = incomeAmount - totalExpenses
       const roi = property.monthly_rent > 0 ? (netIncome / property.monthly_rent) * 100 : 0
       
       return {
         property: property.address,
-        monthlyRent: property.monthly_rent,
+        monthlyRent: incomeAmount, // Show actual paid rent
         totalExpenses,
         netIncome,
         roi
@@ -127,9 +166,6 @@ export default function ReportsPage() {
     const allExpenses = expenses
     const monthlyMap = new Map<string, { income: number; expenses: number }>()
     
-    console.log('Properties:', properties)
-    console.log('All expenses for monthly data:', allExpenses)
-    
     // Initialize last 6 months including current month
     const now = new Date()
     for (let i = 5; i >= 0; i--) {
@@ -145,28 +181,20 @@ export default function ReportsPage() {
       const current = monthlyMap.get(monthKey)
       if (current) {
         current.expenses += expense.amount
-        console.log(`Added expense ${expense.amount} to ${monthKey}`)
       }
     })
     
-    // Add income from properties (only from when they were created)
-    properties.forEach(property => {
-      console.log(`Property: ${property.address}, Monthly rent: ${property.monthly_rent}, Created: ${property.created_at}`)
-      
-      // Get the creation month
-      const createdDate = new Date(property.created_at)
-      const createdMonth = createdDate.toISOString().slice(0, 7) // YYYY-MM
-      console.log(`Property created in month: ${createdMonth}`)
-      
-      monthlyMap.forEach((value, monthKey) => {
-        // Only add income from the month the property was created onwards
-        if (monthKey >= createdMonth) {
-          value.income += property.monthly_rent
-          console.log(`Added income ${property.monthly_rent} to ${monthKey} (property created in ${createdMonth})`)
-        } else {
-          console.log(`Skipped income for ${monthKey} (property created in ${createdMonth})`)
-        }
-      })
+    // Add income from actual rent payments that are marked as paid
+    // Only count payments that have status === 'paid'
+    const paidPayments = rentPayments.filter(payment => payment.status === 'paid')
+    
+    paidPayments.forEach(payment => {
+      // Create month key from payment year and month (1-12)
+      const monthKey = `${payment.year}-${String(payment.month).padStart(2, '0')}`
+      const current = monthlyMap.get(monthKey)
+      if (current) {
+        current.income += payment.amount
+      }
     })
     
     const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
@@ -175,13 +203,18 @@ export default function ReportsPage() {
       expenses: data.expenses
     }))
     
-    console.log('Monthly data result:', result)
     return result
   }
 
   const calculateTaxSummary = () => {
     const filteredExpenses = getFilteredExpenses()
-    const totalIncome = properties.reduce((sum, property) => sum + property.monthly_rent, 0)
+    
+    // Calculate total income from actual paid rent payments
+    // Sum all paid payments regardless of date for YTD calculation
+    const totalIncome = rentPayments
+      .filter(payment => payment.status === 'paid')
+      .reduce((sum, payment) => sum + payment.amount, 0)
+    
     const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0)
     const netTaxableIncome = totalIncome - totalExpenses
     
