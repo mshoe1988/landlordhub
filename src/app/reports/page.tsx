@@ -140,8 +140,8 @@ export default function ReportsPage() {
           .reduce((sum, payment) => sum + payment.amount, 0)
       }
       
-      // Use actual paid rent if available, otherwise fallback to monthly rent
-      const incomeAmount = actualPaidRent > 0 ? actualPaidRent : property.monthly_rent
+      // Use actual paid rent if available, otherwise show $0
+      const incomeAmount = actualPaidRent > 0 ? actualPaidRent : 0
       const netIncome = incomeAmount - totalExpenses
       const roi = property.monthly_rent > 0 ? (netIncome / property.monthly_rent) * 100 : 0
       
