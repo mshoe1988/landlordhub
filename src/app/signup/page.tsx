@@ -91,13 +91,16 @@ export default function SignupPage() {
               alt="LandlordHub Logo"
               width={600}
               height={240}
-              className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+              className="w-auto h-auto max-w-[280px] sm:max-w-[350px] md:max-w-[450px] lg:max-w-[600px] drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
               priority
               quality={100}
+              unoptimized
               style={{ 
                 background: 'transparent !important',
                 backgroundColor: 'transparent !important',
-                backgroundImage: 'none !important'
+                backgroundImage: 'none !important',
+                maxWidth: '100%',
+                height: 'auto'
               }}
             />
             </div>

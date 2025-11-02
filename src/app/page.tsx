@@ -45,9 +45,17 @@ export default function Home() {
                 alt="LandlordHub Logo"
                 width={600}
                 height={240}
-                className="mr-3 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                className="mr-3 w-auto h-auto max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[400px] drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
                 priority
                 quality={100}
+                unoptimized
+                style={{ 
+                  background: 'transparent !important',
+                  backgroundColor: 'transparent !important',
+                  backgroundImage: 'none !important',
+                  maxWidth: '100%',
+                  height: 'auto'
+                }}
               />
             </div>
             {/* Removed header Sign In/Sign Up to avoid duplication with hero CTAs */}
@@ -64,13 +72,16 @@ export default function Home() {
               alt="LandlordHub Logo"
               width={700}
               height={280}
-              className="drop-shadow-[0_0_12px_rgba(255,255,255,0.9)]"
+              className="w-auto h-auto max-w-[280px] sm:max-w-[350px] md:max-w-[450px] lg:max-w-[700px] drop-shadow-[0_0_12px_rgba(255,255,255,0.9)]"
               priority
               quality={100}
+              unoptimized
               style={{ 
                 background: 'transparent !important',
                 backgroundColor: 'transparent !important',
-                backgroundImage: 'none !important'
+                backgroundImage: 'none !important',
+                maxWidth: '100%',
+                height: 'auto'
               }}
             />
           </div>
