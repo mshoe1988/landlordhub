@@ -19,7 +19,6 @@ import {
   Users
 } from 'lucide-react'
 import HelpModal from './HelpModal'
-import PlanChangeBanner from './PlanChangeBanner'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -169,9 +168,6 @@ export default function Layout({ children }: LayoutProps) {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {children}
       </div>
-
-      {/* Plan change banner */}
-      <PlanChangeBanner />
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-6 mt-12">
