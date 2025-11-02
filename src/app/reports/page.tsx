@@ -487,9 +487,13 @@ export default function ReportsPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={monthlyNetIncomeTrend}>
                     <defs>
-                      <linearGradient id="colorNetIncome" x1="0" y1="0" x2="0" y2="1">
+                      <linearGradient id="colorNetIncomePositive" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorNetIncomeNegative" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -504,19 +508,15 @@ export default function ReportsPage() {
                         borderRadius: '8px'
                       }}
                     />
+                    {/* Positive area */}
                     <Area
                       type="monotone"
                       dataKey="netIncome"
                       stroke="#10b981"
                       fillOpacity={1}
-                      fill="url(#colorNetIncome)"
+                      fill="url(#colorNetIncomePositive)"
                       strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="netIncome"
-                      stroke="#10b981"
-                      strokeWidth={3}
+                      strokeDasharray=""
                       dot={(props: any) => {
                         const { cx, cy, payload } = props
                         const color = payload.netIncome < 0 ? '#ef4444' : '#10b981'
@@ -524,6 +524,16 @@ export default function ReportsPage() {
                           <circle cx={cx} cy={cy} r={5} fill={color} stroke={color} strokeWidth={2} />
                         )
                       }}
+                    />
+                    {/* Zero line reference */}
+                    <Line
+                      type="linear"
+                      dataKey={() => 0}
+                      stroke="#9ca3af"
+                      strokeWidth={1}
+                      strokeDasharray="5 5"
+                      dot={false}
+                      legendType="none"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
