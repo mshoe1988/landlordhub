@@ -313,6 +313,7 @@ export default function ReportsPage() {
     )
   }
 
+  // Calculate chart data
   const profitLossData = calculateProfitLoss()
   const categoryData = calculateCategoryData()
   const monthlyData = calculateMonthlyData()
