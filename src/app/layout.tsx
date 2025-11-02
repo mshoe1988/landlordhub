@@ -22,6 +22,18 @@ export const metadata: Metadata = {
   description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
   keywords: "property management, rental properties, landlord, real estate, tax reporting, expense tracking",
   authors: [{ name: "LandlordHub" }],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-16.ico', sizes: '16x16', type: 'image/x-icon' },
+      { url: '/favicon-32.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/Favicon.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/Favicon.png' },
+    ],
+  },
   openGraph: {
     title: "LandlordHub: Simplify Life. Maximize Rentals.",
     description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
