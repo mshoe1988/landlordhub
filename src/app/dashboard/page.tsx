@@ -276,7 +276,7 @@ export default function DashboardPage() {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-gray-500 text-sm md:text-sm">Total Properties</p>
+                  <p className="text-gray-500 text-base md:text-base font-bold">Total Properties</p>
                   <p className="text-3xl md:text-3xl font-bold text-gray-800 mt-1">{properties.length}</p>
                 </div>
                 <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
@@ -289,7 +289,7 @@ export default function DashboardPage() {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-gray-500 text-sm md:text-sm">Monthly Rent</p>
+                  <p className="text-gray-500 text-base md:text-base font-bold">Monthly Rent</p>
                   <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">${totalMonthlyRent.toLocaleString()}</p>
                 </div>
                 <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
@@ -302,7 +302,7 @@ export default function DashboardPage() {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-gray-500 text-sm md:text-sm">This Month's Expenses</p>
+                  <p className="text-gray-500 text-base md:text-base font-bold">This Month's Expenses</p>
                   <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
                 </div>
                 <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
@@ -315,7 +315,7 @@ export default function DashboardPage() {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-gray-500 text-sm md:text-sm">Upcoming Tasks</p>
+                  <p className="text-gray-500 text-base md:text-base font-bold">Upcoming Tasks</p>
                   <p className="text-3xl md:text-3xl font-bold text-orange-600 mt-1">{upcomingTasks}</p>
                 </div>
                 <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
@@ -332,7 +332,7 @@ export default function DashboardPage() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-500 text-sm md:text-sm">Rent Paid This Month</p>
+                    <p className="text-gray-500 text-base md:text-base font-bold">Rent Paid This Month</p>
                     <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">{paidRentCount}/{propertiesWithTenants.length}</p>
                   </div>
                   <CheckCircle2 className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
@@ -345,7 +345,7 @@ export default function DashboardPage() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-500 text-sm md:text-sm">Rent Unpaid</p>
+                    <p className="text-gray-500 text-base md:text-base font-bold">Rent Unpaid</p>
                     <p className="text-3xl md:text-3xl font-bold text-gray-600 mt-1">{unpaidRentCount}</p>
                   </div>
                   <XCircle className="w-8 h-8 md:w-12 md:h-12 text-gray-500 opacity-20 flex-shrink-0 ml-2" />
@@ -359,7 +359,7 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="text-gray-500 text-sm md:text-sm">Overdue Payments</p>
+                      <p className="text-gray-500 text-base md:text-base font-bold">Overdue Payments</p>
                       <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
                     </div>
                     <AlertCircle className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
