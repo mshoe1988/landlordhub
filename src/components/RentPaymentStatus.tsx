@@ -221,7 +221,7 @@ export default function RentPaymentStatus({
 
   return (
     <>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium ${getStatusColor()}`}>
           {isPaid ? (
             <CheckCircle2 className="h-4 w-4" />
@@ -230,54 +230,59 @@ export default function RentPaymentStatus({
           )}
           <span>{getStatusText()}</span>
           {currentPayment?.payment_date && (
-            <span className="text-xs opacity-75 ml-1">
+            <span className="text-xs opacity-75 ml-1 hidden sm:inline">
               ({currentPayment.payment_date})
             </span>
           )}
         </div>
-        <button
-          onClick={handleTogglePayment}
-          disabled={updating}
-          className={`
-            px-3 py-1.5 text-sm font-medium rounded-md transition-colors
-            ${isPaid
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              : 'bg-green-100 text-green-700 hover:bg-green-200'
-            }
-            disabled:opacity-50 disabled:cursor-not-allowed
-            flex items-center gap-1.5
-          `}
-          title={isPaid ? 'Mark as unpaid' : 'Mark as paid'}
-        >
-          {updating ? (
-            <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              <span>Updating...</span>
-            </>
-          ) : (
-            <>
-              {isPaid ? 'Mark Unpaid' : 'Mark Paid'}
-            </>
-          )}
-        </button>
-        <button
-          onClick={() => setShowBulkPaymentModal(true)}
-          disabled={updating}
-          className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
-          title="Pay multiple months at once"
-        >
-          <Calendar className="h-3.5 w-3.5" />
-          Pay Multiple
-        </button>
-        <button
-          onClick={() => setShowProratedModal(true)}
-          disabled={updating}
-          className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors bg-purple-100 text-purple-700 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
-          title="Record prorated rent (move-in/out mid-month)"
-        >
-          <Calendar className="h-3.5 w-3.5" />
-          Prorated
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleTogglePayment}
+            disabled={updating}
+            className={`
+              px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors
+              ${isPaid
+                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+              }
+              disabled:opacity-50 disabled:cursor-not-allowed
+              flex items-center gap-1 sm:gap-1.5
+            `}
+            title={isPaid ? 'Mark as unpaid' : 'Mark as paid'}
+          >
+            {updating ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span className="hidden sm:inline">Updating...</span>
+              </>
+            ) : (
+              <>
+                <span className="hidden sm:inline">{isPaid ? 'Mark Unpaid' : 'Mark Paid'}</span>
+                <span className="sm:hidden">{isPaid ? 'Unpaid' : 'Paid'}</span>
+              </>
+            )}
+          </button>
+          <button
+            onClick={() => setShowBulkPaymentModal(true)}
+            disabled={updating}
+            className="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 sm:gap-1.5"
+            title="Pay multiple months at once"
+          >
+            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="hidden sm:inline">Pay Multiple</span>
+            <span className="sm:hidden">Multiple</span>
+          </button>
+          <button
+            onClick={() => setShowProratedModal(true)}
+            disabled={updating}
+            className="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors bg-purple-100 text-purple-700 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 sm:gap-1.5"
+            title="Record prorated rent (move-in/out mid-month)"
+          >
+            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="hidden sm:inline">Prorated</span>
+            <span className="sm:hidden">Prorated</span>
+          </button>
+        </div>
       </div>
 
       {/* Bulk Payment Modal */}
