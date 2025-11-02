@@ -104,13 +104,13 @@ export default function Layout({ children }: LayoutProps) {
       {/* Header */}
       <div className="text-white p-4 md:p-6 shadow-lg" style={{ backgroundColor: '#DFE9F7' }}>
         <div className="flex items-center justify-center">
-          <Link href="/dashboard" className="hover:opacity-90 transition-opacity w-full max-w-full flex justify-center">
+          <Link href="/dashboard" className="hover:opacity-90 transition-opacity inline-block">
             <Image
               src="/landlord-hub-logo.svg?v=21"
               alt="LandlordHub Logo"
               width={650}
               height={260}
-              className="w-full max-w-[280px] md:max-w-[400px] lg:max-w-[650px] h-auto drop-shadow-[0_0_15px_rgba(255,255,255,1)] drop-shadow-[0_0_30px_rgba(255,255,255,0.6)] cursor-pointer"
+              className="w-[280px] md:w-[400px] lg:w-[650px] h-auto drop-shadow-[0_0_15px_rgba(255,255,255,1)] drop-shadow-[0_0_30px_rgba(255,255,255,0.6)] cursor-pointer"
               priority
               quality={100}
               style={{ 
