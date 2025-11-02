@@ -375,7 +375,7 @@ export default function DashboardPage() {
               <h2 className="text-xl font-bold text-gray-800">Properties Overview</h2>
             </div>
             <div className="p-6">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {properties.map(property => {
                   const propertyExpenses = getExpensesByProperty(property.id)
                   const netForProperty = property.monthly_rent - propertyExpenses
