@@ -269,100 +269,100 @@ export default function DashboardPage() {
       <Layout>
         <div className="space-y-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div 
-              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
               onClick={() => router.push('/properties')}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 text-sm">Total Properties</p>
-                  <p className="text-3xl font-bold text-gray-800 mt-1">{properties.length}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-gray-500 text-xs md:text-sm">Total Properties</p>
+                  <p className="text-2xl md:text-3xl font-bold text-gray-800 mt-1">{properties.length}</p>
                 </div>
-                <Home className="w-12 h-12 text-blue-500 opacity-20" />
+                <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
               onClick={() => router.push('/reports')}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 text-sm">Monthly Rent</p>
-                  <p className="text-3xl font-bold text-green-600 mt-1">${totalMonthlyRent.toLocaleString()}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-gray-500 text-xs md:text-sm">Monthly Rent</p>
+                  <p className="text-2xl md:text-3xl font-bold text-green-600 mt-1">${totalMonthlyRent.toLocaleString()}</p>
                 </div>
-                <DollarSign className="w-12 h-12 text-green-500 opacity-20" />
+                <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
               onClick={() => router.push('/expenses')}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 text-sm">This Month's Expenses</p>
-                  <p className="text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-gray-500 text-xs md:text-sm">This Month's Expenses</p>
+                  <p className="text-2xl md:text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
                 </div>
-                <DollarSign className="w-12 h-12 text-red-500 opacity-20" />
+                <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
               onClick={() => router.push('/maintenance')}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 text-sm">Upcoming Tasks</p>
-                  <p className="text-3xl font-bold text-orange-600 mt-1">{upcomingTasks}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-gray-500 text-xs md:text-sm">Upcoming Tasks</p>
+                  <p className="text-2xl md:text-3xl font-bold text-orange-600 mt-1">{upcomingTasks}</p>
                 </div>
-                <Calendar className="w-12 h-12 text-orange-500 opacity-20" />
+                <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
             </div>
           </div>
 
           {/* Rent Payment Status Card */}
           {propertiesWithTenants.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-6">
               <div 
-                className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
                 onClick={() => router.push('/properties')}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 text-sm">Rent Paid This Month</p>
-                    <p className="text-3xl font-bold text-green-600 mt-1">{paidRentCount}/{propertiesWithTenants.length}</p>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-gray-500 text-xs md:text-sm">Rent Paid This Month</p>
+                    <p className="text-2xl md:text-3xl font-bold text-green-600 mt-1">{paidRentCount}/{propertiesWithTenants.length}</p>
                   </div>
-                  <CheckCircle2 className="w-12 h-12 text-green-500 opacity-20" />
+                  <CheckCircle2 className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
               </div>
               
               <div 
-                className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
                 onClick={() => router.push('/properties')}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 text-sm">Rent Unpaid</p>
-                    <p className="text-3xl font-bold text-gray-600 mt-1">{unpaidRentCount}</p>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-gray-500 text-xs md:text-sm">Rent Unpaid</p>
+                    <p className="text-2xl md:text-3xl font-bold text-gray-600 mt-1">{unpaidRentCount}</p>
                   </div>
-                  <XCircle className="w-12 h-12 text-gray-500 opacity-20" />
+                  <XCircle className="w-8 h-8 md:w-12 md:h-12 text-gray-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
               </div>
 
               {overdueRentCount > 0 && (
                 <div 
-                  className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300"
+                  className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300 aspect-square flex flex-col justify-between col-span-2 md:col-span-1"
                   onClick={() => router.push('/properties')}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-500 text-sm">Overdue Payments</p>
-                      <p className="text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-gray-500 text-xs md:text-sm">Overdue Payments</p>
+                      <p className="text-2xl md:text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
                     </div>
-                    <AlertCircle className="w-12 h-12 text-red-500 opacity-20" />
+                    <AlertCircle className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
                   </div>
                 </div>
               )}
