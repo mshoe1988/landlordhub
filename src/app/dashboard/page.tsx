@@ -490,11 +490,27 @@ export default function DashboardPage() {
         })
         .reduce((sum, expense) => sum + expense.amount, 0)
       
-      // Average monthly expenses (from last 3 months)
-      const averageMonthlyExpenses = lastThreeMonthsExpenses / 3
+      // Count number of months with expenses (for better averaging)
+      const expenseMonths = new Set(
+        expenses
+          .filter(expense => {
+            const expenseDate = new Date(expense.date)
+            const monthsAgo = (now.getFullYear() - expenseDate.getFullYear()) * 12 + 
+                             (now.getMonth() - expenseDate.getMonth())
+            return monthsAgo >= 0 && monthsAgo < 3
+          })
+          .map(expense => {
+            const expenseDate = new Date(expense.date)
+            return `${expenseDate.getFullYear()}-${expenseDate.getMonth()}`
+          })
+      ).size
       
-      // Use current month's expenses if no historical data
-      const projectedExpenses = expenses.length > 0 ? averageMonthlyExpenses : totalExpenses
+      // Average monthly expenses (from last 3 months), or use current month if no historical data
+      const averageMonthlyExpenses = expenseMonths > 0 
+        ? lastThreeMonthsExpenses / expenseMonths 
+        : (totalExpenses > 0 ? totalExpenses : 0)
+      
+      const projectedExpenses = averageMonthlyExpenses || 0
       
       const netCashFlow = projectedIncome - projectedExpenses
       
