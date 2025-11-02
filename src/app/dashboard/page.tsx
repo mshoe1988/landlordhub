@@ -463,7 +463,7 @@ export default function DashboardPage() {
               {maintenance.filter(m => m.status === 'pending').length === 0 ? (
                 <p className="text-gray-500 text-center py-8">No upcoming maintenance tasks</p>
               ) : (
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {maintenance.filter(m => m.status === 'pending').map(task => {
                     const property = properties.find(p => p.id === task.property_id)
                     return (
