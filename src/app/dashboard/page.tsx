@@ -353,7 +353,7 @@ export default function DashboardPage() {
               </div>
 
               <div 
-                className={`bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between col-span-2 md:col-span-1 ${overdueRentCount > 0 ? 'border-2 border-red-300' : ''}`}
+                className={`bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between ${overdueRentCount > 0 ? 'border-2 border-red-300' : ''}`}
                 onClick={() => router.push('/properties')}
               >
                 <div className="flex items-start md:items-center justify-between">
