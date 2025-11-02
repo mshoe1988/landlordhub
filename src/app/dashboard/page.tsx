@@ -396,27 +396,47 @@ export default function DashboardPage() {
     })
     
     // Add income from actual rent payments (only paid payments)
+    console.log('Dashboard: Total rent payments loaded:', allRentPayments.length)
+    console.log('Dashboard: All rent payments:', allRentPayments)
     const paidPayments = allRentPayments.filter(payment => payment.status === 'paid')
+    console.log('Dashboard: Paid rent payments:', paidPayments.length)
+    
+    // Debug logging
+    if (paidPayments.length > 0) {
+      console.log('Dashboard: Processing rent payments for chart:', paidPayments.length, 'paid payments')
+      console.log('Dashboard: Sample payment:', paidPayments[0])
+    } else {
+      console.log('Dashboard: No paid payments found')
+    }
     
     paidPayments.forEach(payment => {
       // Create month key from payment year and month (1-12)
       const monthKey = `${payment.year}-${String(payment.month).padStart(2, '0')}`
       
+      // Debug logging for November 2025
+      if (payment.year === 2025 && payment.month === 11) {
+        console.log('Dashboard: Found November 2025 payment:', payment)
+        console.log('Dashboard: Month key:', monthKey)
+        console.log('Dashboard: Date range:', lineChartDateRange)
+      }
+      
       // If date range is set, filter payments within range
       if (lineChartDateRange) {
-        // Create payment date at start of month for comparison
-        const paymentDate = new Date(payment.year, payment.month - 1, 1)
-        const startDate = new Date(lineChartDateRange.start)
-        // Set end date to end of month for proper comparison
-        const endDate = new Date(lineChartDateRange.end)
-        endDate.setHours(23, 59, 59, 999) // Set to end of day for comparison
+        // Compare at month level: payment month must be within the date range
+        // Extract year-month from date range (YYYY-MM format)
+        const startMonth = lineChartDateRange.start.slice(0, 7) // e.g., "2025-10"
+        const endMonth = lineChartDateRange.end.slice(0, 7) // e.g., "2025-12"
         
-        // Check if payment month is within the range
-        // Compare at month level: payment month must be >= start month and <= end month
-        const paymentMonthStart = new Date(payment.year, payment.month - 1, 1)
-        const paymentMonthEnd = new Date(payment.year, payment.month, 0, 23, 59, 59, 999)
+        // Debug logging for November
+        if (payment.year === 2025 && payment.month === 11) {
+          console.log('Dashboard: Comparing', monthKey, 'with range', startMonth, 'to', endMonth)
+        }
         
-        if (paymentMonthEnd < startDate || paymentMonthStart > endDate) {
+        // Check if payment month is within range
+        if (monthKey < startMonth || monthKey > endMonth) {
+          if (payment.year === 2025 && payment.month === 11) {
+            console.log('Dashboard: November payment filtered out by date range')
+          }
           return // Skip payments outside the range
         }
       }
@@ -427,7 +447,13 @@ export default function DashboardPage() {
       }
       
       const existingMonth = monthlyMap.get(monthKey)!
+      const previousIncome = existingMonth.income
       existingMonth.income += payment.amount
+      
+      // Debug logging
+      if (payment.year === 2025 && payment.month === 11) {
+        console.log('Dashboard: Added payment to November. Previous income:', previousIncome, 'Payment amount:', payment.amount, 'New income:', existingMonth.income)
+      }
     })
     
     const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
