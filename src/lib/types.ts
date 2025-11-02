@@ -3,6 +3,7 @@ export interface Property {
   user_id: string
   address: string
   monthly_rent: number
+  security_deposit?: number
   tenant_name?: string
   tenant_email?: string
   tenant_phone?: string

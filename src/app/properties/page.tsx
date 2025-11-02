@@ -27,6 +27,7 @@ export default function PropertiesPage() {
   const [newProperty, setNewProperty] = useState({
     address: '',
     monthly_rent: '',
+    security_deposit: '',
     tenant_name: '',
     tenant_email: '',
     tenant_phone: '',
@@ -112,6 +113,7 @@ export default function PropertiesPage() {
     setNewProperty({
       address: property.address,
       monthly_rent: property.monthly_rent.toString(),
+      security_deposit: property.security_deposit?.toString() || '',
       tenant_name: property.tenant_name || '',
       tenant_email: property.tenant_email || '',
       tenant_phone: property.tenant_phone || '',
@@ -131,6 +133,7 @@ export default function PropertiesPage() {
       const updatedProperty = await updateProperty(editingProperty.id, {
         address: newProperty.address,
         monthly_rent: parseFloat(newProperty.monthly_rent),
+        security_deposit: newProperty.security_deposit ? parseFloat(newProperty.security_deposit) : undefined,
         tenant_name: newProperty.tenant_name || undefined,
         tenant_email: newProperty.tenant_email || undefined,
         tenant_phone: newProperty.tenant_phone || undefined,
@@ -178,7 +181,7 @@ export default function PropertiesPage() {
         property.id === editingProperty.id ? updatedProperty : property
       ))
       setEditingProperty(null)
-      setNewProperty({ address: '', monthly_rent: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
+      setNewProperty({ address: '', monthly_rent: '', security_deposit: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
       setSelectedDocument(null)
       setDocumentType('Lease')
     } catch (error: any) {
@@ -215,6 +218,7 @@ export default function PropertiesPage() {
         user_id: user!.id,
         address: newProperty.address,
         monthly_rent: parseFloat(newProperty.monthly_rent),
+        security_deposit: newProperty.security_deposit ? parseFloat(newProperty.security_deposit) : undefined,
         tenant_name: newProperty.tenant_name || undefined,
         tenant_email: newProperty.tenant_email || undefined,
         tenant_phone: newProperty.tenant_phone || undefined,
@@ -259,7 +263,7 @@ export default function PropertiesPage() {
       }
       
       setProperties([...properties, property])
-      setNewProperty({ address: '', monthly_rent: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
+      setNewProperty({ address: '', monthly_rent: '', security_deposit: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
       setSelectedDocument(null)
       setDocumentType('Lease')
       setShowAddProperty(false)
@@ -320,6 +324,17 @@ export default function PropertiesPage() {
                     type="number"
                     value={newProperty.monthly_rent}
                     onChange={(e) => setNewProperty({ ...newProperty, monthly_rent: e.target.value })}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-black !text-black"
+                    style={{ color: 'black' }}
+                    placeholder="1200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Security Deposit</label>
+                  <input
+                    type="number"
+                    value={newProperty.security_deposit}
+                    onChange={(e) => setNewProperty({ ...newProperty, security_deposit: e.target.value })}
                     className="w-full border border-gray-300 rounded px-3 py-2 text-black !text-black"
                     style={{ color: 'black' }}
                     placeholder="1200"
@@ -448,7 +463,7 @@ export default function PropertiesPage() {
                   onClick={() => {
                     setShowAddProperty(false)
                     setEditingProperty(null)
-                    setNewProperty({ address: '', monthly_rent: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
+                    setNewProperty({ address: '', monthly_rent: '', security_deposit: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
                     setSelectedDocument(null)
                     setDocumentType('Lease')
                   }}
@@ -473,10 +488,14 @@ export default function PropertiesPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-800">{property.address}</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
                         <div>
                           <p className="text-sm text-gray-500">Monthly Rent</p>
                           <p className="text-lg font-semibold text-green-600">${property.monthly_rent}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Security Deposit</p>
+                          <p className="text-lg font-semibold text-blue-600">{property.security_deposit ? `$${property.security_deposit.toLocaleString()}` : 'N/A'}</p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">Rent Due</p>

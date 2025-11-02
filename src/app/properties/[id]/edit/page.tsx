@@ -24,6 +24,7 @@ export default function EditPropertyPage() {
   const [formData, setFormData] = useState({
     address: '',
     monthly_rent: '',
+    security_deposit: '',
     tenant_name: '',
     lease_end_date: '',
     lease_start_date: '',
@@ -45,6 +46,7 @@ export default function EditPropertyPage() {
         setFormData({
           address: property.address,
           monthly_rent: property.monthly_rent.toString(),
+          security_deposit: property.security_deposit?.toString() || '',
           tenant_name: property.tenant_name || '',
           lease_end_date: property.lease_end_date || '',
           lease_start_date: property.lease_start_date || '',
@@ -70,6 +72,7 @@ export default function EditPropertyPage() {
       await updateProperty(propertyId, {
         address: formData.address,
         monthly_rent: parseFloat(formData.monthly_rent),
+        security_deposit: formData.security_deposit ? parseFloat(formData.security_deposit) : undefined,
         tenant_name: formData.tenant_name || undefined,
         lease_end_date: formData.lease_end_date || undefined,
         lease_start_date: formData.lease_start_date || undefined,
@@ -175,6 +178,23 @@ export default function EditPropertyPage() {
                     step="0.01"
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                     value={formData.monthly_rent}
+                    onChange={handleChange}
+                    placeholder="1500.00"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="security_deposit" className="block text-sm font-medium text-gray-700">
+                    Security Deposit
+                  </label>
+                  <input
+                    type="number"
+                    name="security_deposit"
+                    id="security_deposit"
+                    min="0"
+                    step="0.01"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                    value={formData.security_deposit}
                     onChange={handleChange}
                     placeholder="1500.00"
                   />
