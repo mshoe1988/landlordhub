@@ -26,7 +26,11 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  LineChart,
+  Line
 } from 'recharts'
 import CostInputModal from '@/components/CostInputModal'
 import RentCollectionStatusChart from '@/components/RentCollectionStatusChart'
@@ -464,9 +468,51 @@ export default function DashboardPage() {
     return result
   }
 
+  // Calculate cash flow forecast for next 3 months
+  const calculateCashFlowForecast = () => {
+    const now = new Date()
+    const forecast = []
+    
+    for (let i = 1; i <= 3; i++) {
+      const forecastDate = new Date(now.getFullYear(), now.getMonth() + i, 1)
+      const monthName = forecastDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+      
+      // Projected income: sum of all properties' monthly rent
+      const projectedIncome = properties.reduce((sum, property) => sum + property.monthly_rent, 0)
+      
+      // Projected expenses: average of last 3 months of expenses
+      const lastThreeMonthsExpenses = expenses
+        .filter(expense => {
+          const expenseDate = new Date(expense.date)
+          const monthsAgo = (now.getFullYear() - expenseDate.getFullYear()) * 12 + 
+                           (now.getMonth() - expenseDate.getMonth())
+          return monthsAgo >= 0 && monthsAgo < 3
+        })
+        .reduce((sum, expense) => sum + expense.amount, 0)
+      
+      // Average monthly expenses (from last 3 months)
+      const averageMonthlyExpenses = lastThreeMonthsExpenses / 3
+      
+      // Use current month's expenses if no historical data
+      const projectedExpenses = expenses.length > 0 ? averageMonthlyExpenses : totalExpenses
+      
+      const netCashFlow = projectedIncome - projectedExpenses
+      
+      forecast.push({
+        month: monthName,
+        income: projectedIncome,
+        expenses: projectedExpenses,
+        netCashFlow: netCashFlow
+      })
+    }
+    
+    return forecast
+  }
+
   // Calculate chart data
   const categoryData = calculateCategoryData()
   const monthlyData = calculateMonthlyData()
+  const cashFlowForecast = calculateCashFlowForecast()
   const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
 
   return (
@@ -744,6 +790,77 @@ export default function DashboardPage() {
                     />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Cash Flow Forecast Chart */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Cash Flow Forecast (Next 3 Months)</h2>
+              
+              <div className="h-80 md:h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={cashFlowForecast}>
+                    <defs>
+                      <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name]}
+                      labelFormatter={(label) => `Month: ${label}`}
+                    />
+                    <Legend />
+                    <Area 
+                      type="monotone" 
+                      dataKey="income" 
+                      stroke="#10b981" 
+                      fillOpacity={1} 
+                      fill="url(#colorIncome)"
+                      name="Projected Income"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="expenses" 
+                      stroke="#ef4444" 
+                      fillOpacity={1} 
+                      fill="url(#colorExpenses)"
+                      name="Projected Expenses"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="netCashFlow" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3}
+                      dot={{ fill: '#3b82f6', r: 5 }}
+                      name="Net Cash Flow"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              
+              {/* Summary */}
+              <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+                {cashFlowForecast.map((month, index) => (
+                  <div key={index} className="text-center">
+                    <p className="text-xs text-gray-600 mb-1">{month.month}</p>
+                    <p className={`text-lg font-semibold ${month.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      ${month.netCashFlow.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-gray-500">Net Flow</p>
+                  </div>
+                ))}
               </div>
             </div>
 
