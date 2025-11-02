@@ -50,7 +50,19 @@ export default function ReportsPage() {
   const [maintenanceTasks, setMaintenanceTasks] = useState<MaintenanceTask[]>([])
   const [rentPayments, setRentPayments] = useState<RentPayment[]>([])
   const [loading, setLoading] = useState(true)
-  const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(null)
+  
+  // Initialize date range to this month by default
+  const getThisMonthRange = () => {
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const currentMonth = now.getMonth()
+    return {
+      start: new Date(currentYear, currentMonth, 1).toISOString().split('T')[0],
+      end: new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0]
+    }
+  }
+  
+  const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(getThisMonthRange())
 
   useEffect(() => {
     if (user) {
