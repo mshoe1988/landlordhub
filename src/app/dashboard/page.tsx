@@ -511,15 +511,33 @@ export default function DashboardPage() {
       const projectedIncome = properties.reduce((sum, property) => sum + property.monthly_rent, 0)
       
       // Check if there are actual expenses logged for this forecast month
-      const monthStart = new Date(forecastDate.getFullYear(), forecastDate.getMonth(), 1)
-      const monthEnd = new Date(forecastDate.getFullYear(), forecastDate.getMonth() + 1, 0)
+      const forecastYear = forecastDate.getFullYear()
+      const forecastMonth = forecastDate.getMonth() // 0-indexed (0 = Jan, 11 = Dec)
       
       const actualExpensesForMonth = expenses
         .filter(expense => {
           const expenseDate = new Date(expense.date)
-          return expenseDate >= monthStart && expenseDate <= monthEnd
+          const expenseYear = expenseDate.getFullYear()
+          const expenseMonth = expenseDate.getMonth()
+          
+          // Match if same year and month
+          return expenseYear === forecastYear && expenseMonth === forecastMonth
         })
         .reduce((sum, expense) => sum + expense.amount, 0)
+      
+      // Debug logging
+      if (i === 1) {
+        console.log('Cash Flow Forecast Debug for first month:', {
+          forecastMonth: monthName,
+          forecastYear,
+          forecastMonthIndex: forecastMonth,
+          expensesInMonth: expenses.filter(expense => {
+            const expenseDate = new Date(expense.date)
+            return expenseDate.getFullYear() === forecastYear && expenseDate.getMonth() === forecastMonth
+          }).map(e => ({ date: e.date, amount: e.amount })),
+          actualExpensesForMonth
+        })
+      }
       
       // Use actual expenses if available, otherwise use average
       const projectedExpenses = actualExpensesForMonth > 0 
