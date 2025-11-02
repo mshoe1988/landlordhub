@@ -191,12 +191,13 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="w-full">
       <div className="flex justify-between items-center mb-4">
         <div className="flex-1">
           <h2 className="text-xl font-bold text-gray-800">Rent Collection Status</h2>
+          <p className="text-sm text-gray-600 mt-1">{monthName}</p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
           {/* Month/Year Selector */}
           <div className="flex gap-2">
             <select
@@ -205,10 +206,10 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
                 setSelectedMonth(parseInt(e.target.value))
                 setSelectedSegment(null) // Clear selection when changing month
               }}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
+              className="px-2 py-1.5 text-xs border border-gray-300 rounded-md bg-white text-gray-900"
             >
               {monthNames.map((name, index) => (
-                <option key={index + 1} value={index + 1}>{name}</option>
+                <option key={index + 1} value={index + 1}>{name.substring(0, 3)}</option>
               ))}
             </select>
             <select
@@ -217,48 +218,49 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
                 setSelectedYear(parseInt(e.target.value))
                 setSelectedSegment(null) // Clear selection when changing year
               }}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
+              className="px-2 py-1.5 text-xs border border-gray-300 rounded-md bg-white text-gray-900"
             >
               {getYearOptions().map(year => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </select>
           </div>
-          {/* Chart Type Toggle */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setChartType('bar')}
-              className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-                chartType === 'bar'
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              Bar
-            </button>
-            <button
-              onClick={() => setChartType('donut')}
-              className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-                chartType === 'donut'
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              Donut
-            </button>
-          </div>
         </div>
       </div>
-      <p className="text-sm text-gray-600 mb-4">{monthName}</p>
+
+      {/* Chart */}
+      <div className="h-64 mb-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={statusData as any}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ status, percentage }: any) => `${percentage}%`}
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="count"
+              onClick={(data: any, index: number) => handlePieClick(data, index)}
+              cursor="pointer"
+            >
+              {statusData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomPieTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="flex justify-center gap-4 mb-4">
         {statusData.map((status) => (
           <div
             key={status.status}
-            className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
               selectedSegment === status.status
-                ? 'border-gray-800 shadow-lg'
+                ? 'border-gray-800 shadow-lg bg-gray-50'
                 : 'border-gray-200 hover:border-gray-400'
             }`}
             onClick={() => {
@@ -269,64 +271,13 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
               }
             }}
           >
-            <div className="flex items-center gap-2 mb-2">
-              {status.status === 'Paid' && <CheckCircle2 className="h-5 w-5 text-green-600" />}
-              {status.status === 'Pending' && <AlertCircle className="h-5 w-5 text-yellow-600" />}
-              {status.status === 'Late' && <XCircle className="h-5 w-5 text-red-600" />}
-              <span className="font-semibold text-gray-800">{status.status}</span>
-            </div>
-            <div className="text-2xl font-bold" style={{ color: status.color }}>
-              {status.count}
-            </div>
-            <div className="text-sm text-gray-600">
-              {status.percentage}% • {status.count}/{totalUnits} units
-            </div>
+            {status.status === 'Paid' && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+            {status.status === 'Pending' && <AlertCircle className="h-4 w-4 text-yellow-600" />}
+            {status.status === 'Late' && <XCircle className="h-4 w-4 text-red-600" />}
+            <span className="text-sm font-semibold text-gray-800">{status.status}</span>
+            <span className="text-sm text-gray-600">({status.count})</span>
           </div>
         ))}
-      </div>
-
-      {/* Chart */}
-      <div className="h-80 mb-6">
-        <ResponsiveContainer width="100%" height="100%">
-          {chartType === 'bar' ? (
-            <BarChart data={statusData as any}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="status" />
-              <YAxis />
-              <Tooltip content={<CustomBarTooltip />} />
-              <Bar 
-                dataKey="count" 
-                fill="#3b82f6"
-                onClick={handleBarClick}
-                cursor="pointer"
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          ) : (
-            <PieChart>
-              <Pie
-                data={statusData as any}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ status, percentage }: any) => `${status}: ${percentage}%`}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="count"
-                onClick={(data: any, index: number) => handlePieClick(data, index)}
-                cursor="pointer"
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomPieTooltip />} />
-            </PieChart>
-          )}
-        </ResponsiveContainer>
       </div>
 
       {/* Tenant List */}

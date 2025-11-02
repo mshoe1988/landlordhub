@@ -473,104 +473,75 @@ export default function DashboardPage() {
     <ProtectedRoute>
       <Layout>
         <div className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
-              onClick={() => router.push('/properties')}
-            >
-              <div className="flex items-start md:items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-gray-500 text-base md:text-base font-bold">Total Properties</p>
-                  <p className="text-3xl md:text-3xl font-bold text-gray-800 mt-1">{properties.length}</p>
-                </div>
-                <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
-              </div>
-            </div>
-            
-            <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
-              onClick={() => router.push('/reports')}
-            >
-              <div className="flex items-start md:items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-gray-500 text-base md:text-base font-bold">Monthly Rent</p>
-                  <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">${totalMonthlyRent.toLocaleString()}</p>
-                </div>
-                <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
-              </div>
-            </div>
-            
-            <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
-              onClick={() => router.push('/expenses')}
-            >
-              <div className="flex items-start md:items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-gray-500 text-base md:text-base font-bold">This Month's Expenses</p>
-                  <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
-                </div>
-                <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
-              </div>
-            </div>
-            
-            <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
-              onClick={() => router.push('/maintenance')}
-            >
-              <div className="flex items-start md:items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-gray-500 text-base md:text-base font-bold">Upcoming Tasks</p>
-                  <p className="text-3xl md:text-3xl font-bold text-orange-600 mt-1">{upcomingTasks}</p>
-                </div>
-                <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
-              </div>
-            </div>
-          </div>
-
-          {/* Rent Payment Status Card */}
-          {propertiesWithTenants.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-6">
+          {/* Top Section: Stats Cards and Rent Collection Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left Side: Stats Cards (2x2 grid) */}
+            <div className="grid grid-cols-2 gap-4 md:gap-6">
+              {/* Top Row */}
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
                 onClick={() => router.push('/properties')}
               >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-500 text-base md:text-base font-bold">Rent Paid This Month</p>
-                    <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">{paidRentCount}/{propertiesWithTenants.length}</p>
+                    <p className="text-gray-500 text-base md:text-base font-bold">Total Properties</p>
+                    <p className="text-3xl md:text-3xl font-bold text-gray-800 mt-1">{properties.length}</p>
                   </div>
-                  <CheckCircle2 className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
+                  <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
               </div>
               
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
-                onClick={() => router.push('/properties')}
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
+                onClick={() => router.push('/maintenance')}
               >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-500 text-base md:text-base font-bold">Rent Unpaid</p>
-                    <p className="text-3xl md:text-3xl font-bold text-gray-600 mt-1">{unpaidRentCount}</p>
+                    <p className="text-gray-500 text-base md:text-base font-bold">Upcoming Tasks</p>
+                    <p className="text-3xl md:text-3xl font-bold text-orange-600 mt-1">{upcomingTasks}</p>
                   </div>
-                  <XCircle className="w-8 h-8 md:w-12 md:h-12 text-gray-500 opacity-20 flex-shrink-0 ml-2" />
+                  <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
               </div>
 
+              {/* Bottom Row */}
               <div 
-                className={`bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between ${overdueRentCount > 0 ? 'border-2 border-red-300' : ''}`}
-                onClick={() => router.push('/properties')}
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
+                onClick={() => router.push('/reports')}
               >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-500 text-base md:text-base font-bold">Overdue Payments</p>
-                    <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
+                    <p className="text-gray-500 text-base md:text-base font-bold">Monthly Rent</p>
+                    <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">${totalMonthlyRent.toLocaleString()}</p>
                   </div>
-                  <AlertCircle className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
+                  <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
+                </div>
+              </div>
+              
+              <div 
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
+                onClick={() => router.push('/expenses')}
+              >
+                <div className="flex items-start md:items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-gray-500 text-base md:text-base font-bold">This Month's Expenses</p>
+                    <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
+                  </div>
+                  <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Right Side: Rent Collection Status Chart */}
+            {propertiesWithTenants.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <RentCollectionStatusChart 
+                  properties={properties}
+                  rentPayments={allRentPayments}
+                />
+              </div>
+            )}
+          </div>
 
           {/* Properties Overview */}
           <div className="bg-white rounded-lg shadow">
@@ -776,11 +747,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Rent Collection Status Chart */}
-            <RentCollectionStatusChart 
-              properties={properties}
-              rentPayments={allRentPayments}
-            />
           </div>
         </div>
 
