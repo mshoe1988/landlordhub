@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { getProperties, getMaintenanceTasks, getExpenses, updateMaintenanceTask, createExpense } from '@/lib/database'
-import { Property, MaintenanceTask, Expense } from '@/lib/types'
+import { getProperties, getMaintenanceTasks, getExpenses, updateMaintenanceTask, createExpense, getCurrentMonthRentStatus } from '@/lib/database'
+import { Property, MaintenanceTask, Expense, RentPayment } from '@/lib/types'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import { 
@@ -12,7 +12,10 @@ import {
   DollarSign, 
   Wrench, 
   Calendar,
-  Mail
+  Mail,
+  CheckCircle2,
+  XCircle,
+  AlertCircle
 } from 'lucide-react'
 import { 
   PieChart, 
@@ -47,6 +50,7 @@ export default function DashboardPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [maintenance, setMaintenance] = useState<MaintenanceTask[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
+  const [rentPayments, setRentPayments] = useState<Record<string, RentPayment | null>>({})
   const [loading, setLoading] = useState(true)
   const [showCostModal, setShowCostModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<MaintenanceTask | null>(null)
@@ -59,15 +63,17 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     try {
-      const [propertiesData, maintenanceData, expensesData] = await Promise.all([
+      const [propertiesData, maintenanceData, expensesData, paymentsData] = await Promise.all([
         getProperties(user!.id),
         getMaintenanceTasks(user!.id),
-        getExpenses(user!.id)
+        getExpenses(user!.id),
+        getCurrentMonthRentStatus(user!.id).catch(() => ({})) // Load rent payments, but don't fail if table doesn't exist
       ])
       
       setProperties(propertiesData)
       setMaintenance(maintenanceData)
       setExpenses(expensesData)
+      setRentPayments(paymentsData)
     } catch (error) {
       console.error('Error loading dashboard data:', error)
     } finally {
@@ -102,6 +108,24 @@ export default function DashboardPage() {
   
   const totalExpenses = thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0)
   const upcomingTasks = maintenance.filter(m => m.status === 'pending').length
+
+  // Calculate rent payment stats
+  const propertiesWithTenants = properties.filter(p => p.tenant_name)
+  const paidRentCount = propertiesWithTenants.filter(p => {
+    const payment = rentPayments[p.id]
+    return payment?.status === 'paid'
+  }).length
+  const unpaidRentCount = propertiesWithTenants.filter(p => {
+    const payment = rentPayments[p.id]
+    const isPaid = payment?.status === 'paid'
+    const isOverdue = !isPaid && p.rent_due_date && currentDate.getDate() > p.rent_due_date
+    return !isPaid
+  }).length
+  const overdueRentCount = propertiesWithTenants.filter(p => {
+    const payment = rentPayments[p.id]
+    const isPaid = payment?.status === 'paid'
+    return !isPaid && p.rent_due_date && currentDate.getDate() > p.rent_due_date
+  }).length
 
   const getExpensesByProperty = (propertyId: string) => {
     return expenses.filter(e => e.property_id === propertyId).reduce((sum, e) => sum + e.amount, 0)
@@ -299,6 +323,52 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Rent Payment Status Card */}
+          {propertiesWithTenants.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div 
+                className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => router.push('/properties')}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-500 text-sm">Rent Paid This Month</p>
+                    <p className="text-3xl font-bold text-green-600 mt-1">{paidRentCount}/{propertiesWithTenants.length}</p>
+                  </div>
+                  <CheckCircle2 className="w-12 h-12 text-green-500 opacity-20" />
+                </div>
+              </div>
+              
+              <div 
+                className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => router.push('/properties')}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-500 text-sm">Rent Unpaid</p>
+                    <p className="text-3xl font-bold text-gray-600 mt-1">{unpaidRentCount}</p>
+                  </div>
+                  <XCircle className="w-12 h-12 text-gray-500 opacity-20" />
+                </div>
+              </div>
+
+              {overdueRentCount > 0 && (
+                <div 
+                  className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300"
+                  onClick={() => router.push('/properties')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-500 text-sm">Overdue Payments</p>
+                      <p className="text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
+                    </div>
+                    <AlertCircle className="w-12 h-12 text-red-500 opacity-20" />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Properties Overview */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
@@ -323,6 +393,42 @@ export default function DashboardPage() {
                             <p className="text-sm text-gray-500">Email: {property.tenant_email}</p>
                           )}
                           <p className="text-sm text-gray-500">Rent Due: {property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st'} of each month</p>
+                          
+                          {/* Rent Payment Status */}
+                          {property.tenant_name && (() => {
+                            const payment = rentPayments[property.id]
+                            const isPaid = payment?.status === 'paid'
+                            const isOverdue = !isPaid && property.rent_due_date && currentDate.getDate() > property.rent_due_date
+                            return (
+                              <div className="mt-2">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
+                                  isPaid 
+                                    ? 'bg-green-100 text-green-700' 
+                                    : isOverdue 
+                                      ? 'bg-red-100 text-red-700' 
+                                      : 'bg-gray-100 text-gray-700'
+                                }`}>
+                                  {isPaid ? (
+                                    <>
+                                      <CheckCircle2 className="w-3.5 h-3.5" />
+                                      <span>Rent Paid</span>
+                                    </>
+                                  ) : isOverdue ? (
+                                    <>
+                                      <AlertCircle className="w-3.5 h-3.5" />
+                                      <span>Overdue</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <XCircle className="w-3.5 h-3.5" />
+                                      <span>Unpaid</span>
+                                    </>
+                                  )}
+                                </span>
+                              </div>
+                            )
+                          })()}
+                          
                           <div className="flex gap-4 mt-2 text-sm">
                             <span className="text-green-600">Rent: ${property.monthly_rent}/mo</span>
                             <span className="text-red-600">Expenses: ${propertyExpenses}</span>
