@@ -4,8 +4,11 @@ export interface Property {
   address: string
   monthly_rent: number
   tenant_name?: string
+  tenant_email?: string
+  tenant_phone?: string
   lease_end_date?: string
-  purchase_date?: string
+  lease_start_date?: string
+  rent_due_date?: number
   created_at: string
   updated_at: string
 }
@@ -31,6 +34,8 @@ export interface Expense {
   category: string
   description?: string
   receipt_url?: string
+  is_recurring?: boolean
+  recurring_frequency?: string
   created_at: string
 }
 
@@ -43,6 +48,35 @@ export interface Document {
   file_url: string
   upload_date: string
   created_at: string
+}
+
+export interface Contact {
+  id: string
+  user_id: string
+  contact_type: 'tenant' | 'vendor'
+  name: string
+  email?: string
+  phone?: string
+  company?: string
+  service_type?: string
+  property_id?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface RentPayment {
+  id: string
+  user_id: string
+  property_id: string
+  month: number
+  year: number
+  amount: number
+  status: 'paid' | 'unpaid' | 'partial'
+  payment_date?: string
+  notes?: string
+  created_at: string
+  updated_at: string
 }
 
 export interface DashboardStats {
