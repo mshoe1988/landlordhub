@@ -11,7 +11,7 @@ interface RentCollectionStatusChartProps {
 }
 
 interface CollectionStatusData {
-  status: 'Paid' | 'Pending' | 'Late'
+  status: 'Paid' | 'Unpaid' | 'Overdue'
   count: number
   percentage: number
   tenants: Array<{ property: string; tenant: string; amount: number }>
@@ -19,7 +19,7 @@ interface CollectionStatusData {
 }
 
 export default function RentCollectionStatusChart({ properties, rentPayments }: RentCollectionStatusChartProps) {
-  const [selectedSegment, setSelectedSegment] = useState<'Paid' | 'Pending' | 'Late' | null>(null)
+  const [selectedSegment, setSelectedSegment] = useState<'Paid' | 'Unpaid' | 'Overdue' | null>(null)
   const [chartType, setChartType] = useState<'bar' | 'donut'>('donut')
   
   const now = new Date()
@@ -35,14 +35,14 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
     if (propertiesWithTenants.length === 0) {
       return [
         { status: 'Paid', count: 0, percentage: 0, tenants: [], color: '#10b981' },
-        { status: 'Pending', count: 0, percentage: 0, tenants: [], color: '#f59e0b' },
-        { status: 'Late', count: 0, percentage: 0, tenants: [], color: '#ef4444' }
+        { status: 'Unpaid', count: 0, percentage: 0, tenants: [], color: '#f59e0b' },
+        { status: 'Overdue', count: 0, percentage: 0, tenants: [], color: '#ef4444' }
       ]
     }
 
     const paid: Array<{ property: string; tenant: string; amount: number }> = []
-    const pending: Array<{ property: string; tenant: string; amount: number }> = []
-    const late: Array<{ property: string; tenant: string; amount: number }> = []
+    const unpaid: Array<{ property: string; tenant: string; amount: number }> = []
+    const overdue: Array<{ property: string; tenant: string; amount: number }> = []
 
     // Determine if the selected month is in the past or future for "Late" calculation
     const isSelectedMonthPast = selectedYear < now.getFullYear() || 
@@ -86,17 +86,17 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
         }
         
         if (isLate) {
-          late.push(tenantInfo)
+          overdue.push(tenantInfo)
         } else {
-          pending.push(tenantInfo)
+          unpaid.push(tenantInfo)
         }
       }
     })
 
     const total = propertiesWithTenants.length
     const paidCount = paid.length
-    const pendingCount = pending.length
-    const lateCount = late.length
+    const unpaidCount = unpaid.length
+    const overdueCount = overdue.length
 
     return [
       { 
@@ -107,17 +107,17 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
         color: '#10b981' 
       },
       { 
-        status: 'Pending', 
-        count: pendingCount, 
-        percentage: total > 0 ? Math.round((pendingCount / total) * 100) : 0, 
-        tenants: pending,
+        status: 'Unpaid', 
+        count: unpaidCount, 
+        percentage: total > 0 ? Math.round((unpaidCount / total) * 100) : 0, 
+        tenants: unpaid,
         color: '#f59e0b' 
       },
       { 
-        status: 'Late', 
-        count: lateCount, 
-        percentage: total > 0 ? Math.round((lateCount / total) * 100) : 0, 
-        tenants: late,
+        status: 'Overdue', 
+        count: overdueCount, 
+        percentage: total > 0 ? Math.round((overdueCount / total) * 100) : 0, 
+        tenants: overdue,
         color: '#ef4444' 
       }
     ]
@@ -272,8 +272,8 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
             }}
           >
             {status.status === 'Paid' && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-            {status.status === 'Pending' && <AlertCircle className="h-4 w-4 text-yellow-600" />}
-            {status.status === 'Late' && <XCircle className="h-4 w-4 text-red-600" />}
+            {status.status === 'Unpaid' && <AlertCircle className="h-4 w-4 text-yellow-600" />}
+            {status.status === 'Overdue' && <XCircle className="h-4 w-4 text-red-600" />}
             <span className="text-sm font-semibold text-gray-800">{status.status}</span>
             <span className="text-sm text-gray-600">({status.count})</span>
           </div>
