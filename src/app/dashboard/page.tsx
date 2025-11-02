@@ -473,6 +473,36 @@ export default function DashboardPage() {
     const now = new Date()
     const forecast = []
     
+    // Calculate average monthly expenses from historical data (for fallback)
+    const lastThreeMonthsExpenses = expenses
+      .filter(expense => {
+        const expenseDate = new Date(expense.date)
+        const monthsAgo = (now.getFullYear() - expenseDate.getFullYear()) * 12 + 
+                         (now.getMonth() - expenseDate.getMonth())
+        return monthsAgo >= 0 && monthsAgo < 3
+      })
+      .reduce((sum, expense) => sum + expense.amount, 0)
+    
+    // Count number of months with expenses (for better averaging)
+    const expenseMonths = new Set(
+      expenses
+        .filter(expense => {
+          const expenseDate = new Date(expense.date)
+          const monthsAgo = (now.getFullYear() - expenseDate.getFullYear()) * 12 + 
+                           (now.getMonth() - expenseDate.getMonth())
+          return monthsAgo >= 0 && monthsAgo < 3
+        })
+        .map(expense => {
+          const expenseDate = new Date(expense.date)
+          return `${expenseDate.getFullYear()}-${expenseDate.getMonth()}`
+        })
+    ).size
+    
+    // Average monthly expenses (from last 3 months), or use current month if no historical data
+    const averageMonthlyExpenses = expenseMonths > 0 
+      ? lastThreeMonthsExpenses / expenseMonths 
+      : (totalExpenses > 0 ? totalExpenses : 0)
+    
     for (let i = 1; i <= 3; i++) {
       const forecastDate = new Date(now.getFullYear(), now.getMonth() + i, 1)
       const monthName = forecastDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -480,37 +510,21 @@ export default function DashboardPage() {
       // Projected income: sum of all properties' monthly rent
       const projectedIncome = properties.reduce((sum, property) => sum + property.monthly_rent, 0)
       
-      // Projected expenses: average of last 3 months of expenses
-      const lastThreeMonthsExpenses = expenses
+      // Check if there are actual expenses logged for this forecast month
+      const monthStart = new Date(forecastDate.getFullYear(), forecastDate.getMonth(), 1)
+      const monthEnd = new Date(forecastDate.getFullYear(), forecastDate.getMonth() + 1, 0)
+      
+      const actualExpensesForMonth = expenses
         .filter(expense => {
           const expenseDate = new Date(expense.date)
-          const monthsAgo = (now.getFullYear() - expenseDate.getFullYear()) * 12 + 
-                           (now.getMonth() - expenseDate.getMonth())
-          return monthsAgo >= 0 && monthsAgo < 3
+          return expenseDate >= monthStart && expenseDate <= monthEnd
         })
         .reduce((sum, expense) => sum + expense.amount, 0)
       
-      // Count number of months with expenses (for better averaging)
-      const expenseMonths = new Set(
-        expenses
-          .filter(expense => {
-            const expenseDate = new Date(expense.date)
-            const monthsAgo = (now.getFullYear() - expenseDate.getFullYear()) * 12 + 
-                             (now.getMonth() - expenseDate.getMonth())
-            return monthsAgo >= 0 && monthsAgo < 3
-          })
-          .map(expense => {
-            const expenseDate = new Date(expense.date)
-            return `${expenseDate.getFullYear()}-${expenseDate.getMonth()}`
-          })
-      ).size
-      
-      // Average monthly expenses (from last 3 months), or use current month if no historical data
-      const averageMonthlyExpenses = expenseMonths > 0 
-        ? lastThreeMonthsExpenses / expenseMonths 
-        : (totalExpenses > 0 ? totalExpenses : 0)
-      
-      const projectedExpenses = averageMonthlyExpenses || 0
+      // Use actual expenses if available, otherwise use average
+      const projectedExpenses = actualExpensesForMonth > 0 
+        ? actualExpensesForMonth 
+        : (averageMonthlyExpenses || 0)
       
       const netCashFlow = projectedIncome - projectedExpenses
       
