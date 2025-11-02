@@ -266,7 +266,7 @@ export default function DashboardPage() {
   }
 
   const getCurrentLineChartRangeLabel = () => {
-    if (!lineChartDateRange) return 'Last 6 Months'
+    if (!lineChartDateRange) return 'All Time'
     
     const options = getDateRangeOptions()
     for (const [name, range] of Object.entries(options)) {
@@ -316,20 +316,48 @@ export default function DashboardPage() {
       const endDate = new Date(lineChartDateRange.end)
       
       // Generate all months within the date range
-      const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+      let rangeIterator = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
       const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
       
-      while (current <= end) {
-        const monthKey = current.toISOString().slice(0, 7) // YYYY-MM
+      while (rangeIterator <= end) {
+        const monthKey = rangeIterator.toISOString().slice(0, 7) // YYYY-MM
         monthlyMap.set(monthKey, { income: 0, expenses: 0 })
-        current.setMonth(current.getMonth() + 1)
+        rangeIterator.setMonth(rangeIterator.getMonth() + 1)
       }
     } else {
-      // Default: last 6 months including current month
-      for (let i = 5; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const monthKey = date.toISOString().slice(0, 7) // YYYY-MM
+      // Default: All Time - find the earliest month from expenses or property creation
+      let earliestMonth: Date | null = null
+      let latestMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      
+      // Check expenses for earliest date
+      expenses.forEach(expense => {
+        const expenseDate = new Date(expense.date)
+        const expenseMonth = new Date(expenseDate.getFullYear(), expenseDate.getMonth(), 1)
+        if (!earliestMonth || expenseMonth < earliestMonth) {
+          earliestMonth = expenseMonth
+        }
+      })
+      
+      // Check property creation dates for earliest date
+      properties.forEach(property => {
+        const createdDate = new Date(property.created_at)
+        const createdMonth = new Date(createdDate.getFullYear(), createdDate.getMonth(), 1)
+        if (!earliestMonth || createdMonth < earliestMonth) {
+          earliestMonth = createdMonth
+        }
+      })
+      
+      // If no data exists, default to last 6 months
+      if (!earliestMonth) {
+        earliestMonth = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+      }
+      
+      // Generate all months from earliest to current
+      let monthIterator = new Date(earliestMonth)
+      while (monthIterator <= latestMonth) {
+        const monthKey = monthIterator.toISOString().slice(0, 7) // YYYY-MM
         monthlyMap.set(monthKey, { income: 0, expenses: 0 })
+        monthIterator.setMonth(monthIterator.getMonth() + 1)
       }
     }
     
@@ -347,9 +375,12 @@ export default function DashboardPage() {
       }
       
       const monthKey = expenseDate.toISOString().slice(0, 7)
-      const current = monthlyMap.get(monthKey)
-      if (current) {
-        current.expenses += expense.amount
+      const existingMonth = monthlyMap.get(monthKey)
+      if (existingMonth) {
+        existingMonth.expenses += expense.amount
+      } else {
+        // If month not in map (shouldn't happen with all time), add it
+        monthlyMap.set(monthKey, { income: 0, expenses: expense.amount })
       }
     })
     
@@ -709,7 +740,7 @@ export default function DashboardPage() {
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  Last 6 Months
+                  All Time
                 </button>
                 {Object.keys(getDateRangeOptions()).map((range) => {
                   const options = getDateRangeOptions()
