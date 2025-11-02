@@ -576,6 +576,39 @@ export const deleteRentPayment = async (id: string): Promise<void> => {
   if (error) throw error
 }
 
+// Mark multiple months as paid at once (for bulk payments)
+export const markMultipleMonthsAsPaid = async (
+  userId: string,
+  propertyId: string,
+  months: Array<{ month: number; year: number }>,
+  monthlyRent: number,
+  paymentDate?: string,
+  notes?: string
+): Promise<RentPayment[]> => {
+  const payments: RentPayment[] = []
+  const paymentDateStr = paymentDate || new Date().toISOString().split('T')[0]
+
+  for (const { month, year } of months) {
+    try {
+      const payment = await markRentAsPaid(
+        userId,
+        propertyId,
+        month,
+        year,
+        monthlyRent,
+        paymentDateStr,
+        notes
+      )
+      payments.push(payment)
+    } catch (error) {
+      console.error(`Error marking ${month}/${year} as paid:`, error)
+      throw error
+    }
+  }
+
+  return payments
+}
+
 // Helper function to get current month's payment status for all properties
 export const getCurrentMonthRentStatus = async (userId: string): Promise<Record<string, RentPayment | null>> => {
   const now = new Date()
