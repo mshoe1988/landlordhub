@@ -271,7 +271,7 @@ export default function DashboardPage() {
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
               onClick={() => router.push('/properties')}
             >
               <div className="flex items-start md:items-center justify-between">
@@ -284,7 +284,7 @@ export default function DashboardPage() {
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
               onClick={() => router.push('/reports')}
             >
               <div className="flex items-start md:items-center justify-between">
@@ -297,7 +297,7 @@ export default function DashboardPage() {
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
               onClick={() => router.push('/expenses')}
             >
               <div className="flex items-start md:items-center justify-between">
@@ -310,7 +310,7 @@ export default function DashboardPage() {
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
               onClick={() => router.push('/maintenance')}
             >
               <div className="flex items-start md:items-center justify-between">
@@ -325,9 +325,9 @@ export default function DashboardPage() {
 
           {/* Rent Payment Status Card */}
           {propertiesWithTenants.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6">
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
                 onClick={() => router.push('/properties')}
               >
                 <div className="flex items-start md:items-center justify-between">
@@ -340,7 +340,7 @@ export default function DashboardPage() {
               </div>
               
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between"
                 onClick={() => router.push('/properties')}
               >
                 <div className="flex items-start md:items-center justify-between">
@@ -354,7 +354,7 @@ export default function DashboardPage() {
 
               {overdueRentCount > 0 && (
                 <div 
-                  className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300 aspect-square md:aspect-auto flex flex-col justify-between col-span-2 md:col-span-1"
+                  className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300 aspect-square md:aspect-auto md:min-h-[140px] flex flex-col justify-between col-span-2 md:col-span-1"
                   onClick={() => router.push('/properties')}
                 >
                   <div className="flex items-start md:items-center justify-between">
