@@ -4,7 +4,6 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
-import Image from 'next/image'
 
 // Disable caching for the homepage to ensure latest content
 export const dynamic = 'force-dynamic'
@@ -40,19 +39,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <Image
+              <img
                 src="/landlord-hub-logo.svg?v=23"
                 alt="LandlordHub Logo"
-                width={600}
-                height={240}
                 className="mr-3 w-auto h-auto max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[400px] drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-                priority
-                quality={100}
-                unoptimized
                 style={{ 
-                  background: 'transparent !important',
-                  backgroundColor: 'transparent !important',
-                  backgroundImage: 'none !important',
+                  background: 'transparent',
+                  backgroundColor: 'transparent',
+                  backgroundImage: 'none',
                   maxWidth: '100%',
                   height: 'auto'
                 }}
@@ -67,19 +61,14 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
           <div className="flex justify-center mb-8">
-            <Image
+            <img
               src="/landlord-hub-logo.svg?v=23"
               alt="LandlordHub Logo"
-              width={700}
-              height={280}
               className="w-auto h-auto max-w-[280px] sm:max-w-[350px] md:max-w-[450px] lg:max-w-[700px] drop-shadow-[0_0_12px_rgba(255,255,255,0.9)]"
-              priority
-              quality={100}
-              unoptimized
               style={{ 
-                background: 'transparent !important',
-                backgroundColor: 'transparent !important',
-                backgroundImage: 'none !important',
+                background: 'transparent',
+                backgroundColor: 'transparent',
+                backgroundImage: 'none',
                 maxWidth: '100%',
                 height: 'auto'
               }}

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import Image from 'next/image'
 import { trackLogin } from '@/lib/analytics'
 
 export default function LoginPage() {
@@ -46,19 +45,14 @@ export default function LoginPage() {
         <div>
           <div className="text-center">
             <div className="flex justify-center mb-4">
-            <Image
+            <img
               src="/landlord-hub-logo.svg?v=21"
               alt="LandlordHub Logo"
-              width={600}
-              height={240}
               className="w-auto h-auto max-w-[280px] sm:max-w-[350px] md:max-w-[450px] lg:max-w-[600px] drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
-              priority
-              quality={100}
-              unoptimized
               style={{ 
-                background: 'transparent !important',
-                backgroundColor: 'transparent !important',
-                backgroundImage: 'none !important',
+                background: 'transparent',
+                backgroundColor: 'transparent',
+                backgroundImage: 'none',
                 maxWidth: '100%',
                 height: 'auto'
               }}

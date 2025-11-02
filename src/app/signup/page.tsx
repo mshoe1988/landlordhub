@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
-import Image from 'next/image'
 import { trackSignUp } from '@/lib/analytics'
 
 export default function SignupPage() {
@@ -54,7 +53,7 @@ export default function SignupPage() {
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <Image
+              <img
                 src="/logo.svg"
                 alt="LandlordHub Logo"
                 width={64}
@@ -86,19 +85,14 @@ export default function SignupPage() {
         <div>
           <div className="text-center">
             <div className="flex justify-center mb-4">
-            <Image
+            <img
               src="/landlord-hub-logo.svg?v=15"
               alt="LandlordHub Logo"
-              width={600}
-              height={240}
               className="w-auto h-auto max-w-[280px] sm:max-w-[350px] md:max-w-[450px] lg:max-w-[600px] drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
-              priority
-              quality={100}
-              unoptimized
               style={{ 
-                background: 'transparent !important',
-                backgroundColor: 'transparent !important',
-                backgroundImage: 'none !important',
+                background: 'transparent',
+                backgroundColor: 'transparent',
+                backgroundImage: 'none',
                 maxWidth: '100%',
                 height: 'auto'
               }}
