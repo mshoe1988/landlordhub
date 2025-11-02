@@ -222,10 +222,6 @@ export default function DashboardPage() {
       'This Year': {
         start: new Date(currentYear, 0, 1).toISOString().split('T')[0],
         end: new Date(currentYear, 11, 31).toISOString().split('T')[0]
-      },
-      'Last 6 Months': {
-        start: new Date(currentYear, currentMonth - 6, 1).toISOString().split('T')[0],
-        end: new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0]
       }
     }
   }
