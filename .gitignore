@@ -104,7 +104,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public - commented out to allow public directory files to be tracked
 
 # Storybook build outputs
 .out
