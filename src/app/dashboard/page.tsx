@@ -271,10 +271,10 @@ export default function DashboardPage() {
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
               onClick={() => router.push('/properties')}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start md:items-center justify-between">
                 <div className="flex-1">
                   <p className="text-gray-500 text-base md:text-base font-bold">Total Properties</p>
                   <p className="text-3xl md:text-3xl font-bold text-gray-800 mt-1">{properties.length}</p>
@@ -284,10 +284,10 @@ export default function DashboardPage() {
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
               onClick={() => router.push('/reports')}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start md:items-center justify-between">
                 <div className="flex-1">
                   <p className="text-gray-500 text-base md:text-base font-bold">Monthly Rent</p>
                   <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">${totalMonthlyRent.toLocaleString()}</p>
@@ -297,10 +297,10 @@ export default function DashboardPage() {
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
               onClick={() => router.push('/expenses')}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start md:items-center justify-between">
                 <div className="flex-1">
                   <p className="text-gray-500 text-base md:text-base font-bold">This Month's Expenses</p>
                   <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
@@ -310,10 +310,10 @@ export default function DashboardPage() {
             </div>
             
             <div 
-              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
+              className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
               onClick={() => router.push('/maintenance')}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start md:items-center justify-between">
                 <div className="flex-1">
                   <p className="text-gray-500 text-base md:text-base font-bold">Upcoming Tasks</p>
                   <p className="text-3xl md:text-3xl font-bold text-orange-600 mt-1">{upcomingTasks}</p>
@@ -327,10 +327,10 @@ export default function DashboardPage() {
           {propertiesWithTenants.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-6">
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
                 onClick={() => router.push('/properties')}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
                     <p className="text-gray-500 text-base md:text-base font-bold">Rent Paid This Month</p>
                     <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">{paidRentCount}/{propertiesWithTenants.length}</p>
@@ -340,10 +340,10 @@ export default function DashboardPage() {
               </div>
               
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square flex flex-col justify-between"
+                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow aspect-square md:aspect-auto flex flex-col justify-between"
                 onClick={() => router.push('/properties')}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
                     <p className="text-gray-500 text-base md:text-base font-bold">Rent Unpaid</p>
                     <p className="text-3xl md:text-3xl font-bold text-gray-600 mt-1">{unpaidRentCount}</p>
@@ -354,10 +354,10 @@ export default function DashboardPage() {
 
               {overdueRentCount > 0 && (
                 <div 
-                  className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300 aspect-square flex flex-col justify-between col-span-2 md:col-span-1"
+                  className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-300 aspect-square md:aspect-auto flex flex-col justify-between col-span-2 md:col-span-1"
                   onClick={() => router.push('/properties')}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start md:items-center justify-between">
                     <div className="flex-1">
                       <p className="text-gray-500 text-base md:text-base font-bold">Overdue Payments</p>
                       <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">{overdueRentCount}</p>
