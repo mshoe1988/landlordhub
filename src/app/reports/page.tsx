@@ -57,6 +57,7 @@ export default function ReportsPage() {
   const [maintenanceTasks, setMaintenanceTasks] = useState<MaintenanceTask[]>([])
   const [rentPayments, setRentPayments] = useState<RentPayment[]>([])
   const [loading, setLoading] = useState(true)
+  const [pieChartDateRange, setPieChartDateRange] = useState<{ start: string; end: string } | null>(null)
   
   // Initialize date range to this month by default
   const getThisMonthRange = () => {
@@ -162,9 +163,77 @@ export default function ReportsPage() {
     }).sort((a, b) => b.netIncome - a.netIncome)
   }
 
+  const getDateRangeOptions = () => {
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const currentMonth = now.getMonth()
+
+    return {
+      'This Month': {
+        start: new Date(currentYear, currentMonth, 1).toISOString().split('T')[0],
+        end: new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0]
+      },
+      'Last Month': {
+        start: new Date(currentYear, currentMonth - 1, 1).toISOString().split('T')[0],
+        end: new Date(currentYear, currentMonth, 0).toISOString().split('T')[0]
+      },
+      'This Quarter': {
+        start: new Date(currentYear, Math.floor(currentMonth / 3) * 3, 1).toISOString().split('T')[0],
+        end: new Date(currentYear, Math.floor(currentMonth / 3) * 3 + 3, 0).toISOString().split('T')[0]
+      },
+      'This Year': {
+        start: new Date(currentYear, 0, 1).toISOString().split('T')[0],
+        end: new Date(currentYear, 11, 31).toISOString().split('T')[0]
+      },
+      'Last Quarter': {
+        start: new Date(currentYear, Math.floor(currentMonth / 3) * 3 - 3, 1).toISOString().split('T')[0],
+        end: new Date(currentYear, Math.floor(currentMonth / 3) * 3, 0).toISOString().split('T')[0]
+      },
+      'Last Year': {
+        start: new Date(currentYear - 1, 0, 1).toISOString().split('T')[0],
+        end: new Date(currentYear - 1, 11, 31).toISOString().split('T')[0]
+      }
+    }
+  }
+
+  const handlePieChartDateRange = (rangeName: string | null) => {
+    if (rangeName === null) {
+      setPieChartDateRange(null)
+      return
+    }
+    
+    const options = getDateRangeOptions()
+    const range = options[rangeName as keyof typeof options]
+    if (range) {
+      setPieChartDateRange(range)
+    }
+  }
+
+  const getCurrentPieChartRangeLabel = () => {
+    if (!pieChartDateRange) return 'All Time'
+    
+    const options = getDateRangeOptions()
+    for (const [name, range] of Object.entries(options)) {
+      if (range.start === pieChartDateRange.start && range.end === pieChartDateRange.end) {
+        return name
+      }
+    }
+    
+    return `Custom: ${pieChartDateRange.start} to ${pieChartDateRange.end}`
+  }
+
   const calculateCategoryData = (): CategoryData[] => {
-    const filteredExpenses = getFilteredExpenses()
     const categoryMap = new Map<string, number>()
+    
+    // Filter expenses by pie chart date range if set, otherwise use all expenses
+    const filteredExpenses = pieChartDateRange 
+      ? expenses.filter(expense => {
+          const expenseDate = new Date(expense.date)
+          const startDate = new Date(pieChartDateRange.start)
+          const endDate = new Date(pieChartDateRange.end)
+          return expenseDate >= startDate && expenseDate <= endDate
+        })
+      : expenses
     
     filteredExpenses.forEach(expense => {
       const current = categoryMap.get(expense.category) || 0
@@ -424,7 +493,48 @@ export default function ReportsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Expenses by Category</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-gray-800">Expenses by Category</h2>
+                <div className="text-sm text-gray-600">
+                  Current: {getCurrentPieChartRangeLabel()}
+                </div>
+              </div>
+              
+              {/* Date Range Filter Buttons */}
+              <div className="mb-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => handlePieChartDateRange(null)}
+                  className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                    !pieChartDateRange
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  All Time
+                </button>
+                {Object.keys(getDateRangeOptions()).map((range) => {
+                  const options = getDateRangeOptions()
+                  const rangeData = options[range as keyof typeof options]
+                  const isActive = pieChartDateRange && 
+                    pieChartDateRange.start === rangeData.start && 
+                    pieChartDateRange.end === rangeData.end
+                  
+                  return (
+                    <button
+                      key={range}
+                      onClick={() => handlePieChartDateRange(range)}
+                      className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {range}
+                    </button>
+                  )
+                })}
+              </div>
+              
               <div className="h-80 md:h-96">
                 <ResponsiveContainer width="100%" height="100%" key={`pie-chart-${Date.now()}`}>
                   <PieChart>
