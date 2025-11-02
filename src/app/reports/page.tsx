@@ -16,11 +16,14 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  LineChart,
+  Line
 } from 'recharts'
 import { Download, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import { generateTaxReportPDF } from '@/lib/pdfExport'
-import RentCollectionStatusChart from '@/components/RentCollectionStatusChart'
 
 interface ProfitLossData {
   property: string
@@ -40,6 +43,11 @@ interface MonthlyData {
   month: string
   income: number
   expenses: number
+}
+
+interface MonthlyNetIncomeData {
+  month: string
+  netIncome: number
 }
 
 export default function ReportsPage() {
@@ -267,6 +275,7 @@ export default function ReportsPage() {
   const profitLossData = calculateProfitLoss()
   const categoryData = calculateCategoryData()
   const monthlyData = calculateMonthlyData()
+  const monthlyNetIncomeTrend = calculateMonthlyNetIncomeTrend()
   const taxSummary = calculateTaxSummary()
 
   return (
@@ -410,11 +419,109 @@ export default function ReportsPage() {
               </div>
             </div>
 
-            {/* Rent Collection Status Chart */}
-            <RentCollectionStatusChart 
-              properties={properties}
-              rentPayments={rentPayments}
-            />
+            {/* Monthly Net Income Trend Chart */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-gray-800">Monthly Net Income Trend</h2>
+                {monthlyNetIncomeTrend.length >= 2 && (
+                  <div className="text-sm text-gray-600">
+                    {(() => {
+                      const firstQuarter = monthlyNetIncomeTrend.slice(0, 3).reduce((sum, m) => sum + m.netIncome, 0) / 3
+                      const lastQuarter = monthlyNetIncomeTrend.slice(-3).reduce((sum, m) => sum + m.netIncome, 0) / 3
+                      const percentChange = firstQuarter !== 0 
+                        ? ((lastQuarter - firstQuarter) / Math.abs(firstQuarter) * 100).toFixed(1)
+                        : '0.0'
+                      const isPositive = lastQuarter > firstQuarter
+                      return (
+                        <span className={isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {isPositive ? '↑' : '↓'} {Math.abs(parseFloat(percentChange))}% vs last quarter
+                        </span>
+                      )
+                    })()}
+                  </div>
+                )}
+              </div>
+              
+              <div className="h-80 md:h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={monthlyNetIncomeTrend}>
+                    <defs>
+                      <linearGradient id="colorNetIncome" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Net Income']}
+                      labelFormatter={(label) => `Month: ${label}`}
+                      contentStyle={{
+                        backgroundColor: '#fff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="netIncome"
+                      stroke="#10b981"
+                      fillOpacity={1}
+                      fill="url(#colorNetIncome)"
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="netIncome"
+                      stroke="#10b981"
+                      strokeWidth={3}
+                      dot={(props: any) => {
+                        const { cx, cy, payload } = props
+                        const color = payload.netIncome < 0 ? '#ef4444' : '#10b981'
+                        return (
+                          <circle cx={cx} cy={cy} r={5} fill={color} stroke={color} strokeWidth={2} />
+                        )
+                      }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              
+              {/* Summary Stats */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  {(() => {
+                    const totalNetIncome = monthlyNetIncomeTrend.reduce((sum, m) => sum + m.netIncome, 0)
+                    const averageNetIncome = monthlyNetIncomeTrend.length > 0 ? totalNetIncome / monthlyNetIncomeTrend.length : 0
+                    const negativeMonths = monthlyNetIncomeTrend.filter(m => m.netIncome < 0).length
+                    
+                    return (
+                      <>
+                        <div>
+                          <p className="text-xs text-gray-600 mb-1">Total Net Income</p>
+                          <p className={`text-lg font-semibold ${totalNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            ${totalNetIncome.toLocaleString()}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 mb-1">Average Monthly</p>
+                          <p className={`text-lg font-semibold ${averageNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            ${averageNetIncome.toLocaleString()}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 mb-1">Negative Months</p>
+                          <p className={`text-lg font-semibold ${negativeMonths === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {negativeMonths}
+                          </p>
+                        </div>
+                      </>
+                    )
+                  })()}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </Layout>
