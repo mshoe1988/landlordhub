@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Isolated Supabase Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; margin: 5px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Isolated Supabase Test</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Basic Connection</h3>
+        <button onclick="testConnection()">Test Connection</button>
+        <div id="connection-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Authentication</h3>
+        <input type="email" id="email" placeholder="Email" style="padding: 8px; margin: 5px; width: 200px;">
+        <input type="password" id="password" placeholder="Password" style="padding: 8px; margin: 5px; width: 200px;">
+        <button onclick="testAuth()">Test Sign In</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Debug Info</h3>
+        <div id="debug-info"></div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://xbsxfwazybfypitawnji.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhic3hmd2F6eWJmeXBpdGF3bmppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExMjE0NjUsImV4cCI6MjA3NjY5NzQ2NX0.Rsj86Mo8ncJKThMqjAXDCJiMvkEF9MArk2yrk4ES2p8'
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+        
+        function log(message) {
+            document.getElementById('debug-info').innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`
+        }
+        
+        async function testConnection() {
+            log('Testing basic connection...')
+            document.getElementById('connection-result').innerHTML = 'Testing...'
+            
+            try {
+                const { data, error } = await supabase
+                    .from('properties')
+                    .select('count')
+                    .limit(1)
+                
+                if (error) {
+                    document.getElementById('connection-result').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`
+                    log(`Connection error: ${error.message}`)
+                } else {
+                    document.getElementById('connection-result').innerHTML = `<span class="success">✅ Connection successful!</span>`
+                    log('Connection successful')
+                }
+            } catch (err) {
+                document.getElementById('connection-result').innerHTML = `<span class="error">❌ Exception: ${err.message}</span>`
+                log(`Exception: ${err.message}`)
+            }
+        }
+        
+        async function testAuth() {
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+            
+            if (!email || !password) {
+                document.getElementById('auth-result').innerHTML = '<span class="error">Please enter email and password</span>'
+                return
+            }
+            
+            log(`Testing authentication with ${email}...`)
+            document.getElementById('auth-result').innerHTML = 'Signing in...'
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                })
+                
+                if (error) {
+                    document.getElementById('auth-result').innerHTML = `<span class="error">❌ Auth Error: ${error.message}</span>`
+                    log(`Auth error: ${error.message}`)
+                } else {
+                    document.getElementById('auth-result').innerHTML = `<span class="success">✅ Sign in successful! User: ${data.user?.email}</span>`
+                    log(`Auth successful: ${data.user?.email}`)
+                }
+            } catch (err) {
+                document.getElementById('auth-result').innerHTML = `<span class="error">❌ Exception: ${err.message}</span>`
+                log(`Auth exception: ${err.message}`)
+            }
+        }
+        
+        // Initial log
+        log('Page loaded, ready for testing')
+    </script>
+</body>
+</html>

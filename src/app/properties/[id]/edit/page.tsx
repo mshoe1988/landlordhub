@@ -25,6 +25,7 @@ export default function EditPropertyPage() {
     address: '',
     monthly_rent: '',
     security_deposit: '',
+    nickname: '',
     tenant_name: '',
     lease_end_date: '',
     lease_start_date: '',
@@ -47,6 +48,7 @@ export default function EditPropertyPage() {
           address: property.address,
           monthly_rent: property.monthly_rent.toString(),
           security_deposit: property.security_deposit?.toString() || '',
+          nickname: property.nickname || '',
           tenant_name: property.tenant_name || '',
           lease_end_date: property.lease_end_date || '',
           lease_start_date: property.lease_start_date || '',
@@ -73,6 +75,7 @@ export default function EditPropertyPage() {
         address: formData.address,
         monthly_rent: parseFloat(formData.monthly_rent),
         security_deposit: formData.security_deposit ? parseFloat(formData.security_deposit) : undefined,
+        nickname: formData.nickname || undefined,
         tenant_name: formData.tenant_name || undefined,
         lease_end_date: formData.lease_end_date || undefined,
         lease_start_date: formData.lease_start_date || undefined,
@@ -162,6 +165,21 @@ export default function EditPropertyPage() {
                     value={formData.address}
                     onChange={handleChange}
                     placeholder="123 Main St, City, State 12345"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="nickname" className="block text-sm font-medium text-gray-700">
+                    Nickname (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="nickname"
+                    id="nickname"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                    value={formData.nickname}
+                    onChange={handleChange}
+                    placeholder="e.g., Smith House, Main Property"
                   />
                 </div>
 

@@ -28,6 +28,7 @@ export default function PropertiesPage() {
     address: '',
     monthly_rent: '',
     security_deposit: '',
+    nickname: '',
     tenant_name: '',
     tenant_email: '',
     tenant_phone: '',
@@ -114,6 +115,7 @@ export default function PropertiesPage() {
       address: property.address,
       monthly_rent: property.monthly_rent.toString(),
       security_deposit: property.security_deposit?.toString() || '',
+      nickname: property.nickname || '',
       tenant_name: property.tenant_name || '',
       tenant_email: property.tenant_email || '',
       tenant_phone: property.tenant_phone || '',
@@ -134,6 +136,7 @@ export default function PropertiesPage() {
         address: newProperty.address,
         monthly_rent: parseFloat(newProperty.monthly_rent),
         security_deposit: newProperty.security_deposit ? parseFloat(newProperty.security_deposit) : undefined,
+        nickname: newProperty.nickname || undefined,
         tenant_name: newProperty.tenant_name || undefined,
         tenant_email: newProperty.tenant_email || undefined,
         tenant_phone: newProperty.tenant_phone || undefined,
@@ -219,6 +222,7 @@ export default function PropertiesPage() {
         address: newProperty.address,
         monthly_rent: parseFloat(newProperty.monthly_rent),
         security_deposit: newProperty.security_deposit ? parseFloat(newProperty.security_deposit) : undefined,
+        nickname: newProperty.nickname || undefined,
         tenant_name: newProperty.tenant_name || undefined,
         tenant_email: newProperty.tenant_email || undefined,
         tenant_phone: newProperty.tenant_phone || undefined,
@@ -263,7 +267,7 @@ export default function PropertiesPage() {
       }
       
       setProperties([...properties, property])
-      setNewProperty({ address: '', monthly_rent: '', security_deposit: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
+      setNewProperty({ address: '', monthly_rent: '', security_deposit: '', nickname: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
       setSelectedDocument(null)
       setDocumentType('Lease')
       setShowAddProperty(false)
@@ -316,6 +320,17 @@ export default function PropertiesPage() {
                     className="w-full border border-gray-300 rounded px-3 py-2 text-black !text-black"
                     style={{ color: 'black' }}
                     placeholder="123 Main Street"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nickname (Optional)</label>
+                  <input
+                    type="text"
+                    value={newProperty.nickname}
+                    onChange={(e) => setNewProperty({ ...newProperty, nickname: e.target.value })}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-black !text-black"
+                    style={{ color: 'black' }}
+                    placeholder="e.g., Smith House, Main Property"
                   />
                 </div>
                 <div>
@@ -463,7 +478,7 @@ export default function PropertiesPage() {
                   onClick={() => {
                     setShowAddProperty(false)
                     setEditingProperty(null)
-                    setNewProperty({ address: '', monthly_rent: '', security_deposit: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
+                    setNewProperty({ address: '', monthly_rent: '', security_deposit: '', nickname: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
                     setSelectedDocument(null)
                     setDocumentType('Lease')
                   }}
@@ -487,7 +502,14 @@ export default function PropertiesPage() {
                 <div key={property.id} className="bg-white rounded-lg shadow p-6">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800">{property.address}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-gray-800">
+                          {property.nickname || property.address}
+                        </h3>
+                        {property.nickname && (
+                          <span className="text-sm text-gray-500">({property.address})</span>
+                        )}
+                      </div>
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
                         <div>
                           <p className="text-sm text-gray-500">Monthly Rent</p>
