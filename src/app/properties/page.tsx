@@ -184,7 +184,7 @@ export default function PropertiesPage() {
         property.id === editingProperty.id ? updatedProperty : property
       ))
       setEditingProperty(null)
-      setNewProperty({ address: '', monthly_rent: '', security_deposit: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
+      setNewProperty({ address: '', monthly_rent: '', security_deposit: '', nickname: '', tenant_name: '', tenant_email: '', tenant_phone: '', lease_end_date: '', lease_start_date: '', rent_due_date: '1' })
       setSelectedDocument(null)
       setDocumentType('Lease')
     } catch (error: any) {
