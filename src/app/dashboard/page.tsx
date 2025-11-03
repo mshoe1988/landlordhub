@@ -165,7 +165,7 @@ export default function DashboardPage() {
         date: new Date().toISOString().split('T')[0],
         amount: cost,
         category: 'Maintenance',
-        description: `${selectedTask.task}${property ? ` - ${property.address}` : ''}`,
+        description: `${selectedTask.task}${property ? ` - ${property.nickname || property.address}` : ''}`,
         is_recurring: false,
         recurring_frequency: undefined
       })
@@ -197,10 +197,10 @@ export default function DashboardPage() {
       return
     }
 
-    const subject = encodeURIComponent(`Regarding ${property.address}`)
+    const subject = encodeURIComponent(`Regarding ${property.nickname || property.address}`)
     const body = encodeURIComponent(
       `Hello ${property.tenant_name || 'Tenant'},\n\n` +
-      `I hope this message finds you well. I'm writing regarding the property at ${property.address}.\n\n`
+      `I hope this message finds you well. I'm writing regarding the property at ${property.nickname || property.address}.\n\n`
     )
     
     const mailtoLink = `mailto:${property.tenant_email}?subject=${subject}&body=${body}`
@@ -689,7 +689,14 @@ export default function DashboardPage() {
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800">{property.address}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-800">
+                              {property.nickname || property.address}
+                            </h3>
+                            {property.nickname && (
+                              <span className="text-xs text-gray-500">({property.address})</span>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-500 mt-1">Tenant: {property.tenant_name || 'Vacant'}</p>
                           {property.tenant_email && (
                             <p className="text-sm text-gray-500">Email: {property.tenant_email}</p>
@@ -776,7 +783,7 @@ export default function DashboardPage() {
                       >
                         <div>
                           <h3 className="font-semibold text-gray-800">{task.task}</h3>
-                          <p className="text-sm text-gray-500">{property?.address || 'Unknown Property'}</p>
+                          <p className="text-sm text-gray-500">{property ? (property.nickname || property.address) : 'Unknown Property'}</p>
                           <p className="text-sm text-orange-600 mt-1">Scheduled: {new Date(task.due_date + 'T00:00:00').toLocaleDateString()}</p>
                         </div>
                         <button 
