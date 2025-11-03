@@ -16,7 +16,10 @@ import {
   User,
   LogOut,
   HelpCircle,
-  Users
+  Users,
+  Linkedin,
+  Instagram,
+  Facebook
 } from 'lucide-react'
 import HelpModal from './HelpModal'
 
@@ -172,11 +175,40 @@ export default function Layout({ children }: LayoutProps) {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-6 mt-12">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex items-center gap-6">
               <p className="text-gray-300">© 2025 LandlordHub. All rights reserved.</p>
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://www.linkedin.com/company/landlordhub"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LandlordHub on LinkedIn"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.instagram.com/landlordhubapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="@landlordhubapp on Instagram"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.facebook.com/landlordhubapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LandlordHub on Facebook"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+              </div>
             </div>
-            <div className="flex space-x-6">
+            <div className="flex items-center gap-6">
               <Link
                 href="/privacy"
                 className="text-gray-300 hover:text-white transition-colors"
