@@ -10,7 +10,7 @@ import Layout from '@/components/Layout'
 import PropertyLimitModal from '@/components/PropertyLimitModal'
 import EmptyState from '@/components/EmptyState'
 import RentPaymentStatus from '@/components/RentPaymentStatus'
-import { Plus, Trash2, Edit, Upload } from 'lucide-react'
+import { Plus, Trash2, Edit, Upload, Search, CheckCircle2, XCircle, Settings } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { uploadFile } from '@/lib/storage'
 import { canAddProperty } from '@/lib/stripe'
@@ -40,6 +40,8 @@ export default function PropertiesPage() {
   const [documentType, setDocumentType] = useState('Lease')
   const [uploadingDocument, setUploadingDocument] = useState(false)
   const [rentPayments, setRentPayments] = useState<Record<string, RentPayment | null>>({})
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState<'rent' | 'tenant' | 'lease'>('rent')
 
   useEffect(() => {
     if (user) {
@@ -290,19 +292,106 @@ export default function PropertiesPage() {
     )
   }
 
+  // Filter and sort properties
+  const filteredAndSortedProperties = properties
+    .filter(property => {
+      if (!searchQuery) return true
+      const query = searchQuery.toLowerCase()
+      return (
+        property.address.toLowerCase().includes(query) ||
+        (property.nickname?.toLowerCase().includes(query) || false) ||
+        (property.tenant_name?.toLowerCase().includes(query) || false)
+      )
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'rent':
+          return b.monthly_rent - a.monthly_rent
+        case 'tenant':
+          const aTenant = a.tenant_name || 'ZZZ'
+          const bTenant = b.tenant_name || 'ZZZ'
+          return aTenant.localeCompare(bTenant)
+        case 'lease':
+          const aLease = a.lease_end_date || '9999-12-31'
+          const bLease = b.lease_end_date || '9999-12-31'
+          return aLease.localeCompare(bLease)
+        default:
+          return 0
+      }
+    })
+
   return (
     <ProtectedRoute>
       <Layout>
         <div>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">My Properties</h2>
-            <button
-              onClick={() => setShowAddProperty(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Add Property
-            </button>
+          {/* Header Section */}
+          <div className="mb-6">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <h2 className="font-bold" style={{ color: '#0A2540', fontSize: '20px', fontWeight: 600 }}>
+                  My Properties
+                </h2>
+                <p className="text-sm mt-1" style={{ color: '#667680' }}>
+                  Track rent, deposits, and tenant status for each of your properties.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddProperty(true)}
+                className="text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all duration-200 font-medium"
+                style={{
+                  backgroundColor: '#1C7C63',
+                  borderRadius: '8px',
+                  transform: 'scale(1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#155A47'
+                  e.currentTarget.style.transform = 'scale(1.05)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1C7C63'
+                  e.currentTarget.style.transform = 'scale(1)'
+                }}
+              >
+                <Plus className="w-5 h-5" />
+                Add Property
+              </button>
+            </div>
+            
+            {/* Search and Filter Bar */}
+            {properties.length > 0 && (
+              <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: '#6B7B7A' }} />
+                  <input
+                    type="text"
+                    placeholder="Search properties..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 border rounded-lg"
+                    style={{
+                      borderColor: '#E7ECEA',
+                      color: '#0A2540',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'rent' | 'tenant' | 'lease')}
+                  className="px-4 py-2.5 border rounded-lg"
+                  style={{
+                    borderColor: '#E7ECEA',
+                    color: '#0A2540',
+                    fontSize: '14px',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="rent">Sort by Rent Amount</option>
+                  <option value="tenant">Sort by Tenant</option>
+                  <option value="lease">Sort by Lease End</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {(showAddProperty || editingProperty) && (
@@ -497,79 +586,250 @@ export default function PropertiesPage() {
               actionText="Add Your First Property"
             />
           ) : (
-            <div className="space-y-4">
-              {properties.map(property => (
-                <div key={property.id} className="bg-white rounded-lg shadow p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-bold text-gray-800">
+            filteredAndSortedProperties.length === 0 && searchQuery ? (
+              <div className="bg-white rounded-lg shadow p-12 text-center" style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)' }}>
+                <p className="text-gray-600">No properties found matching "{searchQuery}"</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {filteredAndSortedProperties.map(property => {
+                  const isPaid = rentPayments[property.id]?.status === 'paid'
+                  const isPartial = rentPayments[property.id]?.status === 'partial'
+                  const now = new Date()
+                  const isOverdue = !isPaid && !isPartial && property.rent_due_date && now.getDate() > property.rent_due_date
+                  const paymentStatus = isPaid ? 'paid' : isPartial ? 'partial' : isOverdue ? 'overdue' : 'unpaid'
+                  
+                  return (
+                    <div 
+                      key={property.id} 
+                      className="bg-white p-6 transition-all duration-200"
+                      style={{ 
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                        transform: 'translateY(0)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)'
+                        e.currentTarget.style.transform = 'translateY(-3px)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)'
+                        e.currentTarget.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      {/* Header Section */}
+                      <div className="mb-4 pb-4 border-b" style={{ borderColor: '#E7ECEA', borderBottomWidth: '1px' }}>
+                        <h3 className="font-bold" style={{ color: '#0A2540', fontSize: '18px', fontWeight: 600 }}>
                           {property.nickname || property.address}
                         </h3>
                         {property.nickname && (
-                          <span className="text-sm text-gray-500">({property.address})</span>
+                          <p className="text-sm mt-1" style={{ color: '#6B7B7A' }}>{property.address}</p>
                         )}
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-                        <div>
-                          <p className="text-sm text-gray-500">Monthly Rent</p>
-                          <p className="text-lg font-semibold text-green-600">${property.monthly_rent}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Security Deposit</p>
-                          <p className="text-lg font-semibold text-blue-600">{property.security_deposit ? `$${property.security_deposit.toLocaleString()}` : 'N/A'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Rent Due</p>
-                          <p className="text-lg font-semibold text-black">{property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Tenant</p>
-                          <p className="text-lg font-semibold text-black">{property.tenant_name || 'Vacant'}</p>
-                          {property.tenant_email && (
-                            <p className="text-sm text-gray-600">{property.tenant_email}</p>
+
+                      {/* Two-Column Grid Layout */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Left Column: Property Info */}
+                        <div className="pr-6 border-r" style={{ borderColor: '#E7ECEA', borderRightWidth: '1px' }}>
+                          {/* Property Details */}
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Monthly Rent</p>
+                              <p className="font-bold" style={{ color: '#1C7C63', fontSize: '16px' }}>
+                                ${property.monthly_rent.toLocaleString()}
+                              </p>
+                            </div>
+                            {property.security_deposit && (
+                              <div>
+                                <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Security Deposit</p>
+                                <p className="font-bold" style={{ color: '#1C7C63', fontSize: '16px' }}>
+                                  ${property.security_deposit.toLocaleString()}
+                                </p>
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Rent Due</p>
+                              <p className="font-semibold" style={{ color: '#0A2540', fontSize: '14px' }}>
+                                {property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st'} of the month
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Payment Status Section */}
+                          {property.tenant_name && (
+                            <div className="mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
+                              <p className="text-sm mb-3" style={{ color: '#6B7B7A', fontSize: '13px' }}>Current Month Payment Status</p>
+                              <div className="flex flex-wrap gap-2 mb-3">
+                                {paymentStatus === 'paid' && (
+                                  <span 
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-colors duration-200"
+                                    style={{
+                                      backgroundColor: '#DFF7E4',
+                                      color: '#1C7C63',
+                                      borderRadius: '20px',
+                                      fontSize: '13px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Paid
+                                  </span>
+                                )}
+                                {paymentStatus === 'unpaid' && (
+                                  <span 
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-colors duration-200"
+                                    style={{
+                                      backgroundColor: '#FBEAEA',
+                                      color: '#D94A4A',
+                                      borderRadius: '20px',
+                                      fontSize: '13px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                    Unpaid
+                                  </span>
+                                )}
+                                {paymentStatus === 'overdue' && (
+                                  <span 
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-colors duration-200"
+                                    style={{
+                                      backgroundColor: '#FBEAEA',
+                                      color: '#D94A4A',
+                                      borderRadius: '20px',
+                                      fontSize: '13px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                    Overdue
+                                  </span>
+                                )}
+                                {paymentStatus === 'partial' && (
+                                  <span 
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-colors duration-200"
+                                    style={{
+                                      backgroundColor: '#EEEAFB',
+                                      color: '#6B4AE2',
+                                      borderRadius: '20px',
+                                      fontSize: '13px',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    <Settings className="w-4 h-4" />
+                                    Prorated
+                                  </span>
+                                )}
+                              </div>
+                              <RentPaymentStatus
+                                property={property}
+                                userId={user!.id}
+                                currentPayment={rentPayments[property.id]}
+                                onPaymentUpdate={refreshRentPayments}
+                              />
+                            </div>
                           )}
-                          {property.tenant_phone && (
-                            <p className="text-sm text-gray-600">{property.tenant_phone}</p>
-                          )}
                         </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Lease Ends</p>
-                          <p className="text-lg font-semibold text-black">{property.lease_end_date || 'N/A'}</p>
+
+                        {/* Right Column: Tenant Info */}
+                        <div className="pl-6">
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Tenant</p>
+                              <div className="group relative inline-block">
+                                <p 
+                                  className="font-semibold cursor-pointer" 
+                                  style={{ color: '#5E6B6B', fontSize: '14px' }}
+                                  onMouseEnter={(e) => {
+                                    // Show tooltip on hover
+                                    const tooltip = document.createElement('div')
+                                    tooltip.id = `tooltip-${property.id}`
+                                    tooltip.className = 'absolute z-10 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg'
+                                    tooltip.style.bottom = '100%'
+                                    tooltip.style.left = '50%'
+                                    tooltip.style.transform = 'translateX(-50%)'
+                                    tooltip.style.marginBottom = '8px'
+                                    tooltip.style.whiteSpace = 'nowrap'
+                                    tooltip.innerHTML = `
+                                      <div class="mb-1 font-semibold">${property.tenant_name || 'Vacant'}</div>
+                                      ${property.tenant_email ? `<div>📧 ${property.tenant_email}</div>` : ''}
+                                      ${property.tenant_phone ? `<div>📞 ${property.tenant_phone}</div>` : ''}
+                                    `
+                                    e.currentTarget.parentElement?.appendChild(tooltip)
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    const tooltip = document.getElementById(`tooltip-${property.id}`)
+                                    if (tooltip) {
+                                      tooltip.remove()
+                                    }
+                                  }}
+                                >
+                                  {property.tenant_name || 'Vacant'}
+                                </p>
+                                {property.tenant_email && (
+                                  <p className="text-sm mt-1" style={{ color: '#5E6B6B', fontSize: '13px' }}>
+                                    {property.tenant_email}
+                                  </p>
+                                )}
+                                {property.tenant_phone && (
+                                  <p className="text-sm" style={{ color: '#5E6B6B', fontSize: '13px' }}>
+                                    {property.tenant_phone}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            {property.lease_end_date && (
+                              <div>
+                                <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Lease Ends</p>
+                                <p className="font-semibold" style={{ color: '#5E6B6B', fontSize: '14px' }}>
+                                  {new Date(property.lease_end_date + 'T00:00:00').toLocaleDateString()}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Quick Actions */}
+                          <div className="flex gap-2 mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
+                            <button
+                              onClick={() => handleEdit(property)}
+                              className="text-blue-600 hover:text-blue-800 p-2 transition-colors duration-200"
+                              title="Edit property"
+                              style={{ color: '#1C7C63' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = '#155A47'
+                                e.currentTarget.style.transform = 'scale(1.1)'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = '#1C7C63'
+                                e.currentTarget.style.transform = 'scale(1)'
+                              }}
+                            >
+                              <Edit className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(property.id)}
+                              className="text-red-600 hover:text-red-800 p-2 transition-colors duration-200"
+                              title="Delete property"
+                              style={{ color: '#D94A4A' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = '#B83232'
+                                e.currentTarget.style.transform = 'scale(1.1)'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = '#D94A4A'
+                                e.currentTarget.style.transform = 'scale(1)'
+                              }}
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      {property.tenant_name && (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                          <p className="text-sm text-gray-500 mb-2">Current Month Payment Status</p>
-                          <RentPaymentStatus
-                            property={property}
-                            userId={user!.id}
-                            currentPayment={rentPayments[property.id]}
-                            onPaymentUpdate={refreshRentPayments}
-                          />
-                        </div>
-                      )}
                     </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEdit(property)}
-                        className="text-blue-600 hover:text-blue-800 p-2"
-                        title="Edit property"
-                      >
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(property.id)}
-                        className="text-red-600 hover:text-red-800 p-2"
-                        title="Delete property"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  )
+                })}
+              </div>
+            )
           )}
 
           <PropertyLimitModal
