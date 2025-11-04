@@ -159,7 +159,7 @@ export default function NewDocumentPage() {
                       name="property_id"
                       id="property_id"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.property_id}
                       onChange={handleChange}
                     >
@@ -217,7 +217,7 @@ export default function NewDocumentPage() {
                       name="name"
                       id="name"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="e.g., Lease Agreement - 123 Main St"
@@ -232,7 +232,7 @@ export default function NewDocumentPage() {
                       name="type"
                       id="type"
                       required
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       value={formData.type}
                       onChange={handleChange}
                     >

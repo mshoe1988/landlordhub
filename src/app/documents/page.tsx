@@ -203,7 +203,7 @@ export default function DocumentsPage() {
                   <select
                     value={newDocument.property_id}
                     onChange={(e) => setNewDocument({ ...newDocument, property_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
                   >
                     <option value="">Select Property</option>
                     {properties.map(p => (
@@ -216,7 +216,7 @@ export default function DocumentsPage() {
                   <select
                     value={newDocument.type}
                     onChange={(e) => setNewDocument({ ...newDocument, type: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
                   >
                     {DOCUMENT_TYPES.map(type => (
                       <option key={type} value={type}>{type}</option>
@@ -229,7 +229,7 @@ export default function DocumentsPage() {
                     type="text"
                     value={newDocument.name}
                     onChange={(e) => setNewDocument({ ...newDocument, name: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
                     placeholder="Lease Agreement - John Smith"
                   />
                 </div>
