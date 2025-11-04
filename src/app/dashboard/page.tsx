@@ -926,23 +926,37 @@ export default function DashboardPage() {
 
           {/* Cashflow Bar Chart */}
           <div 
-            className="rounded-lg"
+            className="rounded-lg mx-auto"
             style={{ 
               backgroundColor: '#FFFFFF',
               borderRadius: '12px',
               boxShadow: '0 1px 8px rgba(0, 0, 0, 0.05)',
-              border: '1px solid rgba(227, 232, 229, 0.5)'
+              border: '1px solid rgba(227, 232, 229, 0.5)',
+              width: '95%',
+              maxWidth: '100%'
             }}
           >
             <div className="p-6 border-b" style={{ borderColor: '#E3E8E5' }}>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
-                <div>
-                  <h2 className="text-2xl font-bold mb-1" style={{ color: '#0A2540' }}>Cashflow Overview</h2>
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
+                <div className="flex-1">
+                  <h2 className="text-lg font-bold mb-1" style={{ color: '#0A2540' }}>Cashflow Overview</h2>
                   <p className="text-sm" style={{ color: '#0A2540', opacity: 0.7 }}>
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
-            </div>
-          </div>
+                </div>
+                
+                {/* Legend moved to header */}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#1C7C63' }}></div>
+                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cashflow</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent' }}></div>
+                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cumulative</span>
+                  </div>
+                </div>
+              </div>
 
               {/* Time Filter Pills */}
               <div className="flex flex-wrap gap-2">
@@ -986,12 +1000,31 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="p-6">
-              <div className="h-80 md:h-96" style={{ paddingBottom: '20px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart 
-                    data={calculateCashflowData() as any}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-                  >
+              {(() => {
+                const cashflowData = calculateCashflowData()
+                const hasData = cashflowData.length > 0 && cashflowData.some((entry: any) => entry.income > 0 || entry.expenses > 0)
+                
+                if (!hasData) {
+                  return (
+                    <div className="flex flex-col items-center justify-center py-16" style={{ height: '420px' }}>
+                      <div className="text-center">
+                        <DollarSign className="w-16 h-16 mx-auto mb-4" style={{ color: '#1C7C63', opacity: 0.3 }} />
+                        <h3 className="text-lg font-semibold mb-2" style={{ color: '#0A2540' }}>Start tracking income to see your cashflow grow</h3>
+                        <p className="text-sm" style={{ color: '#0A2540', opacity: 0.6 }}>
+                          Add properties and record rent payments to visualize your cashflow over time
+                        </p>
+                      </div>
+                    </div>
+                  )
+                }
+                
+                return (
+                  <div style={{ height: '420px', paddingBottom: '30px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart 
+                        data={cashflowData as any}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                      >
                     <defs>
                       <linearGradient id="cashflowGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="rgba(28, 124, 99, 0.85)" stopOpacity={1} />
@@ -1000,6 +1033,10 @@ export default function DashboardPage() {
                       <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="rgba(255, 123, 0, 0.85)" stopOpacity={1} />
                         <stop offset="100%" stopColor="rgba(255, 123, 0, 0.6)" stopOpacity={1} />
+                      </linearGradient>
+                      <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(28, 124, 99, 0.15)" stopOpacity={1} />
+                        <stop offset="100%" stopColor="rgba(28, 124, 99, 0)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid 
@@ -1013,43 +1050,53 @@ export default function DashboardPage() {
                       tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
                       angle={-45}
                       textAnchor="end"
-                      height={80}
+                      height={100}
                       style={{ color: 'rgba(10, 37, 64, 0.7)' }}
                     />
                     <YAxis 
                       tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
                       tickFormatter={(value) => `$${value.toLocaleString()}`}
                       width={80}
+                      domain={['auto', 'auto']}
+                      allowDataOverflow={false}
+                      tickCount={6}
                     />
                     <Tooltip 
                       content={({ active, payload, label }: any) => {
                         if (active && payload && payload.length > 0) {
                           const data = payload[0].payload
-                  return (
+                          const cumulativeValue = data.cumulativeCashflow || 0
+                          return (
                             <div style={{ 
-                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              backgroundColor: 'rgba(255, 255, 255, 0.9)',
                               backdropFilter: 'blur(10px)',
                               border: '1px solid #E3E8E5',
                               borderRadius: '12px',
-                              padding: '12px 16px',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                              padding: '14px 18px',
+                              boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
                             }}>
-                              <div style={{ color: '#0A2540', fontWeight: 'bold', marginBottom: '12px', fontSize: '14px' }}>
+                              <div style={{ color: '#0A2540', fontWeight: 'bold', marginBottom: '14px', fontSize: '14px' }}>
                                 {label}
                               </div>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
                                   <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Income:</span>
                                   <span style={{ color: '#1C7C63', fontWeight: '600', fontSize: '12px' }}>${(data.income || 0).toLocaleString()}</span>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
                                   <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Expenses:</span>
                                   <span style={{ color: '#FF7B00', fontWeight: '600', fontSize: '12px' }}>${(data.expenses || 0).toLocaleString()}</span>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginTop: '4px', paddingTop: '8px', borderTop: '1px solid #E3E8E5' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '6px', paddingTop: '10px', borderTop: '1px solid #E3E8E5' }}>
                                   <span style={{ color: '#0A2540', fontWeight: 'bold', fontSize: '12px' }}>Net:</span>
                                   <span style={{ color: (data.cashflow || 0) >= 0 ? '#1C7C63' : '#FF7B00', fontWeight: 'bold', fontSize: '13px' }}>
-                                    ${(data.cashflow || 0).toLocaleString()}
+                                    ${(data.cashflow || 0) >= 0 ? '+' : ''}${(data.cashflow || 0).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '4px', paddingTop: '10px', borderTop: '1px solid #E3E8E5' }}>
+                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Cumulative:</span>
+                                  <span style={{ color: '#1C7C63', fontWeight: 'bold', fontSize: '13px' }}>
+                                    ${cumulativeValue >= 0 ? '+' : ''}${cumulativeValue.toLocaleString()}
                                   </span>
                                 </div>
                               </div>
@@ -1059,11 +1106,16 @@ export default function DashboardPage() {
                         return null
                       }}
                     />
-                    <Legend 
-                      wrapperStyle={{ paddingTop: '20px' }}
-                      iconType="square"
+                    {/* Cumulative cashflow line with gradient fill */}
+                    <Area
+                      type="monotone"
+                      dataKey="cumulativeCashflow"
+                      fill="url(#lineGradient)"
+                      stroke="none"
+                      isAnimationActive={true}
+                      animationDuration={700}
+                      animationEasing="ease-out"
                     />
-                    {/* Cumulative cashflow line */}
                     <Line 
                       type="monotone" 
                       dataKey="cumulativeCashflow" 
@@ -1073,6 +1125,9 @@ export default function DashboardPage() {
                       strokeDasharray="0"
                       name="Cumulative Balance"
                       legendType="line"
+                      isAnimationActive={true}
+                      animationDuration={700}
+                      animationEasing="ease-out"
                       style={{
                         filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))'
                       }}
@@ -1081,11 +1136,11 @@ export default function DashboardPage() {
                       dataKey="cashflow" 
                       name="Cashflow (Income - Expenses)"
                       radius={[6, 6, 0, 0]}
-                      animationBegin={0}
-                      animationDuration={600}
+                      isAnimationActive={true}
+                      animationDuration={700}
                       animationEasing="ease-out"
                     >
-                      {(calculateCashflowData() as any).map((entry: any, index: number) => (
+                      {(cashflowData as any).map((entry: any, index: number) => (
                         <Cell 
                           key={`cell-${index}`} 
                           fill={entry.cashflow >= 0 ? 'url(#cashflowGradient)' : 'url(#expenseGradient)'}
@@ -1094,13 +1149,13 @@ export default function DashboardPage() {
                           }}
                           onMouseEnter={(e: any) => {
                             if (entry.cashflow >= 0) {
-                              e.target.style.opacity = '0.9'
-                              e.target.style.transform = 'scaleY(1.02)'
+                              e.currentTarget.style.opacity = '0.9'
+                              e.currentTarget.style.transform = 'scaleY(1.02)'
                             }
                           }}
                           onMouseLeave={(e: any) => {
-                            e.target.style.opacity = '1'
-                            e.target.style.transform = 'scaleY(1)'
+                            e.currentTarget.style.opacity = '1'
+                            e.currentTarget.style.transform = 'scaleY(1)'
                           }}
                         />
                       ))}
