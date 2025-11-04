@@ -177,7 +177,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div className="flex items-center gap-6">
-              <p className="text-gray-300">© 2025 LandlordHub. All rights reserved.</p>
+              <p className="text-gray-300 text-sm">© 2025 LandlordHub | Simplify Life. Maximize Rentals.</p>
               <div className="flex items-center gap-4">
                 <a
                   href="https://www.linkedin.com/company/landlordhub"

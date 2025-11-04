@@ -1399,10 +1399,10 @@ export default function DashboardPage() {
 
           {/* Upcoming Maintenance */}
           <div 
-            className="bg-white"
+            className="bg-white transition-all duration-200"
             style={{ 
-              borderRadius: '12px',
-              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+              borderRadius: '14px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)'
             }}
           >
             <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
@@ -1412,23 +1412,63 @@ export default function DashboardPage() {
               {maintenance.filter(m => m.status === 'pending').length === 0 ? (
                 <p className="text-gray-500 text-center py-8">No upcoming maintenance tasks</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '12px' }}>
                   {maintenance.filter(m => m.status === 'pending').map(task => {
                     const property = properties.find(p => p.id === task.property_id)
+                    const taskIcon = task.task.toLowerCase().includes('plumb') || task.task.toLowerCase().includes('pipe') ? '🚰' : 
+                                    task.task.toLowerCase().includes('hvac') || task.task.toLowerCase().includes('heat') || task.task.toLowerCase().includes('air') ? '❄️' :
+                                    task.task.toLowerCase().includes('electr') ? '⚡' : '🛠️'
                     return (
                       <div 
                         key={task.id} 
-                        className="border rounded-lg p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
+                        className="border rounded-lg p-4 flex justify-between items-center cursor-pointer transition-all duration-200"
+                        style={{
+                          borderRadius: '12px',
+                          borderColor: '#E5E9E7',
+                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                          transform: 'translateY(0)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.08)'
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.04)'
+                          e.currentTarget.style.transform = 'translateY(0)'
+                        }}
                         onClick={() => router.push('/maintenance')}
                       >
-                        <div>
-                          <h3 className="font-semibold text-gray-800">{task.task}</h3>
-                          <p className="text-sm text-gray-500">{property ? (property.nickname || property.address) : 'Unknown Property'}</p>
-                          <p className="text-sm text-orange-600 mt-1">Scheduled: {new Date(task.due_date + 'T00:00:00').toLocaleDateString()}</p>
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl">{taskIcon}</span>
+                          <div>
+                            <h3 className="font-semibold text-gray-800" style={{ fontWeight: 600 }}>{task.task}</h3>
+                            <p className="text-sm text-gray-500 mt-1">{property ? (property.nickname || property.address) : 'Unknown Property'}</p>
+                            <p className="text-sm mt-1" style={{ color: '#667680' }}>Scheduled: {new Date(task.due_date + 'T00:00:00').toLocaleDateString()}</p>
+                          </div>
                         </div>
                         <button 
-                          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                          onClick={(e) => handleMarkComplete(task.id, e)}
+                          className="px-4 py-2 text-white rounded-full transition-all duration-200 font-medium text-sm"
+                          style={{
+                            backgroundColor: '#1C7C63',
+                            borderRadius: '9999px',
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleMarkComplete(task.id, e)
+                            e.currentTarget.style.transform = 'scale(0.95)'
+                            setTimeout(() => {
+                              e.currentTarget.style.transform = 'scale(1)'
+                            }, 150)
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#155A47'
+                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1C7C63'
+                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
                           Mark Complete
                         </button>
