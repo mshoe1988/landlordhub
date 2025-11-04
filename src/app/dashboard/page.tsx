@@ -624,8 +624,17 @@ export default function DashboardPage() {
     const finalStartDate: Date = startDate
     
     // Generate all months within the date range
+    // For "all-time", ensure we always include the current month (November)
     let monthIterator = new Date(finalStartDate.getFullYear(), finalStartDate.getMonth(), 1)
-    const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
+    let endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
+    
+    // For "all-time", ensure we include the current month even if endDate doesn't include it
+    if (cashflowDateRange === 'all-time') {
+      const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      if (endMonth < currentMonth) {
+        endMonth = currentMonth
+      }
+    }
     
     while (monthIterator <= endMonth) {
       const monthKey = monthIterator.toISOString().slice(0, 7) // YYYY-MM
@@ -932,9 +941,9 @@ export default function DashboardPage() {
                   <p className="text-sm" style={{ color: '#0A2540', opacity: 0.7 }}>
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
-                </div>
-              </div>
-              
+            </div>
+          </div>
+
               {/* Time Filter Pills */}
               <div className="flex flex-wrap gap-2">
                 {['all-time', 'this-month', 'last-month', 'last-quarter', 'last-year'].map((range) => {
@@ -1016,7 +1025,7 @@ export default function DashboardPage() {
                       content={({ active, payload, label }: any) => {
                         if (active && payload && payload.length > 0) {
                           const data = payload[0].payload
-                          return (
+                  return (
                             <div style={{ 
                               backgroundColor: 'rgba(255, 255, 255, 0.95)',
                               backdropFilter: 'blur(10px)',
@@ -1162,7 +1171,7 @@ export default function DashboardPage() {
                             </span>
                           </div>
                         </div>
-                      )}
+                        )}
                       </div>
                     </div>
                   )
