@@ -307,12 +307,12 @@ export default function PropertiesPage() {
 
           {(showAddProperty || editingProperty) && (
             <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-bold mb-4">
+              <h3 className="text-lg font-bold mb-4 text-gray-900">
                 {editingProperty ? 'Edit Property' : 'Add New Property'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Address *</label>
                   <input
                     type="text"
                     value={newProperty.address}
@@ -323,7 +323,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nickname (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Nickname (Optional)</label>
                   <input
                     type="text"
                     value={newProperty.nickname}
@@ -334,7 +334,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Monthly Rent *</label>
                   <input
                     type="number"
                     value={newProperty.monthly_rent}
@@ -345,7 +345,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Security Deposit</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Security Deposit</label>
                   <input
                     type="number"
                     value={newProperty.security_deposit}
@@ -356,7 +356,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Rent Due Date *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Rent Due Date *</label>
                   <select
                     value={newProperty.rent_due_date}
                     onChange={(e) => setNewProperty({ ...newProperty, rent_due_date: e.target.value })}
@@ -371,10 +371,10 @@ export default function PropertiesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Upload Document (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Upload Document (Optional)</label>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Document Type</label>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">Document Type</label>
                       <select
                         value={documentType}
                         onChange={(e) => setDocumentType(e.target.value)}
@@ -389,7 +389,7 @@ export default function PropertiesPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Select File</label>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">Select File</label>
                       <input
                         type="file"
                         onChange={(e) => {
@@ -410,7 +410,7 @@ export default function PropertiesPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tenant Name</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Tenant Name</label>
                   <input
                     type="text"
                     value={newProperty.tenant_name}
@@ -421,7 +421,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tenant Email</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Tenant Email</label>
                   <input
                     type="email"
                     value={newProperty.tenant_email}
@@ -432,7 +432,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tenant Phone</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Tenant Phone</label>
                   <input
                     type="tel"
                     value={newProperty.tenant_phone}
@@ -443,7 +443,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lease End Date</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Lease End Date</label>
                   <input
                     type="date"
                     value={newProperty.lease_end_date}
@@ -453,7 +453,7 @@ export default function PropertiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lease Start Date</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Lease Start Date</label>
                   <input
                     type="date"
                     value={newProperty.lease_start_date}

@@ -208,12 +208,12 @@ export default function MaintenancePage() {
 
           {(showAddMaintenance || editingTask) && (
             <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-bold mb-4">
+              <h3 className="text-lg font-bold mb-4 text-gray-900">
                 {editingTask ? 'Edit Maintenance Task' : 'Add Maintenance Task'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Property *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Property *</label>
                   <select
                     value={newMaintenance.property_id}
                     onChange={(e) => setNewMaintenance({ ...newMaintenance, property_id: e.target.value })}
@@ -226,7 +226,7 @@ export default function MaintenancePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Task *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Task *</label>
                   <input
                     type="text"
                     value={newMaintenance.task}
@@ -236,7 +236,7 @@ export default function MaintenancePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Scheduled *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Date Scheduled *</label>
                   <input
                     type="date"
                     value={newMaintenance.due_date}
@@ -245,7 +245,7 @@ export default function MaintenancePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Notes</label>
                   <input
                     type="text"
                     value={newMaintenance.notes}

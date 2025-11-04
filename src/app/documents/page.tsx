@@ -196,10 +196,10 @@ export default function DocumentsPage() {
 
           {showAddDocument && (
             <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-bold mb-4">Add Document</h3>
+              <h3 className="text-lg font-bold mb-4 text-gray-900">Add Document</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Property *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Property *</label>
                   <select
                     value={newDocument.property_id}
                     onChange={(e) => setNewDocument({ ...newDocument, property_id: e.target.value })}
@@ -212,7 +212,7 @@ export default function DocumentsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Document Type</label>
                   <select
                     value={newDocument.type}
                     onChange={(e) => setNewDocument({ ...newDocument, type: e.target.value })}
@@ -224,7 +224,7 @@ export default function DocumentsPage() {
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Document Name *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Document Name *</label>
                   <input
                     type="text"
                     value={newDocument.name}
@@ -234,7 +234,7 @@ export default function DocumentsPage() {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Upload File *</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Upload File *</label>
                   <FileUpload
                     onFileSelect={setSelectedFile}
                     onFileRemove={() => setSelectedFile(null)}
