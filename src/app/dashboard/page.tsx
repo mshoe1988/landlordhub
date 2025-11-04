@@ -1967,11 +1967,11 @@ export default function DashboardPage() {
                 backgroundColor: '#F8FBFA'
               }}
             >
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-1.5 mb-2.5" style={{ marginBottom: '10px' }}>
                 <span className="text-lg">🔧</span>
                 <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Upcoming Maintenance</h2>
               </div>
-              <p className="text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>Track and manage repairs, upkeep, and maintenance tasks</p>
+              <p style={{ fontSize: '0.85rem', color: '#8DA6A0', fontWeight: 400 }}>Track and manage repairs, upkeep, and maintenance tasks</p>
             </div>
             <div className="p-6">
               {maintenance.filter(m => m.status === 'pending').length === 0 ? (
@@ -2008,126 +2008,111 @@ export default function DashboardPage() {
                         key={task.id} 
                         className="border rounded-lg p-4 flex flex-col cursor-pointer transition-all duration-200"
                         style={{
-                          borderRadius: '14px',
-                          borderTopLeftRadius: '14px',
-                          borderTopRightRadius: '14px',
-                          borderColor: (task.status === 'pending' || taskDueSoon) && !taskOverdue ? undefined : '#E5E9E7',
-                          border: (task.status === 'pending' || taskDueSoon) && !taskOverdue 
-                            ? '1px solid' 
-                            : '1px solid #E5E9E7',
-                          borderImage: (task.status === 'pending' || taskDueSoon) && !taskOverdue
-                            ? 'linear-gradient(90deg, #F7A43F, #FFDFA8) 1'
-                            : undefined,
-                          borderLeft: `4px solid ${getBorderColor()}`,
-                          backgroundColor: taskOverdue ? '#FFF5F5' : 'white',
-                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
-                          transform: 'translateY(0)'
+                          borderRadius: '12px',
+                          background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
+                          borderLeft: '3px solid',
+                          borderImage: 'linear-gradient(180deg, #1C7C63, #5DD39E) 1',
+                          borderTop: '1px solid #E5E9E7',
+                          borderRight: '1px solid #E5E9E7',
+                          borderBottom: '1px solid #E5E9E7',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                          transform: 'translateY(0)',
+                          transition: 'transform 0.15s ease'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.12)'
-                          e.currentTarget.style.transform = 'translateY(-3px)'
+                          e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'
+                          e.currentTarget.style.transform = 'translateY(-2px)'
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.04)'
+                          e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
                           e.currentTarget.style.transform = 'translateY(0)'
                         }}
                         onClick={() => router.push('/maintenance')}
                       >
-                        <div className="flex items-start gap-3 mb-3">
-                          <span className="text-2xl">{taskIcon}</span>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <h3 className="font-semibold text-gray-800" style={{ fontWeight: 600, fontSize: '16px' }}>{task.task}</h3>
-                              {/* Status badges */}
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                {taskOverdue ? (
-                                  <span 
-                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
-                                    style={{ backgroundColor: '#FFEAEA', color: '#E04848', borderRadius: '8px', fontWeight: 500 }}
-                                  >
-                                    <AlertTriangle className="w-3 h-3" />
-                                    Overdue
-                                  </span>
-                                ) : task.status === 'pending' ? (
-                                  <span 
-                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
-                                    style={{ backgroundColor: '#FFF7E0', color: '#8A6E00', borderRadius: '8px', fontWeight: 500 }}
-                                  >
-                                    <Clock className="w-3 h-3" />
-                                    Pending
-                                  </span>
-                                ) : null}
-                                {taskDueSoon && !taskOverdue && (
-                                  <span 
-                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
-                                    style={{ backgroundColor: '#FFF4E6', color: '#D97706', borderRadius: '8px', fontWeight: 500 }}
-                                  >
-                                    <AlertCircle className="w-3 h-3" />
-                                    Due Soon
-                                  </span>
-                                )}
-                                {task.priority && (
-                                  <span 
-                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
-                                    style={{ 
-                                      backgroundColor: priorityColor.bg, 
-                                      color: priorityColor.text, 
-                                      borderRadius: '8px', 
-                                      fontWeight: 500 
-                                    }}
-                                  >
-                                    {task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢'} {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                                  </span>
-                                )}
-                                {task.attachment_url && (
-                                  <a
-                                    href={task.attachment_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity"
-                                    style={{ 
-                                      backgroundColor: '#E7F2EF', 
-                                      color: '#1C7C63', 
-                                      borderRadius: '8px', 
-                                      fontWeight: 500 
-                                    }}
-                                    title="View attachment"
-                                  >
-                                    <Paperclip className="w-3 h-3" />
-                                    Attachment
-                                  </a>
-                                )}
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-500 mt-1">{property ? (property.nickname || property.address) : 'Unknown Property'}</p>
-                            <p className="text-sm mt-1" style={{ color: taskOverdue ? '#B0372A' : '#667680', fontSize: '12px' }}>Scheduled: {new Date(task.due_date + 'T00:00:00').toLocaleDateString()}</p>
-                          </div>
+                        {/* Task Title */}
+                        <div className="flex items-start gap-2 mb-3">
+                          <span className="text-xl">{taskIcon}</span>
+                          <h3 className="font-semibold text-gray-800 flex-1" style={{ fontWeight: 600, fontSize: '16px' }}>{task.task}</h3>
                         </div>
-                        <div className="flex justify-end mt-2">
-                          <button 
-                            className="px-4 py-2 text-white rounded-full transition-all duration-200 font-medium text-sm"
-                            style={{
-                              background: 'linear-gradient(90deg, #1C7C63, #29A184)',
-                              borderRadius: '9999px',
-                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                              filter: 'brightness(1)'
-                            }}
+
+                        {/* Status Badge */}
+                        <div className="mb-3">
+                          {taskOverdue ? (
+                            <span 
+                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full"
+                              style={{ 
+                                background: 'linear-gradient(90deg, #FFEAEA 0%, #FFD1C7 100%)', 
+                                color: '#E04848', 
+                                fontWeight: 500 
+                              }}
+                            >
+                              <AlertTriangle className="w-3 h-3" />
+                              Overdue
+                            </span>
+                          ) : taskDueSoon ? (
+                            <span 
+                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full"
+                              style={{ 
+                                background: 'linear-gradient(90deg, #FFE5E1 0%, #FFD1C7 100%)', 
+                                color: '#C0362C', 
+                                fontWeight: 500 
+                              }}
+                            >
+                              <AlertCircle className="w-3 h-3" />
+                              Due Soon
+                            </span>
+                          ) : (
+                            <span 
+                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full"
+                              style={{ 
+                                background: 'linear-gradient(90deg, #FFF8E1 0%, #FFF2C2 100%)', 
+                                color: '#A97900', 
+                                fontWeight: 500 
+                              }}
+                            >
+                              <Clock className="w-3 h-3" />
+                              Pending
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Property Address */}
+                        {property && (
+                          <div className="flex items-center gap-2 mb-2" style={{ color: '#647474', fontSize: '14px' }}>
+                            <span>📍</span>
+                            <span>{property.nickname || property.address}</span>
+                          </div>
+                        )}
+
+                        {/* Scheduled Date */}
+                        <div className="flex items-center gap-2 mb-4" style={{ color: taskOverdue ? '#B0372A' : '#647474', fontSize: '14px' }}>
+                          <span>🗓</span>
+                          <span>
+                            {new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+
+                        {/* Mark Complete Button - Right Aligned */}
+                        <div className="flex justify-end mt-auto">
+                          <button
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleMarkComplete(task.id, e)
-                              e.currentTarget.style.transform = 'scale(0.95)'
-                              setTimeout(() => {
-                                e.currentTarget.style.transform = 'scale(1)'
-                              }, 150)
+                              setSelectedTask(task)
+                              setShowCostModal(true)
+                            }}
+                            className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                            style={{
+                              background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                              color: 'white',
+                              border: 'none',
+                              fontWeight: 500,
+                              cursor: 'pointer'
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.filter = 'brightness(1.05)'
-                              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)'
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.filter = 'brightness(1)'
-                              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
                             }}
                           >
                             Mark Complete

@@ -594,7 +594,20 @@ export default function ExpensesPage() {
             <h2 className="text-2xl font-bold text-gray-800">Expenses</h2>
             <button
               onClick={() => setShowAddExpense(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className="text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200"
+              style={{
+                backgroundColor: '#1C7C63',
+                border: 'none',
+                fontWeight: 500
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#29A184'
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#1C7C63'
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
             >
               <Plus className="w-5 h-5" />
               Add Expense
