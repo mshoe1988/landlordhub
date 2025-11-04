@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     default: 'LandlordHub Simplified property management',
     template: '%s | LandlordHub'
   },
-  description: 'Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.',
+  description: 'Simplify rent collection, expenses, and maintenance in one app. LandlordHub makes property management easy for small landlords — start free today.',
   keywords: [
     'property management software',
     'landlord software',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'LandlordHub: Simplify Life. Maximize Rentals.',
-    description: 'Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.',
+    description: 'Simplify rent collection, expenses, and maintenance in one app. LandlordHub makes property management easy for small landlords — start free today.',
     type: 'website',
     locale: 'en_US',
     url: 'https://landlordhubapp.com/',
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'LandlordHub: Simplify Life. Maximize Rentals.',
-    description: 'Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.',
+    description: 'Simplify rent collection, expenses, and maintenance in one app. LandlordHub makes property management easy for small landlords — start free today.',
     site: '@landlordhubapp',
     creator: '@landlordhubapp',
     images: ['/landlord-hub-logo.png']
