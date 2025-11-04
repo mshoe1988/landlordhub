@@ -155,9 +155,9 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
 
-      {/* Desktop Navigation */}
+      {/* Navigation */}
       <div 
-        className="hidden md:block shadow-sm sticky top-0 z-50"
+        className="shadow-sm sticky top-0 z-50"
         style={{ 
           backgroundColor: '#FFFFFF',
           borderBottom: '1px solid rgba(28,124,99,0.1)',
@@ -165,7 +165,8 @@ export default function Layout({ children }: LayoutProps) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4">
-          <div ref={navRef} className="flex items-center justify-center space-x-2">
+          {/* Desktop: Show all navigation items */}
+          <div ref={navRef} className="hidden md:flex items-center justify-center space-x-2">
             {navigation.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
@@ -336,37 +337,80 @@ export default function Layout({ children }: LayoutProps) {
               )
             })}
           </div>
-        </div>
-      </div>
 
-      {/* Mobile Bottom Navigation */}
-      <div 
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderTop: '1px solid rgba(28,124,99,0.15)',
-          display: 'flex',
-          justifyContent: 'space-around',
-          padding: '8px 0',
-          boxShadow: '0 -2px 8px rgba(0,0,0,0.1)'
-        }}
-      >
-        {primaryNavigation.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="flex flex-col items-center gap-1 transition-all duration-250"
+          {/* Mobile: Show primary navigation with More button */}
+          <div className="md:hidden flex items-center justify-center space-x-1 overflow-x-auto">
+            {primaryNavigation.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="flex flex-col items-center gap-1 font-medium transition-all duration-250 relative px-2"
+                  style={{
+                    color: isActive ? '#1C7C63' : '#6B7B7A',
+                    padding: '8px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: isActive ? 600 : 500,
+                    minWidth: '60px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = '#1C7C63'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                      const icon = e.currentTarget.querySelector('svg')
+                      if (icon) {
+                        icon.style.transform = 'scale(1.15)'
+                      }
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = '#6B7B7A'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      const icon = e.currentTarget.querySelector('svg')
+                      if (icon) {
+                        icon.style.transform = 'scale(1)'
+                      }
+                    }
+                  }}
+                >
+                  <Icon 
+                    className="w-4 h-4 transition-all duration-250"
+                    style={{
+                      transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                    }}
+                  />
+                  <span className="text-xs">{item.name}</span>
+                  {isActive && (
+                    <div 
+                      style={{
+                        width: '24px',
+                        height: '2px',
+                        borderRadius: '2px',
+                        background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                        marginTop: '2px'
+                      }}
+                    />
+                  )}
+                </Link>
+              )
+            })}
+            <button
+              onClick={() => setShowMoreMenu(!showMoreMenu)}
+              className="flex flex-col items-center gap-1 font-medium transition-all duration-250 relative px-2"
               style={{
-                color: isActive ? '#1C7C63' : '#6B7B7A',
-                padding: '8px 16px',
+                color: showMoreMenu ? '#1C7C63' : '#6B7B7A',
+                padding: '8px 12px',
+                fontSize: '0.8rem',
+                fontWeight: showMoreMenu ? 600 : 500,
                 minWidth: '60px'
               }}
               onMouseEnter={(e) => {
-                if (!isActive) {
+                if (!showMoreMenu) {
                   e.currentTarget.style.color = '#1C7C63'
+                  e.currentTarget.style.transform = 'translateY(-1px)'
                   const icon = e.currentTarget.querySelector('svg')
                   if (icon) {
                     icon.style.transform = 'scale(1.15)'
@@ -374,8 +418,9 @@ export default function Layout({ children }: LayoutProps) {
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isActive) {
+                if (!showMoreMenu) {
                   e.currentTarget.style.color = '#6B7B7A'
+                  e.currentTarget.style.transform = 'translateY(0)'
                   const icon = e.currentTarget.querySelector('svg')
                   if (icon) {
                     icon.style.transform = 'scale(1)'
@@ -383,13 +428,9 @@ export default function Layout({ children }: LayoutProps) {
                 }
               }}
             >
-              <Icon 
-                className="w-5 h-5 transition-all duration-250"
-                style={{
-                  transform: isActive ? 'scale(1.1)' : 'scale(1)'
-                }}
-              />
-              {isActive && (
+              <MoreVertical className="w-4 h-4 transition-all duration-250" />
+              <span className="text-xs">More</span>
+              {showMoreMenu && (
                 <div 
                   style={{
                     width: '24px',
@@ -400,31 +441,9 @@ export default function Layout({ children }: LayoutProps) {
                   }}
                 />
               )}
-            </Link>
-          )
-        })}
-        <button
-          onClick={() => setShowMoreMenu(!showMoreMenu)}
-          className="flex flex-col items-center gap-1 transition-all duration-250"
-          style={{
-            color: showMoreMenu ? '#1C7C63' : '#6B7B7A',
-            padding: '8px 16px',
-            minWidth: '60px'
-          }}
-        >
-          <MoreVertical className="w-5 h-5 transition-all duration-250" />
-          {showMoreMenu && (
-            <div 
-              style={{
-                width: '24px',
-                height: '2px',
-                borderRadius: '2px',
-                background: 'linear-gradient(90deg, #1C7C63, #29A184)',
-                marginTop: '2px'
-              }}
-            />
-          )}
-        </button>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Mobile More Menu Sheet */}
@@ -516,11 +535,8 @@ export default function Layout({ children }: LayoutProps) {
         </>
       )}
 
-      {/* Mobile bottom padding to prevent content from being hidden */}
-      <div className="md:hidden" style={{ height: '70px' }} />
-
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8 md:pb-8 pb-20">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {children}
       </div>
 
