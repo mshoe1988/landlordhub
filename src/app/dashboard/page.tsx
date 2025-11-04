@@ -687,10 +687,10 @@ export default function DashboardPage() {
     })
     
     // Ensure at least 3 months are shown (pad with zero months if needed)
-    // Always include the current month and go back from there
-    if (result.length < 3) {
+    // Only pad if we're showing "all-time" or if the selected range naturally has multiple months
+    // For "this-month" or "last-month", we only want to show that specific month
+    if (result.length < 3 && cashflowDateRange !== 'this-month' && cashflowDateRange !== 'last-month') {
       const now = new Date()
-      const currentMonthKey = now.toISOString().slice(0, 7) // YYYY-MM format
       const monthsToShow = 3
       
       // Build array of months to show, starting from current month going back
@@ -719,6 +719,37 @@ export default function DashboardPage() {
       }
       
       // Recalculate cumulative after adding months
+      cumulative = 0
+      result = result.map(entry => {
+        cumulative += entry.cashflow
+        return { ...entry, cumulativeCashflow: cumulative }
+      })
+    }
+    
+    // For "last-month", ensure we only show the last month (October if we're in November)
+    // We need to filter before removing monthKey so we can use it for matching
+    if (cashflowDateRange === 'last-month') {
+      const now = new Date()
+      const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      const lastMonthKey = lastMonthDate.toISOString().slice(0, 7)
+      
+      // Filter result to only include the last month using monthKey
+      result = result.filter(entry => entry.monthKey === lastMonthKey)
+      
+      // If no data for last month, add it with zero values
+      if (result.length === 0) {
+        const lastMonthLabel = lastMonthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        result = [{
+          monthKey: lastMonthKey,
+          month: lastMonthLabel,
+          income: 0,
+          expenses: 0,
+          cashflow: 0,
+          cumulativeCashflow: 0
+        }]
+      }
+      
+      // Recalculate cumulative
       cumulative = 0
       result = result.map(entry => {
         cumulative += entry.cashflow
