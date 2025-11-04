@@ -613,13 +613,16 @@ export default function DashboardPage() {
         break
     }
     
-    // Ensure startDate is not null
+    // Ensure startDate is not null (TypeScript narrowing)
     if (!startDate) {
       startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1) // Default to last 6 months
     }
     
+    // Now TypeScript knows startDate is not null, but we'll use a const for clarity
+    const finalStartDate: Date = startDate
+    
     // Generate all months within the date range
-    let monthIterator = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+    let monthIterator = new Date(finalStartDate.getFullYear(), finalStartDate.getMonth(), 1)
     const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
     
     while (monthIterator <= endMonth) {
@@ -631,7 +634,7 @@ export default function DashboardPage() {
     // Add expenses
     expenses.forEach(expense => {
       const expenseDate = new Date(expense.date)
-      if (expenseDate >= startDate && expenseDate <= endDate) {
+      if (expenseDate >= finalStartDate && expenseDate <= endDate) {
         const monthKey = expenseDate.toISOString().slice(0, 7)
         const existingMonth = monthlyMap.get(monthKey)
         if (existingMonth) {
@@ -644,7 +647,7 @@ export default function DashboardPage() {
     const paidPayments = allRentPayments.filter(payment => payment.status === 'paid')
     paidPayments.forEach(payment => {
       const paymentDate = new Date(payment.year, payment.month - 1, 1)
-      if (paymentDate >= startDate && paymentDate <= endMonth) {
+      if (paymentDate >= finalStartDate && paymentDate <= endMonth) {
         const monthKey = `${payment.year}-${String(payment.month).padStart(2, '0')}`
         const existingMonth = monthlyMap.get(monthKey)
         if (existingMonth) {
