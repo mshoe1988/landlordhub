@@ -23,8 +23,8 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#E7F2EF' }}>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2" style={{ borderColor: '#1C7C63' }}></div>
       </div>
     )
   }
@@ -34,7 +34,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen" style={{ backgroundColor: '#E7F2EF' }}>
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" role="main">
         <div className="text-center">
@@ -52,28 +52,37 @@ export default function Home() {
               }}
             />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: '#0A2540' }}>
             LandlordHub Simplified property management
           </h1>
-          <p className="text-lg text-gray-700 mb-12 max-w-3xl mx-auto">
+          <p className="text-lg mb-12 max-w-3xl mx-auto" style={{ color: '#0A2540' }}>
             Simplify rent collection, expenses, and maintenance in one app. LandlordHub makes property management easy for small landlords — start free today.
           </p>
           <div className="flex justify-center space-x-4">
             <Link
               href="/signup"
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors"
+              style={{ backgroundColor: '#1C7C63' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#155a47'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1C7C63'}
             >
               Get Started Free
             </Link>
             <Link
               href="/pricing"
-              className="bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="bg-white border px-8 py-3 rounded-lg text-lg font-semibold transition-colors"
+              style={{ color: '#1C7C63', borderColor: '#1C7C63' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E7F2EF'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
             >
               View Pricing
             </Link>
             <Link
               href="/login"
-              className="bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="bg-white border px-8 py-3 rounded-lg text-lg font-semibold transition-colors"
+              style={{ color: '#1C7C63', borderColor: '#1C7C63' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E7F2EF'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
             >
               Sign In
             </Link>
@@ -83,33 +92,33 @@ export default function Home() {
         {/* Features Grid */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ color: '#1C7C63' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Property Management</h2>
-            <p className="text-gray-600">Manage multiple properties with ease. Track rent collection, tenant information, and property details.</p>
+            <h2 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>Property Management</h2>
+            <p style={{ color: '#0A2540' }}>Manage multiple properties with ease. Track rent collection, tenant information, and property details.</p>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ color: '#1C7C63' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Expense Tracking</h2>
-            <p className="text-gray-600">Keep detailed records of all property-related expenses for tax purposes and financial planning.</p>
+            <h2 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>Expense Tracking</h2>
+            <p style={{ color: '#0A2540' }}>Keep detailed records of all property-related expenses for tax purposes and financial planning.</p>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ color: '#1C7C63' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Reports & Analytics</h2>
-            <p className="text-gray-600">Generate comprehensive reports for tax filing, financial analysis, and property performance tracking.</p>
+            <h2 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>Reports & Analytics</h2>
+            <p style={{ color: '#0A2540' }}>Generate comprehensive reports for tax filing, financial analysis, and property performance tracking.</p>
           </div>
         </div>
 

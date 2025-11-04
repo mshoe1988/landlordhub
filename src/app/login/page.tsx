@@ -41,7 +41,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#E7F2EF' }}>
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="text-center">
@@ -60,12 +60,12 @@ export default function LoginPage() {
             />
             </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: '#0A2540' }}>
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm" style={{ color: '#0A2540' }}>
             Or{' '}
-            <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/signup" className="font-medium transition-colors" style={{ color: '#1C7C63' }} onMouseEnter={(e) => e.currentTarget.style.color = '#155a47'} onMouseLeave={(e) => e.currentTarget.style.color = '#1C7C63'}>
               create a new account
             </Link>
           </p>
@@ -78,7 +78,7 @@ export default function LoginPage() {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium" style={{ color: '#0A2540' }}>
                 Email address
               </label>
               <input
@@ -87,14 +87,17 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                style={{ color: '#0A2540' }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = '#1C7C63'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(28, 124, 99, 0.1)' }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = '' }}
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium" style={{ color: '#0A2540' }}>
                 Password
               </label>
               <div className="relative">
@@ -104,7 +107,10 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 pr-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 pr-12 border border-gray-300 placeholder-gray-500 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                  style={{ color: '#0A2540' }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = '#1C7C63'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(28, 124, 99, 0.1)' }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = '' }}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -113,7 +119,10 @@ export default function LoginPage() {
                   type="button"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
+                  style={{ color: '#0A2540' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#1C7C63'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#0A2540'}
                 >
                   {showPassword ? (
                     // Heroicons: eye-slash
@@ -137,7 +146,7 @@ export default function LoginPage() {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/forgot-password" className="font-medium transition-colors" style={{ color: '#1C7C63' }} onMouseEnter={(e) => e.currentTarget.style.color = '#155a47'} onMouseLeave={(e) => e.currentTarget.style.color = '#1C7C63'}>
                 Forgot your password?
               </Link>
             </div>
@@ -147,7 +156,12 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+              style={{ backgroundColor: '#1C7C63' }}
+              onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#155a47')}
+              onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1C7C63')}
+              onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(28, 124, 99, 0.3)'}
+              onBlur={(e) => e.currentTarget.style.boxShadow = ''}
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>

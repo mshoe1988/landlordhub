@@ -102,9 +102,9 @@ export default function Layout({ children }: LayoutProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#E7F2EF' }}>
       {/* Header */}
-      <div className="text-white p-4 md:p-6 shadow-lg" style={{ backgroundColor: '#DFE9F7' }}>
+      <div className="p-4 md:p-6 shadow-lg" style={{ backgroundColor: '#E7F2EF', color: '#0A2540' }}>
         <div className="flex items-center justify-center">
           <Link href="/dashboard" className="hover:opacity-90 transition-opacity">
             <Image
@@ -129,7 +129,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Navigation */}
-      <div className="bg-white shadow">
+      <div className="shadow" style={{ backgroundColor: '#E7F2EF' }}>
         <div className="max-w-7xl mx-auto px-4">
           <div ref={navRef} className="flex space-x-8 overflow-x-auto">
             {navigation.map((item) => {
@@ -143,7 +143,7 @@ export default function Layout({ children }: LayoutProps) {
                   className={`py-4 border-b-2 font-medium transition-colors relative ${
                     item.isProFeature ? 'px-2 pr-8' : 'px-2'
                   } ${
-                    isActive ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                    isActive ? 'border-[#1C7C63] text-[#1C7C63]' : 'border-transparent text-[#0A2540] hover:text-[#1C7C63]'
                   }`}
                 >
                   <Icon className="inline w-5 h-5 mr-2" />
@@ -158,7 +158,7 @@ export default function Layout({ children }: LayoutProps) {
             })}
             <button
               onClick={handleSignOut}
-              className="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium transition-colors"
+              className="py-4 px-2 border-b-2 border-transparent text-[#0A2540] hover:text-[#1C7C63] font-medium transition-colors"
             >
               <LogOut className="inline w-5 h-5 mr-2" />
               Sign Out

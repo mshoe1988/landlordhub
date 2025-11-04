@@ -18,3 +18,6 @@ CREATE INDEX IF NOT EXISTS idx_properties_tenant_phone ON properties(tenant_phon
 
 
 
+
+
+

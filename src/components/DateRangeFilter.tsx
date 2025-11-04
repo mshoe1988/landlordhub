@@ -101,9 +101,15 @@ export default function DateRangeFilter({ onDateRangeChange, selectedRange }: Da
               selectedRange && 
               getDateRangeOptions()[range as keyof ReturnType<typeof getDateRangeOptions>]?.start === selectedRange.start &&
               getDateRangeOptions()[range as keyof ReturnType<typeof getDateRangeOptions>]?.end === selectedRange.end
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                ? 'text-white'
+                : 'bg-white border-gray-300 hover:bg-gray-50'
             }`}
+            style={selectedRange && 
+              getDateRangeOptions()[range as keyof ReturnType<typeof getDateRangeOptions>]?.start === selectedRange.start &&
+              getDateRangeOptions()[range as keyof ReturnType<typeof getDateRangeOptions>]?.end === selectedRange.end
+                ? { backgroundColor: '#1C7C63', borderColor: '#1C7C63', color: '#fff' }
+                : { color: '#0A2540' }
+            }
           >
             {range}
           </button>
@@ -115,9 +121,13 @@ export default function DateRangeFilter({ onDateRangeChange, selectedRange }: Da
           onClick={() => setShowCustomRange(!showCustomRange)}
           className={`px-4 py-2 text-sm rounded-md border transition-colors flex items-center gap-2 ${
             showCustomRange
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              ? 'text-white'
+              : 'bg-white border-gray-300 hover:bg-gray-50'
           }`}
+          style={showCustomRange
+            ? { backgroundColor: '#1C7C63', borderColor: '#1C7C63', color: '#fff' }
+            : { color: '#0A2540' }
+          }
         >
           <Calendar className="w-4 h-4" />
           Custom Range
@@ -163,7 +173,10 @@ export default function DateRangeFilter({ onDateRangeChange, selectedRange }: Da
             <button
               onClick={handleCustomRange}
               disabled={!customStart || !customEnd}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              style={{ backgroundColor: '#1C7C63' }}
+              onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = '#155a47')}
+              onMouseLeave={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = '#1C7C63')}
             >
               Apply Custom Range
             </button>
