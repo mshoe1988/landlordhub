@@ -8,7 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import FileUpload from '@/components/FileUpload'
 import { uploadFile } from '@/lib/storage'
-import { Plus, Trash2, FileText, Download, ChevronUp, ChevronDown, Eye, Filter, SortAsc } from 'lucide-react'
+import { Plus, Trash2, FileText, Download, ChevronUp, ChevronDown, Eye, Filter, SortAsc, FolderOpen, FileType, HardDrive, Calendar } from 'lucide-react'
 
 const DOCUMENT_TYPES = [
   'Lease',
@@ -269,48 +269,108 @@ export default function DocumentsPage() {
           {/* Document Summary Card */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div 
-              className="bg-white p-4 rounded-lg transition-all duration-200"
+              className="bg-white rounded-lg transition-all duration-250"
               style={{
                 background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                 borderRadius: '12px',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                padding: '16px 20px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
               }}
             >
-              <div className="text-sm font-medium" style={{ color: '#647474' }}>Total Documents</div>
-              <div className="text-2xl font-bold mt-1" style={{ color: '#0A2540' }}>{summaryMetrics.totalDocuments}</div>
+              <div className="flex-1">
+                <div className="text-sm font-medium mb-1" style={{ color: '#647474' }}>Total Documents</div>
+                <div className="text-2xl font-bold" style={{ color: '#0A2540' }}>{summaryMetrics.totalDocuments}</div>
+              </div>
+              <FolderOpen className="w-6 h-6" style={{ color: '#1C7C63', opacity: 0.6 }} />
             </div>
             <div 
-              className="bg-white p-4 rounded-lg transition-all duration-200"
+              className="bg-white rounded-lg transition-all duration-250"
               style={{
                 background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                 borderRadius: '12px',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                padding: '16px 20px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
               }}
             >
-              <div className="text-sm font-medium" style={{ color: '#647474' }}>Most Common Type</div>
-              <div className="text-lg font-bold mt-1" style={{ color: '#1C7C63' }}>{summaryMetrics.mostCommonType}</div>
+              <div className="flex-1">
+                <div className="text-sm font-medium mb-1" style={{ color: '#647474' }}>Most Common Type</div>
+                <div className="text-lg font-bold" style={{ color: '#1C7C63' }}>{summaryMetrics.mostCommonType}</div>
+              </div>
+              <FileType className="w-6 h-6" style={{ color: '#1C7C63', opacity: 0.6 }} />
             </div>
             <div 
-              className="bg-white p-4 rounded-lg transition-all duration-200"
+              className="bg-white rounded-lg transition-all duration-250"
               style={{
                 background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                 borderRadius: '12px',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                padding: '16px 20px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
               }}
             >
-              <div className="text-sm font-medium" style={{ color: '#647474' }}>Storage Used</div>
-              <div className="text-2xl font-bold mt-1" style={{ color: '#0A2540' }}>{summaryMetrics.storageUsed}</div>
+              <div className="flex-1">
+                <div className="text-sm font-medium mb-1" style={{ color: '#647474' }}>Storage Used</div>
+                <div className="text-2xl font-bold" style={{ color: '#0A2540' }}>{summaryMetrics.storageUsed}</div>
+              </div>
+              <HardDrive className="w-6 h-6" style={{ color: '#1C7C63', opacity: 0.6 }} />
             </div>
             <div 
-              className="bg-white p-4 rounded-lg transition-all duration-200"
+              className="bg-white rounded-lg transition-all duration-250"
               style={{
                 background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                 borderRadius: '12px',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                padding: '16px 20px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
               }}
             >
-              <div className="text-sm font-medium" style={{ color: '#647474' }}>Last Upload</div>
-              <div className="text-lg font-bold mt-1" style={{ color: '#0A2540' }}>{summaryMetrics.lastUpload}</div>
+              <div className="flex-1">
+                <div className="text-sm font-medium mb-1" style={{ color: '#647474' }}>Last Upload</div>
+                <div className="text-lg font-bold" style={{ color: '#0A2540' }}>{summaryMetrics.lastUpload}</div>
+              </div>
+              <Calendar className="w-6 h-6" style={{ color: '#1C7C63', opacity: 0.6 }} />
             </div>
           </div>
 
