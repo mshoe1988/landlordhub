@@ -917,46 +917,63 @@ export default function DashboardPage() {
 
           {/* Cashflow Bar Chart */}
           <div 
-            className="rounded-lg shadow-lg"
+            className="rounded-lg"
             style={{ 
-              backgroundColor: '#F7FBF9',
+              backgroundColor: '#FFFFFF',
               borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+              boxShadow: '0 1px 8px rgba(0, 0, 0, 0.05)',
+              border: '1px solid rgba(227, 232, 229, 0.5)'
             }}
           >
             <div className="p-6 border-b" style={{ borderColor: '#E3E8E5' }}>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
                 <div>
                   <h2 className="text-2xl font-bold mb-1" style={{ color: '#0A2540' }}>Cashflow Overview</h2>
                   <p className="text-sm" style={{ color: '#0A2540', opacity: 0.7 }}>
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
                 </div>
-                <select
-                  value={cashflowDateRange}
-                  onChange={(e) => setCashflowDateRange(e.target.value)}
-                  className="px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all"
-                  style={{ 
-                    color: '#0A2540', 
-                    borderColor: '#1C7C63',
-                    borderRadius: '8px',
-                    backgroundColor: '#fff'
-                  }}
-                  onFocus={(e) => { 
-                    e.currentTarget.style.borderColor = '#1C7C63'; 
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(28, 124, 99, 0.1)' 
-                  }}
-                  onBlur={(e) => { 
-                    e.currentTarget.style.borderColor = ''; 
-                    e.currentTarget.style.boxShadow = '' 
-                  }}
-                >
-                  <option value="all-time">All Time</option>
-                  <option value="this-month">This Month</option>
-                  <option value="last-month">Last Month</option>
-                  <option value="last-quarter">Last Quarter</option>
-                  <option value="last-year">Last Year</option>
-                </select>
+              </div>
+              
+              {/* Time Filter Pills */}
+              <div className="flex flex-wrap gap-2">
+                {['all-time', 'this-month', 'last-month', 'last-quarter', 'last-year'].map((range) => {
+                  const isActive = cashflowDateRange === range
+                  const labelMap: Record<string, string> = {
+                    'all-time': 'All Time',
+                    'this-month': 'This Month',
+                    'last-month': 'Last Month',
+                    'last-quarter': 'Last Quarter',
+                    'last-year': 'Last Year'
+                  }
+                  return (
+                    <button
+                      key={range}
+                      onClick={() => setCashflowDateRange(range)}
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                      style={{
+                        backgroundColor: isActive ? '#1C7C63' : 'transparent',
+                        color: isActive ? '#FFFFFF' : '#0A2540',
+                        border: `1px solid ${isActive ? '#1C7C63' : '#E3E8E5'}`,
+                        opacity: isActive ? 1 : 0.7
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = '#F7FBF9'
+                          e.currentTarget.style.opacity = '1'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                          e.currentTarget.style.opacity = '0.7'
+                        }
+                      }}
+                    >
+                      {labelMap[range]}
+                    </button>
+                  )
+                })}
               </div>
             </div>
             <div className="p-6">
@@ -996,15 +1013,42 @@ export default function DashboardPage() {
                       width={80}
                     />
                     <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#fff', 
-                        border: '1px solid #E3E8E5',
-                        borderRadius: '8px',
-                        color: '#0A2540',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      content={({ active, payload, label }: any) => {
+                        if (active && payload && payload.length > 0) {
+                          const data = payload[0].payload
+                          return (
+                            <div style={{ 
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              backdropFilter: 'blur(10px)',
+                              border: '1px solid #E3E8E5',
+                              borderRadius: '12px',
+                              padding: '12px 16px',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                            }}>
+                              <div style={{ color: '#0A2540', fontWeight: 'bold', marginBottom: '12px', fontSize: '14px' }}>
+                                {label}
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Income:</span>
+                                  <span style={{ color: '#1C7C63', fontWeight: '600', fontSize: '12px' }}>${(data.income || 0).toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Expenses:</span>
+                                  <span style={{ color: '#FF7B00', fontWeight: '600', fontSize: '12px' }}>${(data.expenses || 0).toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginTop: '4px', paddingTop: '8px', borderTop: '1px solid #E3E8E5' }}>
+                                  <span style={{ color: '#0A2540', fontWeight: 'bold', fontSize: '12px' }}>Net:</span>
+                                  <span style={{ color: (data.cashflow || 0) >= 0 ? '#1C7C63' : '#FF7B00', fontWeight: 'bold', fontSize: '13px' }}>
+                                    ${(data.cashflow || 0).toLocaleString()}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        }
+                        return null
                       }}
-                      formatter={(value: any) => `$${value.toLocaleString()}`}
-                      labelStyle={{ color: '#0A2540', fontWeight: 'bold' }}
                     />
                     <Legend 
                       wrapperStyle={{ paddingTop: '20px' }}
@@ -1015,18 +1059,21 @@ export default function DashboardPage() {
                       type="monotone" 
                       dataKey="cumulativeCashflow" 
                       stroke="#1C7C63" 
-                      strokeWidth={2}
+                      strokeWidth={2.5}
                       dot={false}
-                      strokeDasharray="5 5"
+                      strokeDasharray="0"
                       name="Cumulative Balance"
                       legendType="line"
+                      style={{
+                        filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))'
+                      }}
                     />
                     <Bar 
                       dataKey="cashflow" 
                       name="Cashflow (Income - Expenses)"
                       radius={[6, 6, 0, 0]}
                       animationBegin={0}
-                      animationDuration={800}
+                      animationDuration={600}
                       animationEasing="ease-out"
                     >
                       {(calculateCashflowData() as any).map((entry: any, index: number) => (
@@ -1090,19 +1137,32 @@ export default function DashboardPage() {
                       {summary.percentageChange !== null && summary.percentageChange > 0 && (
                         <div className="flex items-center gap-2">
                           <div 
-                            className="px-3 py-1.5 rounded-full flex items-center gap-1.5"
+                            className="px-4 py-2 rounded-lg flex items-center gap-2"
                             style={{ 
-                              backgroundColor: 'rgba(28, 124, 99, 0.1)',
-                              color: '#1C7C63'
+                              backgroundColor: '#E7F2EF',
+                              color: '#1C7C63',
+                              border: '1px solid rgba(28, 124, 99, 0.2)'
                             }}
                           >
-                            <span className="text-sm font-semibold">↑</span>
+                            <span className="text-base">🎉</span>
                             <span className="text-sm font-semibold">
-                              Cashflow Up {Math.abs(summary.percentageChange).toFixed(0)}% from Last Month
+                              {summary.percentageChange > 1000 ? (
+                                <>
+                                  Great work — your cashflow is up {Math.abs(summary.percentageChange / 100).toFixed(1)}x from last month!
+                                </>
+                              ) : summary.percentageChange > 100 ? (
+                                <>
+                                  Cashflow up {Math.abs(summary.percentageChange).toFixed(0)}% since last month — keep it growing!
+                                </>
+                              ) : (
+                                <>
+                                  Cashflow up {Math.abs(summary.percentageChange).toFixed(0)}% from last month — great progress!
+                                </>
+                              )}
                             </span>
                           </div>
                         </div>
-                        )}
+                      )}
                       </div>
                     </div>
                   )
