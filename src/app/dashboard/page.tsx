@@ -610,8 +610,9 @@ export default function DashboardPage() {
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
         break
       case 'last-year':
-        startDate = new Date(now.getFullYear() - 1, 0, 1)
-        endDate = new Date(now.getFullYear() - 1, 11, 31)
+        // Last year = past 12 months (rolling)
+        startDate = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0) // End of current month
         break
     }
     
@@ -926,14 +927,12 @@ export default function DashboardPage() {
 
           {/* Cashflow Bar Chart */}
           <div 
-            className="rounded-lg mx-auto"
+            className="rounded-lg"
             style={{ 
               backgroundColor: '#FFFFFF',
               borderRadius: '12px',
               boxShadow: '0 1px 8px rgba(0, 0, 0, 0.05)',
-              border: '1px solid rgba(227, 232, 229, 0.5)',
-              width: '95%',
-              maxWidth: '100%'
+              border: '1px solid rgba(227, 232, 229, 0.5)'
             }}
           >
             <div className="p-6 border-b" style={{ borderColor: '#E3E8E5' }}>
@@ -954,9 +953,9 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2">
                     <div style={{ width: '8px', height: '8px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent', marginRight: '5px' }}></div>
                     <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cumulative</span>
-                  </div>
-                </div>
               </div>
+            </div>
+          </div>
 
               {/* Time Filter Pills */}
               <div className="flex flex-wrap gap-2">
