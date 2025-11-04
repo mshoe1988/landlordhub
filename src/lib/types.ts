@@ -23,6 +23,8 @@ export interface MaintenanceTask {
   due_date: string
   status: 'pending' | 'completed'
   notes?: string
+  priority?: 'low' | 'medium' | 'high'
+  attachment_url?: string
   created_at: string
   updated_at: string
 }
