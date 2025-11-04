@@ -38,7 +38,6 @@ export default function Home() {
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" role="main">
         <div className="text-center">
-          <h1 className="sr-only">Property Management Software for Landlords | LandlordHub</h1>
           <div className="flex justify-center mb-8">
             <img
               src="/landlord-hub-logo.svg?v=23"
@@ -53,10 +52,11 @@ export default function Home() {
               }}
             />
           </div>
-          {/* Tagline removed; it's included in the logo */}
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            LandlordHub Simplified property management
+          </h1>
           <p className="text-lg text-gray-700 mb-12 max-w-3xl mx-auto">
-            Streamline your property management with our comprehensive suite of tools. 
-            Track income, manage expenses, schedule maintenance, and generate detailed reports—all in one place.
+            Simplify rent collection, expenses, and maintenance in one app. LandlordHub makes property management easy for small landlords — start free today.
           </p>
           <div className="flex justify-center space-x-4">
             <Link
