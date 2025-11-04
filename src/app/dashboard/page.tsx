@@ -68,12 +68,66 @@ export default function DashboardPage() {
   const [pieChartDateRange, setPieChartDateRange] = useState<{ start: string; end: string } | null>(null)
   const [lineChartDateRange, setLineChartDateRange] = useState<{ start: string; end: string } | null>(null)
   const [cashflowDateRange, setCashflowDateRange] = useState<string>('all-time')
+  const [countUpValues, setCountUpValues] = useState({
+    properties: 0,
+    tasks: 0,
+    rent: 0,
+    expenses: 0
+  })
 
   useEffect(() => {
     if (user) {
       loadDashboardData()
     }
   }, [user])
+
+  // Calculate totals for count-up animation
+  const totalMonthlyRent = properties.reduce((sum, p) => sum + p.monthly_rent, 0)
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+  const thisMonthExpenses = expenses.filter(expense => {
+    const expenseDate = new Date(expense.date)
+    return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear
+  })
+  const totalExpenses = thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0)
+  const upcomingTasks = maintenance.filter(m => m.status === 'pending').length
+
+  // Count-up animation for KPI cards
+  useEffect(() => {
+    if (!loading && properties.length >= 0) {
+      const duration = 1500 // 1.5 seconds
+      const steps = 60
+      const interval = duration / steps
+      
+      let currentStep = 0
+      const timer = setInterval(() => {
+        currentStep++
+        const progress = Math.min(currentStep / steps, 1)
+        // Ease-out function
+        const easeOut = 1 - Math.pow(1 - progress, 3)
+        
+        setCountUpValues({
+          properties: Math.round(properties.length * easeOut),
+          tasks: Math.round(upcomingTasks * easeOut),
+          rent: Math.round(totalMonthlyRent * easeOut),
+          expenses: Math.round(totalExpenses * easeOut)
+        })
+        
+        if (currentStep >= steps) {
+          clearInterval(timer)
+          setCountUpValues({
+            properties: properties.length,
+            tasks: upcomingTasks,
+            rent: totalMonthlyRent,
+            expenses: totalExpenses
+          })
+        }
+      }, interval)
+      
+      return () => clearInterval(timer)
+    }
+  }, [loading, properties.length, upcomingTasks, totalMonthlyRent, totalExpenses])
 
   const loadDashboardData = async () => {
     try {
@@ -109,9 +163,6 @@ export default function DashboardPage() {
     )
   }
 
-  // Calculate totals
-  const totalMonthlyRent = properties.reduce((sum, p) => sum + p.monthly_rent, 0)
-  
   // Calculate rent collection percentage for smart insight
   const getRentCollectionPercentage = () => {
     const now = new Date()
@@ -127,18 +178,6 @@ export default function DashboardPage() {
     return Math.round((paidAmount / totalMonthlyRent) * 100)
   }
   
-  // Calculate this month's expenses
-  const currentDate = new Date()
-  const currentMonth = currentDate.getMonth()
-  const currentYear = currentDate.getFullYear()
-  
-  const thisMonthExpenses = expenses.filter(expense => {
-    const expenseDate = new Date(expense.date)
-    return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear
-  })
-  
-  const totalExpenses = thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0)
-  const upcomingTasks = maintenance.filter(m => m.status === 'pending').length
 
   // Calculate rent payment stats
   const propertiesWithTenants = properties.filter(p => p.tenant_name)
@@ -1051,8 +1090,8 @@ export default function DashboardPage() {
                       <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
                         Total Properties
                       </p>
-                    </div>
-                    <p className="font-bold text-gray-800 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{properties.length}</p>
+                </div>
+                    <p className="font-bold text-gray-800 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{countUpValues.properties}</p>
                 </div>
                   <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
@@ -1085,7 +1124,7 @@ export default function DashboardPage() {
                         Upcoming Tasks
                       </p>
                     </div>
-                    <p className="font-bold text-orange-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{upcomingTasks}</p>
+                    <p className="font-bold text-orange-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{countUpValues.tasks}</p>
                   </div>
                   <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
@@ -1118,8 +1157,8 @@ export default function DashboardPage() {
                       <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
                         Monthly Rent
                       </p>
-                    </div>
-                    <p className="font-bold text-green-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${totalMonthlyRent.toLocaleString()}</p>
+                </div>
+                    <p className="font-bold text-green-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${countUpValues.rent.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
@@ -1151,8 +1190,8 @@ export default function DashboardPage() {
                       <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
                         This Month's Expenses
                       </p>
-                    </div>
-                    <p className="font-bold text-red-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${totalExpenses.toLocaleString()}</p>
+                </div>
+                    <p className="font-bold text-red-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${countUpValues.expenses.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
@@ -1246,18 +1285,23 @@ export default function DashboardPage() {
                         transform: 'scale(1)',
                         transition: 'all 0.15s ease',
                         position: 'relative',
-                        paddingBottom: isActive ? '11px' : '8px'
+                        paddingBottom: isActive ? '11px' : '8px',
+                        boxShadow: isActive ? '0 0 12px rgba(28, 124, 99, 0.3)' : 'none'
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
                           e.currentTarget.style.backgroundColor = '#F7FBF9'
                           e.currentTarget.style.opacity = '1'
+                        } else {
+                          e.currentTarget.style.boxShadow = '0 0 16px rgba(28, 124, 99, 0.4)'
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isActive) {
                           e.currentTarget.style.backgroundColor = 'transparent'
                           e.currentTarget.style.opacity = '0.8'
+                        } else {
+                          e.currentTarget.style.boxShadow = '0 0 12px rgba(28, 124, 99, 0.3)'
                         }
                       }}
                     >
@@ -1271,7 +1315,8 @@ export default function DashboardPage() {
                             right: '10%',
                             height: '3px',
                             background: 'linear-gradient(90deg, #1C7C63, #5DD39E)',
-                            borderRadius: '2px'
+                            borderRadius: '2px',
+                            boxShadow: '0 0 8px rgba(93, 211, 158, 0.5)'
                           }}
                         />
                       )}
@@ -1521,7 +1566,7 @@ export default function DashboardPage() {
                     </div>
                   )
               })()}
-            </div>
+              </div>
             
             {/* Expenses Comparison Insight Banner */}
             {getExpensesComparison() && (
@@ -1537,7 +1582,7 @@ export default function DashboardPage() {
                 <p className="text-sm" style={{ color: '#1C7C63', fontWeight: 500 }}>
                   💡 Your expenses {getExpensesComparison()!.change > 0 ? 'increased' : 'decreased'} {Math.abs(getExpensesComparison()!.change)}% this month compared to {getExpensesComparison()!.lastMonthName}. {getExpensesComparison()!.change > 0 ? 'Check Reports for a breakdown.' : 'Great cost management!'}
                 </p>
-              </div>
+            </div>
             )}
             
             {/* Smart Insight Card */}
@@ -1565,6 +1610,26 @@ export default function DashboardPage() {
             borderTop: '1px solid rgba(28,124,99,0.1)'
           }}></div>
 
+          {/* Financial Overview Section Label */}
+          <div style={{ marginBottom: '8px' }}>
+            <h2 style={{ 
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              color: '#0A2540',
+              marginBottom: '8px'
+            }}>
+              Financial Overview
+            </h2>
+            <p style={{ 
+              fontSize: '0.875rem',
+              color: '#8DA6A0',
+              fontWeight: 400,
+              marginTop: '4px'
+            }}>
+              Income, expenses, and forecast performance
+            </p>
+            </div>
+
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '24px' }}>
             {/* Expenses by Category Pie Chart */}
@@ -1583,7 +1648,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">📊</span>
                   <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Expenses by Category</h2>
-                </div>
+                        </div>
                 <div className="text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>
                   Current: {getCurrentPieChartRangeLabel()}
                 </div>
@@ -1591,7 +1656,7 @@ export default function DashboardPage() {
               
               {/* Date Range Filter Buttons */}
               <div className="mb-4 flex flex-wrap gap-2">
-                <button
+                        <button 
                   onClick={() => handlePieChartDateRange(null)}
                   className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
                   style={{
@@ -1614,7 +1679,7 @@ export default function DashboardPage() {
                   }}
                 >
                   All Time
-                </button>
+                        </button>
                 {Object.keys(getDateRangeOptions()).map((range) => {
                   const options = getDateRangeOptions()
                   const rangeData = options[range as keyof typeof options]
@@ -1632,34 +1697,55 @@ export default function DashboardPage() {
                           e.currentTarget.style.transform = 'scale(1)'
                         }, 150)
                       }}
-                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 relative"
                       style={{
                         backgroundColor: isActive ? '#1C7C63' : 'transparent',
                         color: isActive ? '#FFFFFF' : '#0A2540',
                         border: `1px solid ${isActive ? '#1C7C63' : '#E5E9E7'}`,
                         opacity: isActive ? 1 : 0.8,
                         transform: 'scale(1)',
-                        transition: 'all 0.15s ease'
+                        transition: 'all 0.15s ease',
+                        position: 'relative',
+                        paddingBottom: isActive ? '11px' : '8px',
+                        boxShadow: isActive ? '0 0 12px rgba(28, 124, 99, 0.3)' : 'none'
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
                           e.currentTarget.style.backgroundColor = '#F7FBF9'
                           e.currentTarget.style.opacity = '1'
+                        } else {
+                          e.currentTarget.style.boxShadow = '0 0 16px rgba(28, 124, 99, 0.4)'
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isActive) {
                           e.currentTarget.style.backgroundColor = 'transparent'
                           e.currentTarget.style.opacity = '0.8'
+                        } else {
+                          e.currentTarget.style.boxShadow = '0 0 12px rgba(28, 124, 99, 0.3)'
                         }
                       }}
                     >
                       {range}
+                      {isActive && (
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            bottom: '0',
+                            left: '10%',
+                            right: '10%',
+                            height: '3px',
+                            background: 'linear-gradient(90deg, #1C7C63, #5DD39E)',
+                            borderRadius: '2px',
+                            boxShadow: '0 0 8px rgba(93, 211, 158, 0.5)'
+                          }}
+                        />
+                      )}
                     </button>
                   )
                 })}
-              </div>
-              
+          </div>
+
               <div className="h-80" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.08))' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -1725,7 +1811,7 @@ export default function DashboardPage() {
                     <Legend 
                       verticalAlign="bottom" 
                       height={60}
-                      wrapperStyle={{
+                      wrapperStyle={{ 
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -1873,7 +1959,14 @@ export default function DashboardPage() {
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)'
             }}
           >
-            <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+            <div 
+              className="p-6 border-b" 
+              style={{ 
+                borderColor: '#E5E9E7', 
+                borderBottomWidth: '1px',
+                backgroundColor: '#F8FBFA'
+              }}
+            >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">🔧</span>
                 <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Upcoming Maintenance</h2>
@@ -1918,7 +2011,13 @@ export default function DashboardPage() {
                           borderRadius: '14px',
                           borderTopLeftRadius: '14px',
                           borderTopRightRadius: '14px',
-                          borderColor: '#E5E9E7',
+                          borderColor: (task.status === 'pending' || taskDueSoon) && !taskOverdue ? undefined : '#E5E9E7',
+                          border: (task.status === 'pending' || taskDueSoon) && !taskOverdue 
+                            ? '1px solid' 
+                            : '1px solid #E5E9E7',
+                          borderImage: (task.status === 'pending' || taskDueSoon) && !taskOverdue
+                            ? 'linear-gradient(90deg, #F7A43F, #FFDFA8) 1'
+                            : undefined,
                           borderLeft: `4px solid ${getBorderColor()}`,
                           backgroundColor: taskOverdue ? '#FFF5F5' : 'white',
                           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
