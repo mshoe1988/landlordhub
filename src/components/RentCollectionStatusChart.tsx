@@ -192,10 +192,10 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
         <div className="flex-1">
-          <h2 className="text-xl font-bold text-gray-800">Rent Collection Status</h2>
-          <p className="text-sm text-gray-600 mt-1">{monthName}</p>
+          <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Rent Collection Status</h2>
+          <p className="text-sm mt-1" style={{ color: '#7A8A8A' }}>{monthName}</p>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
           {/* Month/Year Selector */}

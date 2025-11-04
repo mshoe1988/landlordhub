@@ -886,13 +886,13 @@ export default function DashboardPage() {
     // Predefined colors for common categories
     const categoryColorMap: Record<string, string> = {
       'Maintenance': '#3b82f6',      // Blue
-      'Repairs': '#ef4444',           // Red
+      'Repairs': '#E8684A',          // Soft coral
       'Utilities': '#10b981',         // Green
-      'Insurance': '#f59e0b',         // Yellow/Orange
-      'Property Tax': '#8b5cf6',     // Purple
-      'Taxes': '#8b5cf6',            // Purple (alternative name)
+      'Insurance': '#F6BD16',         // Muted gold
+      'Property Tax': '#5B8FF9',     // Deep blue
+      'Taxes': '#5B8FF9',            // Deep blue (alternative name)
       'HOA Fees': '#06b6d4',         // Cyan
-      'Lawn Care': '#84cc16',         // Lime
+      'Lawn Care': '#6DC8A0',         // Soft mint green
       'Pest Control': '#f97316',     // Orange
       'Legal Fees': '#ec4899',       // Pink
       'Legal': '#ec4899',            // Pink (alternative name)
@@ -924,15 +924,25 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="space-y-6">
+        <div className="space-y-6" style={{ gap: '24px' }}>
           {/* Top Section: Stats Cards and Rent Collection Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '24px' }}>
             {/* Left Side: Stats Cards (2x2 grid) */}
-            <div className="grid grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-2" style={{ gap: '24px' }}>
               {/* Top Row */}
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
-              onClick={() => router.push('/properties')}
+                className="bg-white p-4 md:p-6 cursor-pointer transition-shadow flex flex-col justify-between min-h-[140px]"
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+                onClick={() => router.push('/properties')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
@@ -944,7 +954,17 @@ export default function DashboardPage() {
             </div>
             
             <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
+                className="bg-white p-4 md:p-6 cursor-pointer transition-shadow flex flex-col justify-between min-h-[140px]"
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
                 onClick={() => router.push('/maintenance')}
               >
                 <div className="flex items-start md:items-center justify-between">
@@ -958,8 +978,18 @@ export default function DashboardPage() {
 
               {/* Bottom Row */}
               <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
-              onClick={() => router.push('/reports')}
+                className="bg-white p-4 md:p-6 cursor-pointer transition-shadow flex flex-col justify-between min-h-[140px]"
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+                onClick={() => router.push('/reports')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
@@ -971,8 +1001,18 @@ export default function DashboardPage() {
             </div>
             
             <div 
-                className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
-              onClick={() => router.push('/expenses')}
+                className="bg-white p-4 md:p-6 cursor-pointer transition-shadow flex flex-col justify-between min-h-[140px]"
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+                onClick={() => router.push('/expenses')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
@@ -986,7 +1026,13 @@ export default function DashboardPage() {
             
             {/* Right Side: Rent Collection Status Chart */}
             {propertiesWithTenants.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div 
+                className="bg-white p-6"
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+                }}
+              >
                 <RentCollectionStatusChart 
                   properties={properties}
                   rentPayments={allRentPayments}
@@ -995,21 +1041,28 @@ export default function DashboardPage() {
             )}
           </div>
 
+          {/* Divider */}
+          <div style={{ 
+            height: '2px',
+            background: 'linear-gradient(to right, #E5E9E7, rgba(0,0,0,0))',
+            margin: '16px 0'
+          }}></div>
+
           {/* Cashflow Bar Chart */}
           <div 
             className="rounded-lg"
             style={{ 
               backgroundColor: '#FFFFFF',
               borderRadius: '12px',
-              boxShadow: '0 1px 8px rgba(0, 0, 0, 0.05)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
               border: '1px solid rgba(227, 232, 229, 0.5)'
             }}
           >
-            <div className="p-6 border-b" style={{ borderColor: '#E3E8E5' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
                 <div className="flex-1">
-                  <h2 className="text-lg font-semibold mb-1" style={{ color: '#0A2540', opacity: 0.9, fontWeight: 600 }}>Cashflow Overview</h2>
-                  <p className="text-sm" style={{ color: '#0A2540', opacity: 0.7 }}>
+                  <h2 className="mb-1" style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cashflow Overview</h2>
+                  <p className="text-sm" style={{ color: '#7A8A8A' }}>
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
                 </div>
@@ -1046,8 +1099,8 @@ export default function DashboardPage() {
                       style={{
                         backgroundColor: isActive ? '#1C7C63' : 'transparent',
                         color: isActive ? '#FFFFFF' : '#0A2540',
-                        border: `1px solid ${isActive ? '#1C7C63' : '#E3E8E5'}`,
-                        opacity: isActive ? 1 : 0.7
+                        border: `1px solid ${isActive ? '#1C7C63' : '#E5E9E7'}`,
+                        opacity: isActive ? 1 : 0.8
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
@@ -1058,7 +1111,7 @@ export default function DashboardPage() {
                       onMouseLeave={(e) => {
                         if (!isActive) {
                           e.currentTarget.style.backgroundColor = 'transparent'
-                          e.currentTarget.style.opacity = '0.7'
+                          e.currentTarget.style.opacity = '0.8'
                         }
                       }}
                     >
@@ -1256,15 +1309,15 @@ export default function DashboardPage() {
                 const sign = isPositive ? '+' : ''
                 
                   return (
-                  <div className="mt-2 pt-3 border-t" style={{ borderColor: '#E3E8E5' }}>
+                  <div className="mt-2 pt-3 border-t" style={{ borderColor: '#E5E9E7' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
-                        <p className="text-sm mb-1" style={{ color: '#0A2540', opacity: 0.7 }}>
+                        <p className="text-sm mb-1" style={{ color: '#7A8A8A' }}>
                           Net Cashflow ({periodLabel})
                         </p>
                         <p 
-                          className="text-2xl font-bold"
-                          style={{ color: isPositive ? '#1C7C63' : '#FF7B00' }}
+                          className="font-bold"
+                          style={{ color: isPositive ? '#1C7C63' : '#EF4444', fontSize: '18px' }}
                         >
                           {sign}${summary.totalCashflow.toLocaleString()}
                         </p>
@@ -1307,9 +1360,15 @@ export default function DashboardPage() {
           </div>
 
           {/* Upcoming Maintenance */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Upcoming Maintenance</h2>
+          <div 
+            className="bg-white"
+            style={{ 
+              borderRadius: '12px',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+            }}
+          >
+            <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+              <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Upcoming Maintenance</h2>
             </div>
             <div className="p-6">
               {maintenance.filter(m => m.status === 'pending').length === 0 ? (
@@ -1344,12 +1403,18 @@ export default function DashboardPage() {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '24px' }}>
             {/* Expenses by Category Pie Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Expenses by Category</h2>
-                <div className="text-sm text-gray-600">
+            <div 
+              className="bg-white p-6"
+              style={{ 
+                borderRadius: '12px',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+              }}
+            >
+              <div className="flex justify-between items-center mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Expenses by Category</h2>
+                <div className="text-sm" style={{ color: '#7A8A8A' }}>
                   Current: {getCurrentPieChartRangeLabel()}
                 </div>
               </div>
@@ -1358,11 +1423,25 @@ export default function DashboardPage() {
               <div className="mb-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => handlePieChartDateRange(null)}
-                  className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-                    !pieChartDateRange
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
+                  className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: !pieChartDateRange ? '#1C7C63' : 'transparent',
+                    color: !pieChartDateRange ? '#FFFFFF' : '#0A2540',
+                    border: `1px solid ${!pieChartDateRange ? '#1C7C63' : '#E5E9E7'}`,
+                    opacity: !pieChartDateRange ? 1 : 0.8
+                  }}
+                  onMouseEnter={(e) => {
+                    if (pieChartDateRange) {
+                      e.currentTarget.style.backgroundColor = '#F7FBF9'
+                      e.currentTarget.style.opacity = '1'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (pieChartDateRange) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.opacity = '0.8'
+                    }
+                  }}
                 >
                   All Time
                 </button>
@@ -1377,11 +1456,25 @@ export default function DashboardPage() {
                     <button
                       key={range}
                       onClick={() => handlePieChartDateRange(range)}
-                      className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
-                        isActive
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                      style={{
+                        backgroundColor: isActive ? '#1C7C63' : 'transparent',
+                        color: isActive ? '#FFFFFF' : '#0A2540',
+                        border: `1px solid ${isActive ? '#1C7C63' : '#E5E9E7'}`,
+                        opacity: isActive ? 1 : 0.8
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = '#F7FBF9'
+                          e.currentTarget.style.opacity = '1'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                          e.currentTarget.style.opacity = '0.8'
+                        }
+                      }}
                     >
                       {range}
                     </button>
@@ -1402,9 +1495,12 @@ export default function DashboardPage() {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name)} />
-                      ))}
+                      {categoryData.map((entry, index) => {
+                        const baseColor = getCategoryColor(entry.name)
+                        // Apply opacity: 0.8 to all colors
+                        const colorWithOpacity = baseColor + 'CC' // CC = 80% opacity in hex
+                        return <Cell key={`cell-${index}`} fill={colorWithOpacity} />
+                      })}
                     </Pie>
                     <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
                     <Legend 
@@ -1426,27 +1522,35 @@ export default function DashboardPage() {
             </div>
 
             {/* Cash Flow Forecast Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Cash Flow Forecast (Next 3 Months)</h2>
+            <div 
+              className="bg-white p-6"
+              style={{ 
+                borderRadius: '12px',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+              }}
+            >
+              <div className="mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cash Flow Forecast (Next 3 Months)</h2>
+              </div>
               
               <div className="h-80 md:h-96">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={cashFlowForecast}>
                     <defs>
                       <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        <stop offset="0%" stopColor="rgba(28, 124, 99, 0.2)" stopOpacity={1}/>
+                        <stop offset="100%" stopColor="rgba(28, 124, 99, 0)" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                        <stop offset="0%" stopColor="rgba(255, 123, 0, 0.2)" stopOpacity={1}/>
+                        <stop offset="100%" stopColor="rgba(255, 123, 0, 0)" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        <stop offset="0%" stopColor="rgba(28, 124, 99, 0.2)" stopOpacity={1}/>
+                        <stop offset="100%" stopColor="rgba(28, 124, 99, 0)" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E9E7" strokeOpacity={0.3} />
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip 
@@ -1457,25 +1561,42 @@ export default function DashboardPage() {
                     <Area 
                       type="monotone" 
                       dataKey="income" 
-                      stroke="#10b981" 
-                      fillOpacity={1} 
+                      stroke="#1C7C63" 
+                      strokeWidth={2}
+                      fillOpacity={0.8} 
                       fill="url(#colorIncome)"
                       name="Projected Income"
+                      dot={{ fill: '#1C7C63', r: 4, strokeWidth: 2, stroke: '#FFFFFF' }}
                     />
                     <Area 
                       type="monotone" 
                       dataKey="expenses" 
-                      stroke="#ef4444" 
-                      fillOpacity={1} 
+                      stroke="#FF7B00" 
+                      strokeWidth={2}
+                      fillOpacity={0.8} 
                       fill="url(#colorExpenses)"
                       name="Projected Expenses"
+                      dot={{ fill: '#FF7B00', r: 4, strokeWidth: 2, stroke: '#FFFFFF' }}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="netCashFlow" 
-                      stroke="#3b82f6" 
-                      strokeWidth={3}
-                      dot={{ fill: '#3b82f6', r: 5 }}
+                      stroke="#1C7C63" 
+                      strokeWidth={2.5}
+                      dot={(props: any) => {
+                        const { payload } = props
+                        const isNegative = payload.netCashFlow < 0
+                        return (
+                          <circle 
+                            cx={props.cx} 
+                            cy={props.cy} 
+                            r={5} 
+                            fill={isNegative ? '#EF4444' : '#1C7C63'} 
+                            stroke="#FFFFFF" 
+                            strokeWidth={2}
+                          />
+                        )
+                      }}
                       name="Net Cash Flow"
                     />
                   </AreaChart>
