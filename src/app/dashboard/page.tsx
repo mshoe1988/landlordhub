@@ -955,10 +955,10 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 text-base md:text-base font-bold flex items-center gap-2">
-                      <span className="text-xl">🏠</span> Total Properties
+                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                      Total Properties
                     </p>
-                    <p className="text-3xl md:text-3xl font-bold text-gray-800 mt-1" style={{ fontSize: '20px' }}>{properties.length}</p>
+                    <p className="font-bold text-gray-800 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{properties.length}</p>
                 </div>
                   <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
@@ -984,10 +984,10 @@ export default function DashboardPage() {
               >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 text-base md:text-base font-bold flex items-center gap-2">
-                      <span className="text-xl">📅</span> Upcoming Tasks
+                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                      Upcoming Tasks
                     </p>
-                    <p className="text-3xl md:text-3xl font-bold text-orange-600 mt-1" style={{ fontSize: '20px' }}>{upcomingTasks}</p>
+                    <p className="font-bold text-orange-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{upcomingTasks}</p>
                   </div>
                   <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
@@ -1014,10 +1014,10 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 text-base md:text-base font-bold flex items-center gap-2">
-                      <span className="text-xl">💰</span> Monthly Rent
+                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                      Monthly Rent
                     </p>
-                    <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1" style={{ fontSize: '20px' }}>${totalMonthlyRent.toLocaleString()}</p>
+                    <p className="font-bold text-green-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${totalMonthlyRent.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
@@ -1043,10 +1043,10 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 text-base md:text-base font-bold flex items-center gap-2">
-                      <span className="text-xl">💸</span> This Month's Expenses
+                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                      This Month's Expenses
                     </p>
-                    <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1" style={{ fontSize: '20px' }}>${totalExpenses.toLocaleString()}</p>
+                    <p className="font-bold text-red-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${totalExpenses.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
