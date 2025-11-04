@@ -325,8 +325,8 @@ export default function PropertiesPage() {
       <Layout>
         <div>
           {/* Header Section */}
-          <div className="mb-6">
-            <div className="flex justify-between items-start mb-2">
+          <div className="mb-8" style={{ paddingTop: '15px' }}>
+            <div className="flex justify-between items-start mb-4">
               <div>
                 <h2 className="font-bold" style={{ color: '#0A2540', fontSize: '20px', fontWeight: 600 }}>
                   My Properties
@@ -335,33 +335,71 @@ export default function PropertiesPage() {
                   Track rent, deposits, and tenant status for each of your properties.
                 </p>
               </div>
-              <button
-                onClick={() => setShowAddProperty(true)}
+            <button
+              onClick={() => setShowAddProperty(true)}
                 className="text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all duration-200 font-medium"
                 style={{
                   backgroundColor: '#1C7C63',
-                  borderRadius: '8px',
-                  transform: 'scale(1)'
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+                  transform: 'scale(1)',
+                  fontWeight: 500
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#155A47'
-                  e.currentTarget.style.transform = 'scale(1.05)'
+                  e.currentTarget.style.transform = 'translateY(-1px)'
+                  e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = '#1C7C63'
-                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
                 }}
-              >
-                <Plus className="w-5 h-5" />
-                Add Property
-              </button>
+            >
+              <Plus className="w-5 h-5" />
+              Add Property
+            </button>
             </div>
+            
+            {/* Portfolio Summary */}
+            {properties.length > 0 && (
+              <div className="mb-6 p-4 rounded-lg" style={{ 
+                backgroundColor: '#F7FBF9',
+                border: '1px solid #E5EBE9',
+                borderRadius: '8px'
+              }}>
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  <span style={{ color: '#0A2540', fontWeight: 500 }}>
+                    <strong>Portfolio Overview:</strong> {properties.length} {properties.length === 1 ? 'property' : 'properties'}
+                  </span>
+                  <span style={{ color: '#647474' }}>
+                    • ${properties.reduce((sum, p) => sum + p.monthly_rent, 0).toLocaleString()} total monthly rent
+                  </span>
+                  {properties.filter(p => p.tenant_name).length > 0 && (
+                    <>
+                      <span style={{ color: '#647474' }}>
+                        • {Math.round((Object.values(rentPayments).filter(p => p?.status === 'paid').length / properties.filter(p => p.tenant_name).length) * 100) || 0}% paid
+                      </span>
+                      <span style={{ color: '#647474' }}>
+                        • {Object.values(rentPayments).filter(p => {
+                          if (!p || p.status === 'paid') return false
+                          const now = new Date()
+                          const property = properties.find(prop => prop.id === p.property_id)
+                          return property && property.rent_due_date && now.getDate() > property.rent_due_date
+                        }).length} overdue
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
             
             {/* Search and Filter Bar */}
             {properties.length > 0 && (
               <div className="flex flex-col sm:flex-row gap-3 mt-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: '#6B7B7A' }} />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: '#6B7B7A', zIndex: 1 }} />
                   <input
                     type="text"
                     placeholder="Search properties..."
@@ -369,9 +407,11 @@ export default function PropertiesPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border rounded-lg"
                     style={{
-                      borderColor: '#E7ECEA',
+                      borderColor: '#D7E2DF',
                       color: '#0A2540',
-                      fontSize: '14px'
+                      fontSize: '14px',
+                      backgroundColor: 'white',
+                      borderRadius: '8px'
                     }}
                   />
                 </div>
@@ -380,10 +420,11 @@ export default function PropertiesPage() {
                   onChange={(e) => setSortBy(e.target.value as 'rent' | 'tenant' | 'lease')}
                   className="px-4 py-2.5 border rounded-lg"
                   style={{
-                    borderColor: '#E7ECEA',
+                    borderColor: '#D7E2DF',
                     color: '#0A2540',
                     fontSize: '14px',
-                    backgroundColor: 'white'
+                    backgroundColor: 'white',
+                    borderRadius: '8px'
                   }}
                 >
                   <option value="rent">Sort by Rent Amount</option>
@@ -634,21 +675,21 @@ export default function PropertiesPage() {
                           {/* Property Details */}
                           <div className="space-y-4">
                             <div>
-                              <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Monthly Rent</p>
+                              <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Monthly Rent</p>
                               <p className="font-bold" style={{ color: '#1C7C63', fontSize: '16px' }}>
                                 ${property.monthly_rent.toLocaleString()}
                               </p>
                             </div>
                             {property.security_deposit && (
                               <div>
-                                <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Security Deposit</p>
+                                <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Security Deposit</p>
                                 <p className="font-bold" style={{ color: '#1C7C63', fontSize: '16px' }}>
                                   ${property.security_deposit.toLocaleString()}
                                 </p>
                               </div>
                             )}
                             <div>
-                              <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Rent Due</p>
+                              <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Rent Due</p>
                               <p className="font-semibold" style={{ color: '#0A2540', fontSize: '14px' }}>
                                 {property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st'} of the month
                               </p>
@@ -735,11 +776,11 @@ export default function PropertiesPage() {
                         <div className="pl-0 md:pl-6">
                           <div className="space-y-4">
                             <div>
-                              <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Tenant</p>
+                              <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Tenant</p>
                               <div className="group relative inline-block">
                                 <p 
                                   className="font-semibold cursor-pointer" 
-                                  style={{ color: '#5E6B6B', fontSize: '14px' }}
+                                  style={{ color: '#0A2540', fontSize: '14px' }}
                                   onMouseEnter={(e) => {
                                     // Show tooltip on hover
                                     const tooltip = document.createElement('div')
@@ -767,12 +808,12 @@ export default function PropertiesPage() {
                                   {property.tenant_name || 'Vacant'}
                                 </p>
                                 {property.tenant_email && (
-                                  <p className="text-sm mt-1" style={{ color: '#5E6B6B', fontSize: '13px' }}>
+                                  <p className="text-sm mt-1" style={{ color: '#7B8B8A', fontSize: '13px' }}>
                                     {property.tenant_email}
                                   </p>
                                 )}
                                 {property.tenant_phone && (
-                                  <p className="text-sm" style={{ color: '#5E6B6B', fontSize: '13px' }}>
+                                  <p className="text-sm" style={{ color: '#7B8B8A', fontSize: '13px' }}>
                                     {property.tenant_phone}
                                   </p>
                                 )}
@@ -780,8 +821,8 @@ export default function PropertiesPage() {
                             </div>
                             {property.lease_end_date && (
                               <div>
-                                <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Lease Ends</p>
-                                <p className="font-semibold" style={{ color: '#5E6B6B', fontSize: '14px' }}>
+                                <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Lease Ends</p>
+                                <p className="font-semibold" style={{ color: '#0A2540', fontSize: '14px' }}>
                                   {new Date(property.lease_end_date + 'T00:00:00').toLocaleDateString()}
                                 </p>
                               </div>
@@ -792,43 +833,57 @@ export default function PropertiesPage() {
                           <div className="flex gap-2 mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
                             <button
                               onClick={() => handleEdit(property)}
-                              className="text-blue-600 hover:text-blue-800 p-2 transition-colors duration-200"
+                              className="p-2 transition-all duration-200"
                               title="Edit property"
-                              style={{ color: '#1C7C63' }}
+                              style={{ 
+                                color: '#1C7C63',
+                                borderRadius: '6px',
+                                transform: 'translateY(0)',
+                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                              }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.color = '#155A47'
-                                e.currentTarget.style.transform = 'scale(1.1)'
+                                e.currentTarget.style.transform = 'translateY(-1px)'
+                                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)'
                               }}
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.color = '#1C7C63'
-                                e.currentTarget.style.transform = 'scale(1)'
+                                e.currentTarget.style.transform = 'translateY(0)'
+                                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
                               }}
                             >
                               <Edit className="w-5 h-5" />
                             </button>
                             <button
                               onClick={() => handleDelete(property.id)}
-                              className="text-red-600 hover:text-red-800 p-2 transition-colors duration-200"
+                              className="p-2 transition-all duration-200"
                               title="Delete property"
-                              style={{ color: '#D94A4A' }}
+                              style={{ 
+                                color: '#D94A4A',
+                                borderRadius: '6px',
+                                transform: 'translateY(0)',
+                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                              }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.color = '#B83232'
-                                e.currentTarget.style.transform = 'scale(1.1)'
+                                e.currentTarget.style.transform = 'translateY(-1px)'
+                                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)'
                               }}
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.color = '#D94A4A'
-                                e.currentTarget.style.transform = 'scale(1)'
+                                e.currentTarget.style.transform = 'translateY(0)'
+                                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
                               }}
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
-                        </div>
-                      </div>
+                  </div>
+                </div>
                     </div>
                   )
                 })}
-              </div>
+            </div>
             )
           )}
 
