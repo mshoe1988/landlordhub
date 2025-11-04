@@ -19,15 +19,14 @@ export default function StructuredData() {
     "logo": `${baseUrl}/landlord-hub-logo.svg`,
     "description": "Property management software for landlords. Track income, expenses, maintenance, and generate tax reports.",
     "sameAs": [
-      // Add your social media links here when available
-      // "https://www.linkedin.com/company/landlordhub",
-      // "https://www.facebook.com/landlordhub",
-      // "https://www.instagram.com/landlordhub"
+      "https://www.linkedin.com/company/landlordhub",
+      "https://www.facebook.com/landlordhubapp",
+      "https://www.instagram.com/landlordhubapp/"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer service",
-      "email": "support@landlordhub.com" // Update with your actual support email
+      "email": "support@landlordhubapp.com"
     }
   }
 
@@ -43,13 +42,6 @@ export default function StructuredData() {
       "price": "0",
       "priceCurrency": "USD",
       "description": "Free tier available with paid plans for advanced features"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "150",
-      "bestRating": "5",
-      "worstRating": "1"
     },
     "description": "Complete property management software for landlords. Track rental income, manage expenses, schedule maintenance tasks, and generate comprehensive tax reports.",
     "featureList": [
