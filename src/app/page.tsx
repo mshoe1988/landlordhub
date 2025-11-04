@@ -65,6 +65,12 @@ export default function Home() {
               Get Started Free
             </Link>
             <Link
+              href="/pricing"
+              className="bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-colors"
+            >
+              View Pricing
+            </Link>
+            <Link
               href="/login"
               className="bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-colors"
             >

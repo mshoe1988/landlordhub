@@ -1,10 +1,27 @@
 'use client'
 
+import type { Metadata } from 'next'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { trackLogin } from '@/lib/analytics'
+
+export const metadata: Metadata = {
+  title: 'Login',
+  description: 'Sign in to LandlordHub to manage your rental properties, track expenses, and view reports.',
+  alternates: { canonical: '/login' },
+  openGraph: {
+    title: 'Login | LandlordHub',
+    description: 'Sign in to LandlordHub to manage your rentals.',
+    url: '/login'
+  },
+  twitter: {
+    title: 'Login | LandlordHub',
+    description: 'Sign in to LandlordHub to manage your rentals.'
+  }
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')

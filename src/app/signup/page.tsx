@@ -1,10 +1,27 @@
 'use client'
 
+import type { Metadata } from 'next'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { trackSignUp } from '@/lib/analytics'
+
+export const metadata: Metadata = {
+  title: 'Sign Up',
+  description: 'Create your LandlordHub account. Start free and manage your rental properties in one place.',
+  alternates: { canonical: '/signup' },
+  openGraph: {
+    title: 'Create your LandlordHub account',
+    description: 'Start free and manage rentals in one place.',
+    url: '/signup'
+  },
+  twitter: {
+    title: 'Create your LandlordHub account',
+    description: 'Start free and manage rentals in one place.'
+  }
+}
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')

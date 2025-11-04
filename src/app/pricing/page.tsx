@@ -1,5 +1,7 @@
 'use client'
 
+import type { Metadata } from 'next'
+
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
@@ -9,6 +11,21 @@ import { Check, X, Star } from 'lucide-react'
 import { PRICING_PLANS, STRIPE_PRICE_IDS } from '@/lib/stripe'
 import { supabase } from '@/lib/supabase'
 import { trackEvent } from '@/lib/analytics'
+
+export const metadata: Metadata = {
+  title: 'Pricing',
+  description: 'Flexible plans for every landlord. Start free and upgrade as you grow.',
+  alternates: { canonical: '/pricing' },
+  openGraph: {
+    title: 'LandlordHub Pricing',
+    description: 'Flexible plans for every landlord. Start free and upgrade as you grow.',
+    url: '/pricing'
+  },
+  twitter: {
+    title: 'LandlordHub Pricing',
+    description: 'Flexible plans for every landlord. Start free and upgrade as you grow.'
+  }
+}
 
 export default function PricingPage() {
   const { user } = useAuth()
