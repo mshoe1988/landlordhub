@@ -332,17 +332,17 @@ export default function DashboardPage() {
       
       while (rangeIterator <= end) {
         const monthKey = rangeIterator.toISOString().slice(0, 7) // YYYY-MM
-        monthlyMap.set(monthKey, { income: 0, expenses: 0 })
+      monthlyMap.set(monthKey, { income: 0, expenses: 0 })
         rangeIterator.setMonth(rangeIterator.getMonth() + 1)
-      }
+    }
     } else {
       // Default: All Time - find the earliest month from expenses or property creation
       let earliestMonth: Date | null = null
       let latestMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-      
+    
       // Check expenses for earliest date
-      expenses.forEach(expense => {
-        const expenseDate = new Date(expense.date)
+    expenses.forEach(expense => {
+      const expenseDate = new Date(expense.date)
         const expenseMonth = new Date(expenseDate.getFullYear(), expenseDate.getMonth(), 1)
         if (!earliestMonth || expenseMonth < earliestMonth) {
           earliestMonth = expenseMonth
@@ -350,8 +350,8 @@ export default function DashboardPage() {
       })
       
       // Check property creation dates for earliest date
-      properties.forEach(property => {
-        const createdDate = new Date(property.created_at)
+    properties.forEach(property => {
+      const createdDate = new Date(property.created_at)
         const createdMonth = new Date(createdDate.getFullYear(), createdDate.getMonth(), 1)
         if (!earliestMonth || createdMonth < earliestMonth) {
           earliestMonth = createdMonth
@@ -598,7 +598,7 @@ export default function DashboardPage() {
         break
       case 'this-month':
         startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0) // Last day of current month
         break
       case 'last-month':
         startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -687,20 +687,29 @@ export default function DashboardPage() {
     })
     
     // Ensure at least 3 months are shown (pad with zero months if needed)
+    // Always include the current month and go back from there
     if (result.length < 3) {
       const now = new Date()
-      const monthsToAdd = 3 - result.length
-      for (let i = monthsToAdd - 1; i >= 0; i--) {
+      const currentMonthKey = now.toISOString().slice(0, 7) // YYYY-MM format
+      const monthsToShow = 3
+      
+      // Build array of months to show, starting from current month going back
+      const monthsToAdd: Array<{ monthKey: string; month: string }> = []
+      for (let i = 0; i < monthsToShow; i++) {
         const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1)
         const monthKey = monthDate.toISOString().slice(0, 7)
         const monthLabel = monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-        
-        // Check if this month already exists
+        monthsToAdd.push({ monthKey, month: monthLabel })
+      }
+      
+      // Add missing months to result (in reverse order to maintain chronological order)
+      for (let i = monthsToAdd.length - 1; i >= 0; i--) {
+        const { monthKey, month } = monthsToAdd[i]
         const exists = result.some(r => r.monthKey === monthKey)
         if (!exists) {
           result.unshift({
             monthKey,
-            month: monthLabel,
+            month,
             income: 0,
             expenses: 0,
             cashflow: 0,
@@ -708,6 +717,7 @@ export default function DashboardPage() {
           })
         }
       }
+      
       // Recalculate cumulative after adding months
       cumulative = 0
       result = result.map(entry => {
@@ -811,18 +821,18 @@ export default function DashboardPage() {
               {/* Top Row */}
               <div 
                 className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
-                onClick={() => router.push('/properties')}
-              >
+              onClick={() => router.push('/properties')}
+            >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
                     <p className="text-gray-900 text-base md:text-base font-bold">Total Properties</p>
                     <p className="text-3xl md:text-3xl font-bold text-gray-800 mt-1">{properties.length}</p>
-                  </div>
-                  <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
+                  <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
-              
-              <div 
+            </div>
+            
+            <div 
                 className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
                 onClick={() => router.push('/maintenance')}
               >
@@ -838,31 +848,31 @@ export default function DashboardPage() {
               {/* Bottom Row */}
               <div 
                 className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
-                onClick={() => router.push('/reports')}
-              >
+              onClick={() => router.push('/reports')}
+            >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
                     <p className="text-gray-900 text-base md:text-base font-bold">Monthly Rent</p>
                     <p className="text-3xl md:text-3xl font-bold text-green-600 mt-1">${totalMonthlyRent.toLocaleString()}</p>
-                  </div>
-                  <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
+                  <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
               </div>
-              
-              <div 
+            </div>
+            
+            <div 
                 className="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition-shadow flex flex-col justify-between min-h-[140px]"
-                onClick={() => router.push('/expenses')}
-              >
+              onClick={() => router.push('/expenses')}
+            >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
                     <p className="text-gray-900 text-base md:text-base font-bold">This Month's Expenses</p>
                     <p className="text-3xl md:text-3xl font-bold text-red-600 mt-1">${totalExpenses.toLocaleString()}</p>
-                  </div>
+                </div>
                   <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
                 </div>
               </div>
             </div>
-
+            
             {/* Right Side: Rent Collection Status Chart */}
             {propertiesWithTenants.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6">
@@ -1020,8 +1030,8 @@ export default function DashboardPage() {
                     </Bar>
                   </ComposedChart>
                 </ResponsiveContainer>
-              </div>
-              
+          </div>
+
               {/* Summary Stats */}
               {(() => {
                 const summary = getCashflowSummary()
@@ -1031,7 +1041,7 @@ export default function DashboardPage() {
                 const isPositive = summary.totalCashflow > 0
                 const sign = isPositive ? '+' : ''
                 
-                return (
+                  return (
                   <div className="mt-6 pt-6 border-t" style={{ borderColor: '#E3E8E5' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
@@ -1061,10 +1071,10 @@ export default function DashboardPage() {
                             </span>
                           </div>
                         </div>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )
+                  )
               })()}
             </div>
           </div>
@@ -1254,7 +1264,7 @@ export default function DashboardPage() {
                       ${month.netCashFlow.toLocaleString()}
                     </p>
                     <p className="text-xs text-gray-500">Net Flow</p>
-                  </div>
+            </div>
                 ))}
               </div>
             </div>
