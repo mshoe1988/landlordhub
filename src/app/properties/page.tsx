@@ -632,13 +632,14 @@ export default function PropertiesPage() {
                 <p className="text-gray-600">No properties found matching "{searchQuery}"</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 {filteredAndSortedProperties.map(property => {
                   const isPaid = rentPayments[property.id]?.status === 'paid'
                   const isPartial = rentPayments[property.id]?.status === 'partial'
                   const now = new Date()
                   const isOverdue = !isPaid && !isPartial && property.rent_due_date && now.getDate() > property.rent_due_date
                   const paymentStatus = isPaid ? 'paid' : isPartial ? 'partial' : isOverdue ? 'overdue' : 'unpaid'
+                  const [showEditIcon, setShowEditIcon] = useState(false)
                   
                   return (
                     <div 
@@ -646,26 +647,45 @@ export default function PropertiesPage() {
                       className="bg-white p-6 transition-all duration-200"
                       style={{ 
                         borderRadius: '12px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+                        border: '1px solid #E5EBE9',
                         transform: 'translateY(0)'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)'
-                        e.currentTarget.style.transform = 'translateY(-3px)'
+                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.06)'
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        setShowEditIcon(true)
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)'
+                        e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
                         e.currentTarget.style.transform = 'translateY(0)'
+                        setShowEditIcon(false)
                       }}
                     >
                       {/* Header Section */}
-                      <div className="mb-4 pb-4 border-b" style={{ borderColor: '#E7ECEA', borderBottomWidth: '1px' }}>
-                        <h3 className="font-bold" style={{ color: '#0A2540', fontSize: '18px', fontWeight: 600 }}>
-                          {property.nickname || property.address}
-                        </h3>
-                        {property.nickname && (
-                          <p className="text-sm mt-1" style={{ color: '#6B7B7A' }}>{property.address}</p>
-                        )}
+                      <div className="mb-4 pb-4 border-b flex justify-between items-start" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+                    <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold" style={{ color: '#0A2540', fontSize: '18px', fontWeight: 600 }}>
+                              {property.nickname || property.address}
+                            </h3>
+                            <button
+                              onClick={() => handleEdit(property)}
+                              className="transition-opacity duration-200"
+                              style={{ 
+                                opacity: showEditIcon ? 1 : 0,
+                                color: '#1C7C63',
+                                pointerEvents: showEditIcon ? 'auto' : 'none'
+                              }}
+                              title="Edit property"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                          </div>
+                          {property.nickname && (
+                            <p className="text-sm mt-1" style={{ color: '#647474', fontSize: '13px' }}>{property.address}</p>
+                          )}
+                        </div>
                       </div>
 
                       {/* Two-Column Grid Layout */}
@@ -681,14 +701,14 @@ export default function PropertiesPage() {
                               </p>
                             </div>
                             {property.security_deposit && (
-                              <div>
+                        <div>
                                 <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Security Deposit</p>
                                 <p className="font-bold" style={{ color: '#1C7C63', fontSize: '16px' }}>
                                   ${property.security_deposit.toLocaleString()}
                                 </p>
-                              </div>
+                        </div>
                             )}
-                            <div>
+                        <div>
                               <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Rent Due</p>
                               <p className="font-semibold" style={{ color: '#0A2540', fontSize: '14px' }}>
                                 {property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st'} of the month
@@ -699,7 +719,7 @@ export default function PropertiesPage() {
                           {/* Payment Status Section */}
                           {property.tenant_name && (
                             <div className="mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
-                              <p className="text-sm mb-3" style={{ color: '#6B7B7A', fontSize: '13px' }}>Current Month Payment Status</p>
+                              <p className="text-sm mb-3" style={{ color: '#647474', fontSize: '13px' }}>Current Month Payment Status</p>
                               <div className="flex flex-wrap gap-2 mb-4">
                                 {paymentStatus === 'paid' && (
                                   <span 
@@ -775,7 +795,7 @@ export default function PropertiesPage() {
                         {/* Right Column: Tenant Info */}
                         <div className="pl-0 md:pl-6">
                           <div className="space-y-4">
-                            <div>
+                        <div>
                               <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Tenant</p>
                               <div className="group relative inline-block">
                                 <p 
@@ -817,8 +837,8 @@ export default function PropertiesPage() {
                                     {property.tenant_phone}
                                   </p>
                                 )}
-                              </div>
-                            </div>
+                        </div>
+                      </div>
                             {property.lease_end_date && (
                               <div>
                                 <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Lease Ends</p>
@@ -827,14 +847,14 @@ export default function PropertiesPage() {
                                 </p>
                               </div>
                             )}
-                          </div>
+                    </div>
 
                           {/* Quick Actions */}
                           <div className="flex gap-2 mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
-                            <button
-                              onClick={() => handleEdit(property)}
+                      <button
+                        onClick={() => handleEdit(property)}
                               className="p-2 transition-all duration-200"
-                              title="Edit property"
+                        title="Edit property"
                               style={{ 
                                 color: '#1C7C63',
                                 borderRadius: '6px',
@@ -851,13 +871,13 @@ export default function PropertiesPage() {
                                 e.currentTarget.style.transform = 'translateY(0)'
                                 e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
                               }}
-                            >
-                              <Edit className="w-5 h-5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(property.id)}
+                      >
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(property.id)}
                               className="p-2 transition-all duration-200"
-                              title="Delete property"
+                        title="Delete property"
                               style={{ 
                                 color: '#D94A4A',
                                 borderRadius: '6px',
@@ -874,10 +894,10 @@ export default function PropertiesPage() {
                                 e.currentTarget.style.transform = 'translateY(0)'
                                 e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
                               }}
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </div>
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
                     </div>
