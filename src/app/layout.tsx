@@ -19,10 +19,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LandlordHub",
-  description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
-  keywords: "property management, rental properties, landlord, real estate, tax reporting, expense tracking",
-  authors: [{ name: "LandlordHub" }],
+  metadataBase: new URL('https://landlordhubapp.com'),
+  applicationName: 'LandlordHub',
+  title: {
+    default: 'LandlordHub',
+    template: '%s | LandlordHub'
+  },
+  description: 'Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.',
+  keywords: [
+    'property management software',
+    'landlord software',
+    'rental property management',
+    'rent tracking',
+    'expense tracking',
+    'maintenance scheduling',
+    'tax reports',
+    'real estate software',
+    'proptech'
+  ],
+  authors: [{ name: 'LandlordHub' }],
+  creator: 'LandlordHub',
+  publisher: 'LandlordHub',
+  category: 'Real Estate',
+  alternates: {
+    canonical: '/'
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -36,16 +57,44 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "LandlordHub: Simplify Life. Maximize Rentals.",
-    description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
-    type: "website",
-    locale: "en_US",
+    title: 'LandlordHub: Simplify Life. Maximize Rentals.',
+    description: 'Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.',
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://landlordhubapp.com/',
+    siteName: 'LandlordHub',
+    images: [
+      {
+        url: '/landlord-hub-logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'LandlordHub'
+      }
+    ]
   },
   twitter: {
-    card: "summary_large_image",
-    title: "LandlordHub: Simplify Life. Maximize Rentals.",
-    description: "Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.",
+    card: 'summary_large_image',
+    title: 'LandlordHub: Simplify Life. Maximize Rentals.',
+    description: 'Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.',
+    site: '@landlordhubapp',
+    creator: '@landlordhubapp',
+    images: ['/landlord-hub-logo.png']
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      maxSnippet: -1,
+      maxImagePreview: 'large',
+      maxVideoPreview: -1
+    }
+  },
+  verification: {
+    google: '90VRHnRDFeaKUCplraNlwJheZ9hKsuNNzifff2G5N8I'
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
