@@ -328,25 +328,42 @@ export default function ExpensesPage() {
     })).sort((a, b) => b.value - a.value)
   }
 
+  // Helper function to get month key (YYYY-MM) using local time
+  const getMonthKey = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    return `${year}-${month}`
+  }
+
   // Calculate monthly expense trend for bar chart
   const getMonthlyExpenseData = () => {
     const filtered = getFilteredExpenses()
     const monthlyMap = new Map<string, number>()
     
     filtered.forEach(expense => {
-      const date = new Date(expense.date)
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      // Parse date string directly to avoid timezone issues
+      const [year, month, day] = expense.date.split('-').map(Number)
+      const expenseDate = new Date(year, month - 1, day)
+      const monthKey = getMonthKey(expenseDate) // Use local time
       const current = monthlyMap.get(monthKey) || 0
       monthlyMap.set(monthKey, current + expense.amount)
     })
     
+    // Convert to array and sort by month key (which sorts chronologically)
     return Array.from(monthlyMap.entries())
-      .map(([month, value]) => ({
-        month: new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-        amount: Math.round(value * 100) / 100
-      }))
-      .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime())
+      .map(([monthKey, value]) => {
+        // Parse month key to create date for formatting
+        const [year, month] = monthKey.split('-').map(Number)
+        const monthDate = new Date(year, month - 1, 1)
+        return {
+          monthKey, // Keep for sorting
+          month: monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          amount: Math.round(value * 100) / 100
+        }
+      })
+      .sort((a, b) => a.monthKey.localeCompare(b.monthKey)) // Sort by month key (YYYY-MM)
       .slice(-6) // Last 6 months
+      .map(({ month, amount }) => ({ month, amount })) // Remove monthKey from final output
   }
 
   // Get time frame label
@@ -376,20 +393,28 @@ export default function ExpensesPage() {
   const getMonthlyComparison = () => {
     const filtered = getFilteredExpenses()
     const now = new Date()
-    const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const currentYear = now.getFullYear()
+    const currentMonth = now.getMonth()
+    const currentMonthStart = new Date(currentYear, currentMonth, 1)
+    const currentMonthEnd = new Date(currentYear, currentMonth + 1, 0)
+    const lastMonthStart = new Date(currentYear, currentMonth - 1, 1)
+    const lastMonthEnd = new Date(currentYear, currentMonth, 0)
     
     const currentMonthExpenses = filtered
       .filter(e => {
-        const expenseDate = new Date(e.date)
-        return expenseDate >= currentMonth && expenseDate < new Date(now.getFullYear(), now.getMonth() + 1, 1)
+        // Parse date string directly to avoid timezone issues
+        const [year, month, day] = e.date.split('-').map(Number)
+        const expenseDate = new Date(year, month - 1, day)
+        return expenseDate >= currentMonthStart && expenseDate <= currentMonthEnd
       })
       .reduce((sum, e) => sum + e.amount, 0)
     
     const lastMonthExpenses = filtered
       .filter(e => {
-        const expenseDate = new Date(e.date)
-        return expenseDate >= lastMonth && expenseDate < currentMonth
+        // Parse date string directly to avoid timezone issues
+        const [year, month, day] = e.date.split('-').map(Number)
+        const expenseDate = new Date(year, month - 1, day)
+        return expenseDate >= lastMonthStart && expenseDate <= lastMonthEnd
       })
       .reduce((sum, e) => sum + e.amount, 0)
     
@@ -752,24 +777,32 @@ export default function ExpensesPage() {
                       }
                       setActiveFilter(filter.value)
                       const now = new Date()
+                      // Helper function to format date as YYYY-MM-DD using local time
+                      const formatLocalDate = (date: Date): string => {
+                        const year = date.getFullYear()
+                        const month = String(date.getMonth() + 1).padStart(2, '0')
+                        const day = String(date.getDate()).padStart(2, '0')
+                        return `${year}-${month}-${day}`
+                      }
+                      
                       if (filter.value === 'all') {
                         setDateRange(null)
                       } else if (filter.value === 'this-month') {
-                        const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-                        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+                        const start = formatLocalDate(new Date(now.getFullYear(), now.getMonth(), 1))
+                        const end = formatLocalDate(new Date(now.getFullYear(), now.getMonth() + 1, 0))
                         setDateRange({ start, end })
                       } else if (filter.value === 'last-month') {
-                        const start = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0]
-                        const end = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0]
+                        const start = formatLocalDate(new Date(now.getFullYear(), now.getMonth() - 1, 1))
+                        const end = formatLocalDate(new Date(now.getFullYear(), now.getMonth(), 0))
                         setDateRange({ start, end })
                       } else if (filter.value === 'this-quarter') {
                         const quarter = Math.floor(now.getMonth() / 3)
-                        const start = new Date(now.getFullYear(), quarter * 3, 1).toISOString().split('T')[0]
-                        const end = new Date(now.getFullYear(), (quarter + 1) * 3, 0).toISOString().split('T')[0]
+                        const start = formatLocalDate(new Date(now.getFullYear(), quarter * 3, 1))
+                        const end = formatLocalDate(new Date(now.getFullYear(), (quarter + 1) * 3, 0))
                         setDateRange({ start, end })
                       } else if (filter.value === 'this-year') {
-                        const start = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0]
-                        const end = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0]
+                        const start = formatLocalDate(new Date(now.getFullYear(), 0, 1))
+                        const end = formatLocalDate(new Date(now.getFullYear(), 11, 31))
                         setDateRange({ start, end })
                       }
                     }}
@@ -829,16 +862,16 @@ export default function ExpensesPage() {
                 boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
               }}
             >
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="flex justify-between items-center">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium text-gray-900" style={{ fontWeight: 600, color: '#0A2540' }}>
-                    Expenses {dateRange ? `(${dateRange.start} to ${dateRange.end})` : '(All Time)'}
-                  </h3>
-                  <div className="text-sm text-gray-500">
-                    {getFilteredExpenses().length} of {expenses.length} expenses
-                  </div>
+                  Expenses {dateRange ? `(${dateRange.start} to ${dateRange.end})` : '(All Time)'}
+                </h3>
+                <div className="text-sm text-gray-500">
+                  {getFilteredExpenses().length} of {expenses.length} expenses
                 </div>
               </div>
+            </div>
             
             {/* Mobile Card View */}
             <div className="md:hidden p-4 space-y-4">
@@ -1189,7 +1222,7 @@ export default function ExpensesPage() {
                             }}
                           >
                             <MoreVertical className="w-4 h-4" />
-                          </button>
+                        </button>
                         </div>
                       </div>
                     </td>
