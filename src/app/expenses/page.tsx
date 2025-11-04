@@ -48,6 +48,7 @@ export default function ExpensesPage() {
   const [sortField, setSortField] = useState<'date' | 'property' | 'category' | 'amount'>('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [activeFilter, setActiveFilter] = useState<'all' | 'this-month' | 'last-month' | 'this-quarter' | 'this-year' | 'custom' | null>(null)
+  const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -386,8 +387,33 @@ export default function ExpensesPage() {
     return uniqueProperties.size
   }
 
-  // Chart colors
+  // Chart colors with gradient definitions
   const CHART_COLORS = ['#1C7C63', '#FF7B00', '#0A2540', '#E7F2EF', '#10b981', '#F6BD16', '#5B8FF9', '#06b6d4', '#6DC8A0', '#f97316', '#ec4899']
+  
+  // Gradient color definitions for pie chart (desaturated hues)
+  const getGradientColors = (baseColor: string) => {
+    const gradientMap: Record<string, { from: string; to: string }> = {
+      '#1C7C63': { from: '#1C7C63', to: '#A7D6C9' }, // Teal
+      '#FF7B00': { from: '#FF7B00', to: '#FFD4A3' }, // Orange
+      '#0A2540': { from: '#0A2540', to: '#7A9BC0' }, // Navy
+      '#E7F2EF': { from: '#E7F2EF', to: '#F0F8F6' }, // Light teal
+      '#10b981': { from: '#10b981', to: '#86EFAC' }, // Green
+      '#F6BD16': { from: '#F6BD16', to: '#FDE68A' }, // Yellow
+      '#5B8FF9': { from: '#5B8FF9', to: '#A5C9FF' }, // Blue
+      '#06b6d4': { from: '#06b6d4', to: '#67E8F9' }, // Cyan
+      '#6DC8A0': { from: '#6DC8A0', to: '#B4E6D0' }, // Mint
+      '#f97316': { from: '#f97316', to: '#FED7AA' }, // Orange
+      '#ec4899': { from: '#ec4899', to: '#F9A8D4' } // Pink
+    }
+    return gradientMap[baseColor] || { from: baseColor, to: baseColor }
+  }
+  
+  // Get top spending category for insights
+  const getTopSpendingCategory = () => {
+    const categoryData = getCategoryData()
+    if (categoryData.length === 0) return null
+    return categoryData[0] // Already sorted by value descending
+  }
 
   // Calculate monthly comparison
   const getMonthlyComparison = () => {
@@ -579,7 +605,15 @@ export default function ExpensesPage() {
           {(showAddExpense || editingExpense) && renderExpenseForm()}
 
           {/* Financial Overview Section */}
-          <div className="mb-6">
+          <div 
+            className="mb-6 p-6 rounded-lg transition-all duration-200"
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+              padding: '1rem 1.5rem'
+            }}
+          >
             <h2 className="text-lg font-semibold mb-3" style={{ color: '#0A2540', fontWeight: 600 }}>Financial Overview</h2>
             
             {/* Monthly Comparison Banner */}
@@ -587,8 +621,10 @@ export default function ExpensesPage() {
               <div 
                 className="mb-4 p-3 rounded-lg transition-all duration-200"
                 style={{
-                  backgroundColor: getMonthlyComparison()!.change > 0 ? '#FFF3E6' : '#E6F5EA',
-                  border: `1px solid ${getMonthlyComparison()!.change > 0 ? '#FFE6CC' : '#D4F4E0'}`,
+                  background: getMonthlyComparison()!.change > 0 
+                    ? 'linear-gradient(90deg, #FFF4E5, #FFF9ED)' 
+                    : 'linear-gradient(90deg, #E6F5EA, #F0F8F6)',
+                  borderLeft: `4px solid ${getMonthlyComparison()!.change > 0 ? '#FFA500' : '#1C7C63'}`,
                   borderRadius: '8px'
                 }}
               >
@@ -597,7 +633,17 @@ export default function ExpensesPage() {
                     Expenses {getMonthlyComparison()!.change > 0 ? 'up' : 'down'} {Math.abs(getMonthlyComparison()!.change)}%
                   </span>
                   {' vs last month'} — track your trend in{' '}
-                  <a href="/reports" className="underline" style={{ color: '#1C7C63' }}>Reports</a>.
+                  <a 
+                    href="/reports" 
+                    className="underline relative" 
+                    style={{ 
+                      color: '#1C7C63',
+                      borderBottom: '2px solid #1C7C63',
+                      paddingBottom: '1px'
+                    }}
+                  >
+                    Reports
+                  </a>.
                 </p>
             </div>
           )}
@@ -628,6 +674,21 @@ export default function ExpensesPage() {
                   <span className="text-lg font-bold" style={{ color: '#1C7C63', fontWeight: 700 }}>{getTimeFrameLabel()}</span>
                 </div>
               </div>
+              
+              {/* Insights Tag */}
+              {getTopSpendingCategory() && (
+                <div 
+                  className="mt-4 pt-4 border-t flex items-center gap-2"
+                  style={{ 
+                    borderColor: '#E5E9E7'
+                  }}
+                >
+                  <span className="text-lg">💡</span>
+                  <p className="text-sm" style={{ color: '#0A2540' }}>
+                    You spent most on <strong>{getTopSpendingCategory()!.name}</strong> this {activeFilter === 'this-month' ? 'month' : activeFilter === 'this-year' ? 'year' : activeFilter === 'this-quarter' ? 'quarter' : 'period'}.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -648,12 +709,24 @@ export default function ExpensesPage() {
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <defs>
-                        {getCategoryData().map((entry, index) => (
-                          <linearGradient key={`gradient-${index}`} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={CHART_COLORS[index % CHART_COLORS.length]} stopOpacity={0.8} />
-                            <stop offset="100%" stopColor={CHART_COLORS[index % CHART_COLORS.length]} stopOpacity={0.3} />
-                          </linearGradient>
-                        ))}
+                        {getCategoryData().map((entry, index) => {
+                          const baseColor = CHART_COLORS[index % CHART_COLORS.length]
+                          const gradientColors = getGradientColors(baseColor)
+                          return (
+                            <linearGradient 
+                              key={`gradient-${index}`} 
+                              id={`gradient-${index}`} 
+                              x1="0" 
+                              y1="0" 
+                              x2="0" 
+                              y2="1"
+                            >
+                              <stop offset="0%" stopColor={gradientColors.from} stopOpacity={0.9} />
+                              <stop offset="50%" stopColor={gradientColors.from} stopOpacity={0.6} />
+                              <stop offset="100%" stopColor={gradientColors.to} stopOpacity={0.4} />
+                            </linearGradient>
+                          )
+                        })}
                       </defs>
                       <Pie
                         data={getCategoryData()}
@@ -698,11 +771,14 @@ export default function ExpensesPage() {
 
               {/* Bar Chart - Monthly Trend */}
               <div 
-                className="bg-white rounded-lg shadow p-6 transition-all duration-200"
+                className="bg-white rounded-lg shadow p-6 transition-all duration-300"
                 style={{ 
                   borderRadius: '12px',
-                  boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
+                  boxShadow: '0 3px 10px rgba(0,0,0,0.05)',
+                  opacity: 1,
+                  transform: 'translateY(0)'
                 }}
+                key={`bar-${activeFilter}-${dateRange?.start}-${dateRange?.end}`}
               >
                 <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>Monthly Expense Trend</h3>
                 {getMonthlyExpenseData().length > 0 ? (
@@ -727,6 +803,22 @@ export default function ExpensesPage() {
                         radius={[6, 6, 0, 0]}
                         animationBegin={0}
                         animationDuration={750}
+                        style={{
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e: any) => {
+                          if (e.target) {
+                            e.target.style.transform = 'scale(1.03)'
+                            e.target.style.filter = 'brightness(1.1)'
+                          }
+                        }}
+                        onMouseLeave={(e: any) => {
+                          if (e.target) {
+                            e.target.style.transform = 'scale(1)'
+                            e.target.style.filter = 'brightness(1)'
+                          }
+                        }}
                       />
                     </BarChart>
                   </ResponsiveContainer>
@@ -775,6 +867,7 @@ export default function ExpensesPage() {
                         setActiveFilter('custom')
                         return
                       }
+                      setIsAnimating(true)
                       setActiveFilter(filter.value)
                       const now = new Date()
                       // Helper function to format date as YYYY-MM-DD using local time
@@ -805,6 +898,9 @@ export default function ExpensesPage() {
                         const end = formatLocalDate(new Date(now.getFullYear(), 11, 31))
                         setDateRange({ start, end })
                       }
+                      
+                      // Reset animation after transition
+                      setTimeout(() => setIsAnimating(false), 300)
                     }}
                     className="px-4 py-2 text-sm rounded-lg transition-all duration-200 font-medium"
                     style={{
@@ -1109,15 +1205,16 @@ export default function ExpensesPage() {
                   return (
                     <tr 
                       key={expense.id} 
-                      className="transition-all duration-150"
+                      className="transition-all duration-200"
                       style={{
-                        backgroundColor: 'white'
+                        backgroundColor: 'white',
+                        background: 'white'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#F8FAF9'
+                        e.currentTarget.style.background = 'linear-gradient(90deg, #F9FCFB, #F3FAF7)'
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white'
+                        e.currentTarget.style.background = 'white'
                       }}
                     >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{expense.date}</td>
@@ -1231,7 +1328,10 @@ export default function ExpensesPage() {
                 })}
                 {/* Totals Row */}
                 {getFilteredExpenses().length > 0 && (
-                  <tr style={{ backgroundColor: '#F3FAF7' }}>
+                  <tr style={{ 
+                    background: 'linear-gradient(90deg, #E7F2EF, #F8FAF9)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  }}>
                     <td colSpan={4} className="px-6 py-4 text-sm" style={{ fontWeight: 600, color: '#1C7C63' }}>
                       TOTAL
                     </td>
