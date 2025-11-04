@@ -15,7 +15,10 @@ import {
   Mail,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Clock,
+  AlertTriangle,
+  Paperclip
 } from 'lucide-react'
 import { 
   PieChart, 
@@ -142,6 +145,24 @@ export default function DashboardPage() {
 
   const getExpensesByProperty = (propertyId: string) => {
     return expenses.filter(e => e.property_id === propertyId).reduce((sum, e) => sum + e.amount, 0)
+  }
+
+  // Check if task is overdue
+  const isOverdue = (task: MaintenanceTask) => {
+    if (task.status === 'completed') return false
+    const dueDate = new Date(task.due_date + 'T00:00:00')
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return dueDate < today
+  }
+
+  // Check if task is due soon (<48 hours)
+  const isDueSoon = (task: MaintenanceTask) => {
+    if (task.status === 'completed') return false
+    const dueDate = new Date(task.due_date + 'T00:00:00')
+    const now = new Date()
+    const hoursUntilDue = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+    return hoursUntilDue > 0 && hoursUntilDue < 48
   }
 
   const handleMarkComplete = async (taskId: string, event: React.MouseEvent) => {
@@ -951,7 +972,7 @@ export default function DashboardPage() {
                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)'
                   e.currentTarget.style.transform = 'translateY(0)'
                 }}
-                onClick={() => router.push('/properties')}
+              onClick={() => router.push('/properties')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
@@ -1418,13 +1439,35 @@ export default function DashboardPage() {
                     const taskIcon = task.task.toLowerCase().includes('plumb') || task.task.toLowerCase().includes('pipe') ? '🚰' : 
                                     task.task.toLowerCase().includes('hvac') || task.task.toLowerCase().includes('heat') || task.task.toLowerCase().includes('air') ? '❄️' :
                                     task.task.toLowerCase().includes('electr') ? '⚡' : '🛠️'
+                    
+                    const taskOverdue = isOverdue(task)
+                    const taskDueSoon = isDueSoon(task)
+                    
+                    // Determine border color based on status
+                    const getBorderColor = () => {
+                      if (taskOverdue) return '#E04848'
+                      if (task.status === 'pending') return '#F7C948'
+                      return '#1C7C63'
+                    }
+
+                    // Determine priority color
+                    const getPriorityColor = (priority?: string) => {
+                      if (priority === 'high') return { bg: '#FFEAEA', text: '#E04848' }
+                      if (priority === 'medium') return { bg: '#FFF7E0', text: '#D97706' }
+                      return { bg: '#E7F2EF', text: '#1C7C63' }
+                    }
+
+                    const priorityColor = getPriorityColor(task.priority)
+
                     return (
                       <div 
                         key={task.id} 
-                        className="border rounded-lg p-4 flex justify-between items-center cursor-pointer transition-all duration-200"
+                        className="border rounded-lg p-4 flex flex-col cursor-pointer transition-all duration-200"
                         style={{
                           borderRadius: '12px',
                           borderColor: '#E5E9E7',
+                          borderLeft: `4px solid ${getBorderColor()}`,
+                          backgroundColor: taskOverdue ? '#FFF5F5' : 'white',
                           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
                           transform: 'translateY(0)'
                         }}
@@ -1438,40 +1481,105 @@ export default function DashboardPage() {
                         }}
                         onClick={() => router.push('/maintenance')}
                       >
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-3 mb-3">
                           <span className="text-2xl">{taskIcon}</span>
-                          <div>
-                            <h3 className="font-semibold text-gray-800" style={{ fontWeight: 600 }}>{task.task}</h3>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <h3 className="font-semibold text-gray-800" style={{ fontWeight: 600, fontSize: '16px' }}>{task.task}</h3>
+                              {/* Status badges */}
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                {taskOverdue ? (
+                                  <span 
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
+                                    style={{ backgroundColor: '#FFEAEA', color: '#E04848', borderRadius: '8px', fontWeight: 500 }}
+                                  >
+                                    <AlertTriangle className="w-3 h-3" />
+                                    Overdue
+                                  </span>
+                                ) : task.status === 'pending' ? (
+                                  <span 
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
+                                    style={{ backgroundColor: '#FFF7E0', color: '#8A6E00', borderRadius: '8px', fontWeight: 500 }}
+                                  >
+                                    <Clock className="w-3 h-3" />
+                                    Pending
+                                  </span>
+                                ) : null}
+                                {taskDueSoon && !taskOverdue && (
+                                  <span 
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
+                                    style={{ backgroundColor: '#FFF4E6', color: '#D97706', borderRadius: '8px', fontWeight: 500 }}
+                                  >
+                                    <AlertCircle className="w-3 h-3" />
+                                    Due Soon
+                                  </span>
+                                )}
+                                {task.priority && (
+                                  <span 
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
+                                    style={{ 
+                                      backgroundColor: priorityColor.bg, 
+                                      color: priorityColor.text, 
+                                      borderRadius: '8px', 
+                                      fontWeight: 500 
+                                    }}
+                                  >
+                                    {task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢'} {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                                  </span>
+                                )}
+                                {task.attachment_url && (
+                                  <a
+                                    href={task.attachment_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity"
+                                    style={{ 
+                                      backgroundColor: '#E7F2EF', 
+                                      color: '#1C7C63', 
+                                      borderRadius: '8px', 
+                                      fontWeight: 500 
+                                    }}
+                                    title="View attachment"
+                                  >
+                                    <Paperclip className="w-3 h-3" />
+                                    Attachment
+                                  </a>
+                                )}
+                              </div>
+                            </div>
                             <p className="text-sm text-gray-500 mt-1">{property ? (property.nickname || property.address) : 'Unknown Property'}</p>
-                            <p className="text-sm mt-1" style={{ color: '#667680' }}>Scheduled: {new Date(task.due_date + 'T00:00:00').toLocaleDateString()}</p>
+                            <p className="text-sm mt-1" style={{ color: taskOverdue ? '#B0372A' : '#667680', fontSize: '12px' }}>Scheduled: {new Date(task.due_date + 'T00:00:00').toLocaleDateString()}</p>
                           </div>
                         </div>
-                        <button 
-                          className="px-4 py-2 text-white rounded-full transition-all duration-200 font-medium text-sm"
-                          style={{
-                            backgroundColor: '#1C7C63',
-                            borderRadius: '9999px',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleMarkComplete(task.id, e)
-                            e.currentTarget.style.transform = 'scale(0.95)'
-                            setTimeout(() => {
-                              e.currentTarget.style.transform = 'scale(1)'
-                            }, 150)
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#155A47'
-                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)'
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#1C7C63'
-                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
-                          }}
-                        >
-                          Mark Complete
-                        </button>
+                        <div className="flex justify-end mt-2">
+                          <button 
+                            className="px-4 py-2 text-white rounded-full transition-all duration-200 font-medium text-sm"
+                            style={{
+                              backgroundColor: '#1C7C63',
+                              borderRadius: '9999px',
+                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleMarkComplete(task.id, e)
+                              e.currentTarget.style.transform = 'scale(0.95)'
+                              setTimeout(() => {
+                                e.currentTarget.style.transform = 'scale(1)'
+                              }, 150)
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#155A47'
+                              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)'
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#1C7C63'
+                              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
+                            }}
+                          >
+                            Mark Complete
+                          </button>
+                        </div>
                       </div>
                     )
                   })}
@@ -1685,7 +1793,7 @@ export default function DashboardPage() {
                             r={5} 
                             fill={isNegative ? '#EF4444' : '#1C7C63'} 
                             stroke="#FFFFFF" 
-                            strokeWidth={2}
+                      strokeWidth={2}
                           />
                         )
                       }}
