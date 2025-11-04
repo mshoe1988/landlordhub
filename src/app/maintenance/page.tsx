@@ -6,7 +6,7 @@ import { getMaintenanceTasks, updateMaintenanceTask, deleteMaintenanceTask, getP
 import { MaintenanceTask, Property } from '@/lib/types'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
-import { Plus, Trash2, Check, X, Edit, Wrench, Droplets, Zap, Home, Filter, SortAsc, AlertCircle, Clock } from 'lucide-react'
+import { Plus, Trash2, Check, X, Edit, Wrench, Droplets, Zap, Home, Filter, SortAsc, AlertCircle, Clock, CheckCircle2 } from 'lucide-react'
 import CostInputModal from '@/components/CostInputModal'
 import EmptyState from '@/components/EmptyState'
 import toast from 'react-hot-toast'
