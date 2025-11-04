@@ -229,7 +229,7 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
       </div>
 
       {/* Chart */}
-      <div className="h-64 mb-4">
+      <div className="h-64 mb-4" style={{ backgroundColor: '#F7FBF9' }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -239,14 +239,17 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
               labelLine={false}
               label={({ status, percentage }: any) => `${percentage}%`}
               outerRadius={80}
+              innerRadius={20}
               fill="#8884d8"
               dataKey="count"
               onClick={(data: any, index: number) => handlePieClick(data, index)}
               cursor="pointer"
             >
-              {statusData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
+              {statusData.map((entry, index) => {
+                // Apply opacity: 0.8 to all colors
+                const colorWithOpacity = entry.color + 'CC' // CC = 80% opacity in hex
+                return <Cell key={`cell-${index}`} fill={colorWithOpacity} />
+              })}
             </Pie>
             <Tooltip content={<CustomPieTooltip />} />
           </PieChart>
