@@ -942,7 +942,7 @@ export default function DashboardPage() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
                 }}
-                onClick={() => router.push('/properties')}
+              onClick={() => router.push('/properties')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
@@ -989,7 +989,7 @@ export default function DashboardPage() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
                 }}
-                onClick={() => router.push('/reports')}
+              onClick={() => router.push('/reports')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
@@ -1012,7 +1012,7 @@ export default function DashboardPage() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
                 }}
-                onClick={() => router.push('/expenses')}
+              onClick={() => router.push('/expenses')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
@@ -1037,9 +1037,9 @@ export default function DashboardPage() {
                   properties={properties}
                   rentPayments={allRentPayments}
                 />
-              </div>
+                </div>
             )}
-          </div>
+              </div>
 
           {/* Divider */}
           <div style={{ 
@@ -1145,7 +1145,7 @@ export default function DashboardPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
                         key={cashflowDateRange}
                       >
                     <defs>
@@ -1309,7 +1309,7 @@ export default function DashboardPage() {
                 const sign = isPositive ? '+' : ''
                 
                   return (
-                  <div className="mt-2 pt-3 border-t" style={{ borderColor: '#E5E9E7' }}>
+                  <div className="mt-0 pt-2 border-t" style={{ borderColor: '#E5E9E7' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
                         <p className="text-sm mb-1" style={{ color: '#7A8A8A' }}>
