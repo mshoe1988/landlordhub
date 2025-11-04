@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { markRentAsPaid, markRentAsUnpaid, getRentPayment, markMultipleMonthsAsPaid } from '@/lib/database'
 import { RentPayment, Property } from '@/lib/types'
-import { CheckCircle2, XCircle, Loader2, Calendar } from 'lucide-react'
+import { CheckCircle2, XCircle, Loader2, Calendar, Settings } from 'lucide-react'
 
 interface RentPaymentStatusProps {
   property: Property
@@ -221,68 +221,94 @@ export default function RentPaymentStatus({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium ${getStatusColor()}`}>
-          {isPaid ? (
-            <CheckCircle2 className="h-4 w-4" />
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          onClick={handleTogglePayment}
+          disabled={updating}
+          className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          style={{
+            backgroundColor: isPaid ? '#F3F4F6' : '#DFF7E4',
+            color: isPaid ? '#6B7280' : '#1C7C63',
+            borderRadius: '20px',
+            fontWeight: 500,
+            transform: 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!updating) {
+              e.currentTarget.style.backgroundColor = isPaid ? '#E5E7EB' : '#C6F6D5'
+              e.currentTarget.style.transform = 'scale(1.05)'
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = isPaid ? '#F3F4F6' : '#DFF7E4'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+          title={isPaid ? 'Mark as unpaid' : 'Mark as paid'}
+        >
+          {updating ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Updating...</span>
+            </>
           ) : (
-            <XCircle className="h-4 w-4" />
+            <>
+              {isPaid ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+              <span>{isPaid ? 'Mark Unpaid' : 'Mark Paid'}</span>
+            </>
           )}
-          <span>{getStatusText()}</span>
-          {currentPayment?.payment_date && (
-            <span className="text-xs opacity-75 ml-1 hidden sm:inline">
-              ({currentPayment.payment_date})
-            </span>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleTogglePayment}
-            disabled={updating}
-            className={`
-              px-4 sm:px-4 py-2.5 sm:py-2.5 text-sm sm:text-base font-medium rounded-md transition-colors
-              ${isPaid
-                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                : 'bg-green-100 text-green-700 hover:bg-green-200'
-              }
-              disabled:opacity-50 disabled:cursor-not-allowed
-              flex items-center gap-2
-            `}
-            title={isPaid ? 'Mark as unpaid' : 'Mark as paid'}
-          >
-            {updating ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="hidden sm:inline">Updating...</span>
-              </>
-            ) : (
-              <>
-                <span className="hidden sm:inline">{isPaid ? 'Mark Unpaid' : 'Mark Paid'}</span>
-                <span className="sm:hidden">{isPaid ? 'Unpaid' : 'Paid'}</span>
-              </>
-            )}
-          </button>
-          <button
-            onClick={() => setShowBulkPaymentModal(true)}
-            disabled={updating}
-            className="px-4 sm:px-4 py-2.5 sm:py-2.5 text-sm sm:text-base font-medium rounded-md transition-colors bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            title="Pay multiple months at once"
-          >
-            <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span className="hidden sm:inline">Pay Multiple</span>
-            <span className="sm:hidden">Multiple</span>
-          </button>
-          <button
-            onClick={() => setShowProratedModal(true)}
-            disabled={updating}
-            className="px-4 sm:px-4 py-2.5 sm:py-2.5 text-sm sm:text-base font-medium rounded-md transition-colors bg-purple-100 text-purple-700 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            title="Record prorated rent (move-in/out mid-month)"
-          >
-            <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span className="hidden sm:inline">Prorated</span>
-            <span className="sm:hidden">Prorated</span>
-          </button>
-        </div>
+        </button>
+        <button
+          onClick={() => setShowBulkPaymentModal(true)}
+          disabled={updating}
+          className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          style={{
+            backgroundColor: '#E0E7FF',
+            color: '#4F46E5',
+            borderRadius: '20px',
+            fontWeight: 500,
+            transform: 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!updating) {
+              e.currentTarget.style.backgroundColor = '#C7D2FE'
+              e.currentTarget.style.transform = 'scale(1.05)'
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#E0E7FF'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+          title="Pay multiple months at once"
+        >
+          <Calendar className="h-4 w-4 flex-shrink-0" />
+          <span>Pay Multiple</span>
+        </button>
+        <button
+          onClick={() => setShowProratedModal(true)}
+          disabled={updating}
+          className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          style={{
+            backgroundColor: '#EEEAFB',
+            color: '#6B4AE2',
+            borderRadius: '20px',
+            fontWeight: 500,
+            transform: 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!updating) {
+              e.currentTarget.style.backgroundColor = '#DDD6FE'
+              e.currentTarget.style.transform = 'scale(1.05)'
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#EEEAFB'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+          title="Record prorated rent (move-in/out mid-month)"
+        >
+          <Settings className="h-4 w-4 flex-shrink-0" />
+          <span>Prorated</span>
+        </button>
       </div>
 
       {/* Bulk Payment Modal */}
