@@ -562,6 +562,13 @@ export default function DashboardPage() {
     return forecast
   }
 
+  // Helper function to get monthKey (YYYY-MM) using local time (not UTC)
+  const getMonthKey = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    return `${year}-${month}`
+  }
+
   // Calculate cashflow data based on selected time period
   const calculateCashflowData = () => {
     const now = new Date()
@@ -636,7 +643,7 @@ export default function DashboardPage() {
     }
     
     while (monthIterator <= endMonth) {
-      const monthKey = monthIterator.toISOString().slice(0, 7) // YYYY-MM
+      const monthKey = getMonthKey(monthIterator) // Use local time, not UTC
       monthlyMap.set(monthKey, { income: 0, expenses: 0, cashflow: 0 })
       monthIterator.setMonth(monthIterator.getMonth() + 1)
     }
@@ -645,7 +652,7 @@ export default function DashboardPage() {
     expenses.forEach(expense => {
       const expenseDate = new Date(expense.date)
       if (expenseDate >= finalStartDate && expenseDate <= endDate) {
-        const monthKey = expenseDate.toISOString().slice(0, 7)
+        const monthKey = getMonthKey(expenseDate) // Use local time, not UTC
         const existingMonth = monthlyMap.get(monthKey)
         if (existingMonth) {
           existingMonth.expenses += expense.amount
@@ -694,8 +701,8 @@ export default function DashboardPage() {
       return { ...entry, cumulativeCashflow: cumulative }
     })
     
-    // ALWAYS ensure current month (November) is included in the result
-    const currentMonthKey = now.toISOString().slice(0, 7) // YYYY-MM format
+    // ALWAYS ensure current month is included in the result
+    const currentMonthKey = getMonthKey(now) // Use local time, not UTC
     const currentMonthExists = result.some(r => r.monthKey === currentMonthKey)
     if (!currentMonthExists && cashflowDateRange !== 'last-month') {
       const currentMonthDate = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -718,6 +725,31 @@ export default function DashboardPage() {
       })
     }
     
+    // For "this-month", ensure we only show the current month
+    if (cashflowDateRange === 'this-month') {
+      const currentMonthKeyLocal = getMonthKey(now)
+      result = result.filter(entry => entry.monthKey === currentMonthKeyLocal)
+      // If no data for current month, add it with zero values
+      if (result.length === 0) {
+        const currentMonthDate = new Date(now.getFullYear(), now.getMonth(), 1)
+        const currentMonthLabel = currentMonthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        result = [{
+          monthKey: currentMonthKeyLocal,
+          month: currentMonthLabel,
+          income: 0,
+          expenses: 0,
+          cashflow: 0,
+          cumulativeCashflow: 0
+        }]
+      }
+      // Recalculate cumulative
+      cumulative = 0
+      result = result.map(entry => {
+        cumulative += entry.cashflow
+        return { ...entry, cumulativeCashflow: cumulative }
+      })
+    }
+    
     // Ensure at least 3 months are shown (pad with zero months if needed)
     // Only pad if we're showing "all-time" or if the selected range naturally has multiple months
     // For "this-month" or "last-month", we only want to show that specific month
@@ -728,7 +760,7 @@ export default function DashboardPage() {
       const monthsToAdd: Array<{ monthKey: string; month: string }> = []
       for (let i = 0; i < monthsToShow; i++) {
         const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const monthKey = monthDate.toISOString().slice(0, 7)
+        const monthKey = getMonthKey(monthDate) // Use local time, not UTC
         const monthLabel = monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
         monthsToAdd.push({ monthKey, month: monthLabel })
       }
@@ -760,9 +792,8 @@ export default function DashboardPage() {
     // For "last-month", ensure we only show the last month (October if we're in November)
     // We need to filter before removing monthKey so we can use it for matching
     if (cashflowDateRange === 'last-month') {
-      const now = new Date()
       const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-      const lastMonthKey = lastMonthDate.toISOString().slice(0, 7)
+      const lastMonthKey = getMonthKey(lastMonthDate) // Use local time, not UTC
       
       // Filter result to only include the last month using monthKey
       result = result.filter(entry => entry.monthKey === lastMonthKey)
