@@ -625,16 +625,14 @@ export default function DashboardPage() {
     const finalStartDate: Date = startDate
     
     // Generate all months within the date range
-    // For "all-time", ensure we always include the current month (November)
+    // Always ensure we include the current month (November) for all date ranges
     let monthIterator = new Date(finalStartDate.getFullYear(), finalStartDate.getMonth(), 1)
     let endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
     
-    // For "all-time", ensure we include the current month even if endDate doesn't include it
-    if (cashflowDateRange === 'all-time') {
-      const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-      if (endMonth < currentMonth) {
-        endMonth = currentMonth
-      }
+    // Always ensure we include the current month if it's not already included
+    const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    if (endMonth < currentMonth) {
+      endMonth = currentMonth
     }
     
     while (monthIterator <= endMonth) {
@@ -1018,11 +1016,11 @@ export default function DashboardPage() {
                 }
                 
                 return (
-                  <div style={{ height: '480px', paddingBottom: '30px' }}>
+                  <div style={{ height: '480px', paddingBottom: '10px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
                         key={cashflowDateRange}
                       >
                     <defs>
@@ -1186,7 +1184,7 @@ export default function DashboardPage() {
                 const sign = isPositive ? '+' : ''
                 
                   return (
-                  <div className="mt-6 pt-6 border-t" style={{ borderColor: '#E3E8E5' }}>
+                  <div className="mt-4 pt-4 border-t" style={{ borderColor: '#E3E8E5' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
                         <p className="text-sm mb-1" style={{ color: '#0A2540', opacity: 0.7 }}>
