@@ -32,7 +32,9 @@ import {
   LineChart,
   Line,
   BarChart,
-  Bar
+  Bar,
+  LabelList,
+  ComposedChart
 } from 'recharts'
 import CostInputModal from '@/components/CostInputModal'
 import RentCollectionStatusChart from '@/components/RentCollectionStatusChart'
@@ -659,7 +661,7 @@ export default function DashboardPage() {
     })
     
     // Calculate cashflow (income - expenses) for each month
-    const result = Array.from(monthlyMap.entries())
+    let result = Array.from(monthlyMap.entries())
       .map(([monthKey, data]) => {
         const cashflow = data.income - data.expenses
         const monthDate = new Date(monthKey + '-01')
@@ -668,16 +670,94 @@ export default function DashboardPage() {
           month: monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
           income: data.income,
           expenses: data.expenses,
-          cashflow: cashflow
+          cashflow: cashflow,
+          cumulativeCashflow: 0 // Will be calculated below
         }
       })
       .sort((a, b) => {
         // Sort by monthKey (YYYY-MM format)
         return a.monthKey.localeCompare(b.monthKey)
       })
-      .map(({ monthKey, ...rest }) => rest) // Remove monthKey from final result
     
-    return result
+    // Calculate cumulative cashflow
+    let cumulative = 0
+    result = result.map(entry => {
+      cumulative += entry.cashflow
+      return { ...entry, cumulativeCashflow: cumulative }
+    })
+    
+    // Ensure at least 3 months are shown (pad with zero months if needed)
+    if (result.length < 3) {
+      const now = new Date()
+      const monthsToAdd = 3 - result.length
+      for (let i = monthsToAdd - 1; i >= 0; i--) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const monthKey = monthDate.toISOString().slice(0, 7)
+        const monthLabel = monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        
+        // Check if this month already exists
+        const exists = result.some(r => r.monthKey === monthKey)
+        if (!exists) {
+          result.unshift({
+            monthKey,
+            month: monthLabel,
+            income: 0,
+            expenses: 0,
+            cashflow: 0,
+            cumulativeCashflow: 0
+          })
+        }
+      }
+      // Recalculate cumulative after adding months
+      cumulative = 0
+      result = result.map(entry => {
+        cumulative += entry.cashflow
+        return { ...entry, cumulativeCashflow: cumulative }
+      })
+    }
+    
+    // Remove monthKey from final result
+    return result.map(({ monthKey, ...rest }) => rest)
+  }
+
+  // Calculate cashflow summary statistics
+  const getCashflowSummary = () => {
+    const data = calculateCashflowData()
+    if (data.length === 0) return null
+    
+    const totalCashflow = data.reduce((sum, entry) => sum + entry.cashflow, 0)
+    const lastEntry = data[data.length - 1]
+    const secondLastEntry = data.length > 1 ? data[data.length - 2] : null
+    
+    let percentageChange: number | null = null
+    if (secondLastEntry && secondLastEntry.cashflow !== 0) {
+      percentageChange = ((lastEntry.cashflow - secondLastEntry.cashflow) / Math.abs(secondLastEntry.cashflow)) * 100
+    }
+    
+    return {
+      totalCashflow,
+      lastMonthCashflow: lastEntry.cashflow,
+      percentageChange,
+      isPositive: totalCashflow > 0
+    }
+  }
+
+  // Get time period label
+  const getCashflowPeriodLabel = () => {
+    switch (cashflowDateRange) {
+      case 'all-time':
+        return 'All Time'
+      case 'this-month':
+        return 'This Month'
+      case 'last-month':
+        return 'Last Month'
+      case 'last-quarter':
+        return 'Last 3 Months'
+      case 'last-year':
+        return 'Last Year'
+      default:
+        return 'All Time'
+    }
   }
 
   // Get consistent color for a category name
@@ -795,17 +875,40 @@ export default function DashboardPage() {
           </div>
 
           {/* Cashflow Bar Chart */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Cashflow</h2>
+          <div 
+            className="rounded-lg shadow-lg"
+            style={{ 
+              backgroundColor: '#F7FBF9',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+            }}
+          >
+            <div className="p-6 border-b" style={{ borderColor: '#E3E8E5' }}>
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold mb-1" style={{ color: '#0A2540' }}>Cashflow Overview</h2>
+                  <p className="text-sm" style={{ color: '#0A2540', opacity: 0.7 }}>
+                    Income vs Expenses ({getCashflowPeriodLabel()})
+                  </p>
+                </div>
                 <select
                   value={cashflowDateRange}
                   onChange={(e) => setCashflowDateRange(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
-                  style={{ color: '#0A2540', borderColor: '#1C7C63' }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = '#1C7C63'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(28, 124, 99, 0.1)' }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = '' }}
+                  className="px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all"
+                  style={{ 
+                    color: '#0A2540', 
+                    borderColor: '#1C7C63',
+                    borderRadius: '8px',
+                    backgroundColor: '#fff'
+                  }}
+                  onFocus={(e) => { 
+                    e.currentTarget.style.borderColor = '#1C7C63'; 
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(28, 124, 99, 0.1)' 
+                  }}
+                  onBlur={(e) => { 
+                    e.currentTarget.style.borderColor = ''; 
+                    e.currentTarget.style.boxShadow = '' 
+                  }}
                 >
                   <option value="all-time">All Time</option>
                   <option value="this-month">This Month</option>
@@ -816,47 +919,153 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="p-6">
-              <div className="h-80 md:h-96">
+              <div className="h-80 md:h-96" style={{ paddingBottom: '20px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={calculateCashflowData() as any}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <ComposedChart 
+                    data={calculateCashflowData() as any}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                  >
+                    <defs>
+                      <linearGradient id="cashflowGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(28, 124, 99, 0.85)" stopOpacity={1} />
+                        <stop offset="100%" stopColor="rgba(28, 124, 99, 0.6)" stopOpacity={1} />
+                      </linearGradient>
+                      <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(255, 123, 0, 0.85)" stopOpacity={1} />
+                        <stop offset="100%" stopColor="rgba(255, 123, 0, 0.6)" stopOpacity={1} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid 
+                      strokeDasharray="3 3" 
+                      stroke="#E3E8E5"
+                      vertical={true}
+                      horizontal={true}
+                    />
                     <XAxis 
                       dataKey="month" 
-                      tick={{ fill: '#0A2540', fontSize: 12 }}
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
                       angle={-45}
                       textAnchor="end"
                       height={80}
+                      style={{ color: 'rgba(10, 37, 64, 0.7)' }}
                     />
                     <YAxis 
-                      tick={{ fill: '#0A2540', fontSize: 12 }}
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
                       tickFormatter={(value) => `$${value.toLocaleString()}`}
+                      width={80}
                     />
                     <Tooltip 
                       contentStyle={{ 
                         backgroundColor: '#fff', 
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        color: '#0A2540'
+                        border: '1px solid #E3E8E5',
+                        borderRadius: '8px',
+                        color: '#0A2540',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                       }}
                       formatter={(value: any) => `$${value.toLocaleString()}`}
+                      labelStyle={{ color: '#0A2540', fontWeight: 'bold' }}
                     />
-                    <Legend />
+                    <Legend 
+                      wrapperStyle={{ paddingTop: '20px' }}
+                      iconType="square"
+                    />
+                    {/* Cumulative cashflow line */}
+                    <Line 
+                      type="monotone" 
+                      dataKey="cumulativeCashflow" 
+                      stroke="#1C7C63" 
+                      strokeWidth={2}
+                      dot={false}
+                      strokeDasharray="5 5"
+                      name="Cumulative Balance"
+                      legendType="line"
+                    />
                     <Bar 
                       dataKey="cashflow" 
                       name="Cashflow (Income - Expenses)"
-                      fill="#1C7C63"
-                      radius={[4, 4, 0, 0]}
+                      radius={[6, 6, 0, 0]}
+                      animationBegin={0}
+                      animationDuration={800}
+                      animationEasing="ease-out"
                     >
                       {(calculateCashflowData() as any).map((entry: any, index: number) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill={entry.cashflow >= 0 ? '#1C7C63' : '#ef4444'} 
+                          fill={entry.cashflow >= 0 ? 'url(#cashflowGradient)' : 'url(#expenseGradient)'}
+                          style={{
+                            transition: 'all 0.3s ease',
+                          }}
+                          onMouseEnter={(e: any) => {
+                            if (entry.cashflow >= 0) {
+                              e.target.style.opacity = '0.9'
+                              e.target.style.transform = 'scaleY(1.02)'
+                            }
+                          }}
+                          onMouseLeave={(e: any) => {
+                            e.target.style.opacity = '1'
+                            e.target.style.transform = 'scaleY(1)'
+                          }}
                         />
                       ))}
+                      <LabelList 
+                        dataKey="cashflow" 
+                        position="top"
+                        formatter={(value: any) => `$${value.toLocaleString()}`}
+                        style={{ 
+                          fill: '#0A2540', 
+                          fontSize: '11px',
+                          fontWeight: '600'
+                        }}
+                      />
                     </Bar>
-                  </BarChart>
+                  </ComposedChart>
                 </ResponsiveContainer>
               </div>
+              
+              {/* Summary Stats */}
+              {(() => {
+                const summary = getCashflowSummary()
+                if (!summary) return null
+                
+                const periodLabel = getCashflowPeriodLabel()
+                const isPositive = summary.totalCashflow > 0
+                const sign = isPositive ? '+' : ''
+                
+                return (
+                  <div className="mt-6 pt-6 border-t" style={{ borderColor: '#E3E8E5' }}>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <p className="text-sm mb-1" style={{ color: '#0A2540', opacity: 0.7 }}>
+                          Net Cashflow ({periodLabel})
+                        </p>
+                        <p 
+                          className="text-2xl font-bold"
+                          style={{ color: isPositive ? '#1C7C63' : '#FF7B00' }}
+                        >
+                          {sign}${summary.totalCashflow.toLocaleString()}
+                        </p>
+                      </div>
+                      
+                      {summary.percentageChange !== null && summary.percentageChange > 0 && (
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="px-3 py-1.5 rounded-full flex items-center gap-1.5"
+                            style={{ 
+                              backgroundColor: 'rgba(28, 124, 99, 0.1)',
+                              color: '#1C7C63'
+                            }}
+                          >
+                            <span className="text-sm font-semibold">↑</span>
+                            <span className="text-sm font-semibold">
+                              Cashflow Up {Math.abs(summary.percentageChange).toFixed(0)}% from Last Month
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
           </div>
 
