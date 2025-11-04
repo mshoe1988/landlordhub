@@ -264,7 +264,63 @@ export default function DocumentsPage() {
           )}
 
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Mobile Card View */}
+            <div className="md:hidden p-4 space-y-4">
+              {getSortedDocuments().map(doc => (
+                <div key={doc.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center flex-1">
+                      <FileText className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" />
+                      <div className="text-sm font-medium text-gray-900">{doc.name}</div>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(doc.id)}
+                      className="text-red-600 hover:text-red-800 ml-2 flex-shrink-0"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-xs font-medium text-gray-500">Type:</span>
+                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                        {doc.type}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-medium text-gray-500">Property:</span>
+                      <span className="ml-2 text-sm text-gray-900">{getPropertyAddress(doc.property_id)}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-medium text-gray-500">Upload Date:</span>
+                      <span className="ml-2 text-sm text-gray-900">{doc.upload_date}</span>
+                    </div>
+                    <div className="flex items-center space-x-3 pt-2">
+                      <a
+                        href={doc.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span className="text-sm">View</span>
+                      </a>
+                      <a
+                        href={doc.file_url}
+                        download
+                        className="text-green-600 hover:text-green-800 flex items-center space-x-1"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="text-sm">Download</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>

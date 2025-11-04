@@ -464,7 +464,82 @@ export default function ExpensesPage() {
                 </div>
               </div>
             </div>
-            <div className="overflow-x-auto">
+            
+            {/* Mobile Card View */}
+            <div className="md:hidden p-4 space-y-4">
+              {getFilteredExpenses().map(expense => (
+                <div key={expense.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="text-lg font-semibold text-gray-900">${expense.amount}</div>
+                      <div className="text-sm text-gray-500">{expense.date}</div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(expense)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Edit expense"
+                      >
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(expense.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Delete expense"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-xs font-medium text-gray-500">Property:</span>
+                      <span className="ml-2 text-sm text-gray-900">{getPropertyAddress(expense.property_id)}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-medium text-gray-500">Category:</span>
+                      <span className="ml-2 text-sm text-gray-900">{expense.category}</span>
+                      {expense.is_recurring && (
+                        <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                          {expense.recurring_frequency}
+                        </span>
+                      )}
+                    </div>
+                    {expense.description && (
+                      <div>
+                        <span className="text-xs font-medium text-gray-500">Description:</span>
+                        <span className="ml-2 text-sm text-gray-900">{expense.description}</span>
+                      </div>
+                    )}
+                    {expense.receipt_url && (
+                      <div className="flex items-center space-x-3 pt-2">
+                        <span className="text-xs font-medium text-gray-500">Receipt:</span>
+                        <a
+                          href={expense.receipt_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span className="text-sm">View</span>
+                        </a>
+                        <a
+                          href={expense.receipt_url}
+                          download
+                          className="text-green-600 hover:text-green-800 flex items-center space-x-1"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span className="text-sm">Download</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
