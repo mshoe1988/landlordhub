@@ -11,8 +11,8 @@ interface EmptyStateProps {
 const emptyStateConfig = {
   properties: {
     icon: Home,
-    title: 'No Properties Yet',
-    description: 'Add your first rental property to start tracking income and expenses.',
+    title: 'No properties added yet.',
+    description: 'Start by adding your first property to track rent and tenants.',
     actionText: 'Add Property',
     color: 'text-blue-600'
   },
@@ -51,16 +51,28 @@ export default function EmptyState({ type, onAction, actionText }: EmptyStatePro
   const Icon = config.icon
 
   return (
-    <div className="text-center py-12">
-      <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-        <Icon className={`w-12 h-12 ${config.color}`} />
+    <div className="text-center py-16">
+      <div className="mx-auto w-20 h-20 mb-6 flex items-center justify-center">
+        <span className="text-6xl">🏡</span>
       </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-2">{config.title}</h3>
-      <p className="text-gray-500 mb-6 max-w-md mx-auto">{config.description}</p>
+      <h3 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>{config.title}</h3>
+      <p className="text-gray-600 mb-8 max-w-md mx-auto">{config.description}</p>
       {onAction && (
         <button
           onClick={onAction}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white transition-all duration-200"
+          style={{
+            backgroundColor: '#1C7C63',
+            transform: 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#155A47'
+            e.currentTarget.style.transform = 'scale(1.05)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#1C7C63'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
         >
           <Plus className="w-4 h-4 mr-2" />
           {actionText || config.actionText}

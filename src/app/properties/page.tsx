@@ -630,7 +630,7 @@ export default function PropertiesPage() {
                       {/* Two-Column Grid Layout */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Left Column: Property Info */}
-                        <div className="pr-6 border-r" style={{ borderColor: '#E7ECEA', borderRightWidth: '1px' }}>
+                        <div className="pr-0 md:pr-6 md:border-r" style={{ borderColor: '#E7ECEA', borderRightWidth: '1px' }}>
                           {/* Property Details */}
                           <div className="space-y-4">
                             <div>
@@ -659,7 +659,7 @@ export default function PropertiesPage() {
                           {property.tenant_name && (
                             <div className="mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
                               <p className="text-sm mb-3" style={{ color: '#6B7B7A', fontSize: '13px' }}>Current Month Payment Status</p>
-                              <div className="flex flex-wrap gap-2 mb-3">
+                              <div className="flex flex-wrap gap-2 mb-4">
                                 {paymentStatus === 'paid' && (
                                   <span 
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-colors duration-200"
@@ -732,7 +732,7 @@ export default function PropertiesPage() {
                         </div>
 
                         {/* Right Column: Tenant Info */}
-                        <div className="pl-6">
+                        <div className="pl-0 md:pl-6">
                           <div className="space-y-4">
                             <div>
                               <p className="text-sm mb-1" style={{ color: '#6B7B7A', fontSize: '13px' }}>Tenant</p>
