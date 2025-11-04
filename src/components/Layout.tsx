@@ -19,7 +19,11 @@ import {
   Users,
   Linkedin,
   Instagram,
-  Facebook
+  Facebook,
+  Settings,
+  MoreVertical,
+  X,
+  Building
 } from 'lucide-react'
 import HelpModal from './HelpModal'
 
@@ -34,7 +38,10 @@ export default function Layout({ children }: LayoutProps) {
   const [showHelpModal, setShowHelpModal] = useState(false)
   const [subscription, setSubscription] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [showQuickActions, setShowQuickActions] = useState(false)
   const navRef = useRef<HTMLDivElement>(null)
+  const quickActionsRef = useRef<HTMLDivElement>(null)
 
   const handleSignOut = async () => {
     await signOut()
@@ -90,16 +97,36 @@ export default function Layout({ children }: LayoutProps) {
   const isPremium = subscription && subscription.status === 'active' && subscription.plan !== 'free'
   const isPro = subscription && subscription.status === 'active' && subscription.plan === 'pro'
 
-  const navigation = [
+  const primaryNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Properties', href: '/properties', icon: Home },
+    { name: 'Properties', href: '/properties', icon: Building },
     { name: 'Maintenance', href: '/maintenance', icon: Wrench },
+  ]
+
+  const secondaryNavigation = [
     { name: 'Expenses', href: '/expenses', icon: DollarSign },
     { name: 'Documents', href: '/documents', icon: FileText },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
     { name: 'Contacts', href: '/contacts', icon: Users, isProFeature: !isPro },
     { name: 'Account', href: '/account', icon: User },
   ]
+
+  const navigation = [...primaryNavigation, ...secondaryNavigation]
+
+  // Close quick actions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (quickActionsRef.current && !quickActionsRef.current.contains(event.target as Node)) {
+        setShowQuickActions(false)
+      }
+    }
+    if (showQuickActions) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showQuickActions])
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#E7F2EF' }}>
@@ -128,47 +155,372 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="shadow" style={{ backgroundColor: '#E7F2EF' }}>
+      {/* Desktop Navigation */}
+      <div 
+        className="hidden md:block shadow-sm sticky top-0 z-50"
+        style={{ 
+          backgroundColor: '#FFFFFF',
+          borderBottom: '1px solid rgba(28,124,99,0.1)',
+          backdropFilter: 'blur(10px)'
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4">
-          <div ref={navRef} className="flex space-x-8 overflow-x-auto">
+          <div ref={navRef} className="flex items-center justify-center space-x-2">
             {navigation.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
+              const isAccount = item.name === 'Account'
+              
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  data-active={isActive}
-                  className={`py-4 border-b-2 font-medium transition-colors relative ${
-                    item.isProFeature ? 'px-2 pr-8' : 'px-2'
-                  } ${
-                    isActive ? 'border-[#1C7C63] text-[#1C7C63]' : 'border-transparent text-[#0A2540] hover:text-[#1C7C63]'
-                  }`}
-                >
-                  <Icon className="inline w-5 h-5 mr-2" />
-                  {item.name}
-                  {item.isProFeature && (
-                    <span className="absolute -top-1 right-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap">
-                      PRO
-                    </span>
+                <div key={item.name} className="relative">
+                  {isAccount ? (
+                    <div className="relative" ref={quickActionsRef}>
+                      <Link
+                        href={item.href}
+                        data-active={isActive}
+                        className={`flex flex-col items-center gap-1 font-medium transition-all duration-250 relative ${
+                          (item as any).isProFeature ? 'px-3 pr-10' : 'px-3'
+                        } ${
+                          isActive ? 'text-[#1C7C63] font-semibold' : 'text-[#6B7B7A] hover:text-[#1C7C63]'
+                        }`}
+                        style={{
+                          padding: '8px 14px',
+                          fontSize: '0.85rem',
+                          fontWeight: isActive ? 600 : 500
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.transform = 'translateY(-1px)'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)'
+                        }}
+                      >
+                        <Icon 
+                          className="w-5 h-5 transition-all duration-250"
+                          style={{
+                            transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.15)'
+                            e.currentTarget.style.color = '#1C7C63'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = isActive ? 'scale(1.1)' : 'scale(1)'
+                            e.currentTarget.style.color = ''
+                          }}
+                        />
+                        <span>{item.name}</span>
+                        {isActive && (
+                          <div 
+                            style={{
+                              content: '',
+                              width: '28px',
+                              height: '3px',
+                              borderRadius: '3px',
+                              background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                              marginTop: '4px'
+                            }}
+                          />
+                        )}
+                      </Link>
+                      <button
+                        onClick={() => setShowQuickActions(!showQuickActions)}
+                        className="absolute -top-1 -right-1 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                        style={{ color: '#6B7B7A' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#1C7C63'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#6B7B7A'
+                        }}
+                      >
+                        <Settings className="w-3 h-3" />
+                      </button>
+                      {showQuickActions && (
+                        <div 
+                          className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                          style={{ minWidth: '160px' }}
+                        >
+                          <Link
+                            href="/account"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowQuickActions(false)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Settings className="w-4 h-4" />
+                              Settings
+                            </div>
+                          </Link>
+                          <button
+                            onClick={() => {
+                              setShowQuickActions(false)
+                              handleSignOut()
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            Sign Out
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      data-active={isActive}
+                      className={`flex flex-col items-center gap-1 font-medium transition-all duration-250 relative ${
+                        (item as any).isProFeature ? 'px-3 pr-10' : 'px-3'
+                      } ${
+                        isActive ? 'text-[#1C7C63] font-semibold' : 'text-[#6B7B7A] hover:text-[#1C7C63]'
+                      }`}
+                      style={{
+                        padding: '8px 14px',
+                        fontSize: '0.85rem',
+                        fontWeight: isActive ? 600 : 500
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.transform = 'translateY(-1px)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      <Icon 
+                        className="w-5 h-5 transition-all duration-250"
+                        style={{
+                          transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.15)'
+                          e.currentTarget.style.color = '#1C7C63'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = isActive ? 'scale(1.1)' : 'scale(1)'
+                          e.currentTarget.style.color = ''
+                        }}
+                      />
+                      <span>{item.name}</span>
+                      {isActive && (
+                        <div 
+                          style={{
+                            content: '',
+                            width: '28px',
+                            height: '3px',
+                            borderRadius: '3px',
+                            background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                            marginTop: '4px'
+                          }}
+                        />
+                      )}
+                      {(item as any).isProFeature && (
+                        <span 
+                          className="absolute -top-1 right-1 text-white text-xs font-semibold whitespace-nowrap"
+                          style={{
+                            background: 'linear-gradient(90deg, #C864E4, #EC9CFB)',
+                            borderRadius: '6px',
+                            padding: '3px 7px',
+                            boxShadow: '0 0 6px rgba(200,100,228,0.4)',
+                            fontSize: '0.75rem'
+                          }}
+                        >
+                          PRO
+                        </span>
+                      )}
+                    </Link>
                   )}
-                </Link>
+                </div>
               )
             })}
-            <button
-              onClick={handleSignOut}
-              className="py-4 px-2 border-b-2 border-transparent text-[#0A2540] hover:text-[#1C7C63] font-medium transition-colors"
-            >
-              <LogOut className="inline w-5 h-5 mr-2" />
-              Sign Out
-            </button>
           </div>
         </div>
       </div>
 
+      {/* Mobile Bottom Navigation */}
+      <div 
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderTop: '1px solid rgba(28,124,99,0.15)',
+          display: 'flex',
+          justifyContent: 'space-around',
+          padding: '8px 0',
+          boxShadow: '0 -2px 8px rgba(0,0,0,0.1)'
+        }}
+      >
+        {primaryNavigation.map((item) => {
+          const Icon = item.icon
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="flex flex-col items-center gap-1 transition-all duration-250"
+              style={{
+                color: isActive ? '#1C7C63' : '#6B7B7A',
+                padding: '8px 16px',
+                minWidth: '60px'
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.color = '#1C7C63'
+                  const icon = e.currentTarget.querySelector('svg')
+                  if (icon) {
+                    icon.style.transform = 'scale(1.15)'
+                  }
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.color = '#6B7B7A'
+                  const icon = e.currentTarget.querySelector('svg')
+                  if (icon) {
+                    icon.style.transform = 'scale(1)'
+                  }
+                }
+              }}
+            >
+              <Icon 
+                className="w-5 h-5 transition-all duration-250"
+                style={{
+                  transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                }}
+              />
+              {isActive && (
+                <div 
+                  style={{
+                    width: '24px',
+                    height: '2px',
+                    borderRadius: '2px',
+                    background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                    marginTop: '2px'
+                  }}
+                />
+              )}
+            </Link>
+          )
+        })}
+        <button
+          onClick={() => setShowMoreMenu(!showMoreMenu)}
+          className="flex flex-col items-center gap-1 transition-all duration-250"
+          style={{
+            color: showMoreMenu ? '#1C7C63' : '#6B7B7A',
+            padding: '8px 16px',
+            minWidth: '60px'
+          }}
+        >
+          <MoreVertical className="w-5 h-5 transition-all duration-250" />
+          {showMoreMenu && (
+            <div 
+              style={{
+                width: '24px',
+                height: '2px',
+                borderRadius: '2px',
+                background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                marginTop: '2px'
+              }}
+            />
+          )}
+        </button>
+      </div>
+
+      {/* Mobile More Menu Sheet */}
+      {showMoreMenu && (
+        <>
+          <div 
+            className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setShowMoreMenu(false)}
+          />
+          <div 
+            className="md:hidden fixed bottom-0 left-0 right-0 bg-white rounded-t-xl z-50 shadow-2xl"
+            style={{ maxHeight: '70vh', overflowY: 'auto' }}
+          >
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold" style={{ color: '#0A2540' }}>More</h3>
+              <button
+                onClick={() => setShowMoreMenu(false)}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-5 h-5" style={{ color: '#6B7B7A' }} />
+              </button>
+            </div>
+            <div className="p-4 space-y-2">
+              {secondaryNavigation.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setShowMoreMenu(false)}
+                    className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
+                    style={{
+                      backgroundColor: isActive ? '#F7FBF9' : 'transparent',
+                      color: isActive ? '#1C7C63' : '#0A2540'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = '#F7FBF9'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent'
+                      }
+                    }}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="font-medium">{item.name}</span>
+                    {(item as any).isProFeature && (
+                      <span 
+                        className="ml-auto text-white text-xs font-semibold"
+                        style={{
+                          background: 'linear-gradient(90deg, #C864E4, #EC9CFB)',
+                          borderRadius: '6px',
+                          padding: '3px 7px',
+                          boxShadow: '0 0 6px rgba(200,100,228,0.4)'
+                        }}
+                      >
+                        PRO
+                      </span>
+                    )}
+                  </Link>
+                )
+              })}
+              <div className="border-t border-gray-200 mt-4 pt-4">
+                <button
+                  onClick={() => {
+                    setShowMoreMenu(false)
+                    handleSignOut()
+                  }}
+                  className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 w-full text-left"
+                  style={{
+                    color: '#0A2540'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F7FBF9'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Mobile bottom padding to prevent content from being hidden */}
+      <div className="md:hidden" style={{ height: '70px' }} />
+
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:pb-8 pb-20">
         {children}
       </div>
 
