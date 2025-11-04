@@ -1,0 +1,28 @@
+# robots.txt for LandlordHub
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /dashboard
+Disallow: /properties
+Disallow: /expenses
+Disallow: /maintenance
+Disallow: /reports
+Disallow: /documents
+Disallow: /api/
+Disallow: /_next/
+Disallow: /test-*
+
+# Allow public pages
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /pricing
+Allow: /privacy
+
+# Sitemap location
+Sitemap: https://landlordhubapp.com/sitemap.xml
+
+# Crawl delay (optional, remove if not needed)
+Crawl-delay: 1
+
