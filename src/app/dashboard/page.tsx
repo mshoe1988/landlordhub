@@ -694,11 +694,34 @@ export default function DashboardPage() {
       return { ...entry, cumulativeCashflow: cumulative }
     })
     
+    // ALWAYS ensure current month (November) is included in the result
+    const currentMonthKey = now.toISOString().slice(0, 7) // YYYY-MM format
+    const currentMonthExists = result.some(r => r.monthKey === currentMonthKey)
+    if (!currentMonthExists && cashflowDateRange !== 'last-month') {
+      const currentMonthDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      const currentMonthLabel = currentMonthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+      result.push({
+        monthKey: currentMonthKey,
+        month: currentMonthLabel,
+        income: 0,
+        expenses: 0,
+        cashflow: 0,
+        cumulativeCashflow: cumulative
+      })
+      // Re-sort to maintain chronological order
+      result.sort((a, b) => a.monthKey.localeCompare(b.monthKey))
+      // Recalculate cumulative after adding current month
+      cumulative = 0
+      result = result.map(entry => {
+        cumulative += entry.cashflow
+        return { ...entry, cumulativeCashflow: cumulative }
+      })
+    }
+    
     // Ensure at least 3 months are shown (pad with zero months if needed)
     // Only pad if we're showing "all-time" or if the selected range naturally has multiple months
     // For "this-month" or "last-month", we only want to show that specific month
     if (result.length < 3 && cashflowDateRange !== 'this-month' && cashflowDateRange !== 'last-month') {
-      const now = new Date()
       const monthsToShow = 3
       
       // Build array of months to show, starting from current month going back
@@ -1016,11 +1039,11 @@ export default function DashboardPage() {
                 }
                 
                 return (
-                  <div style={{ height: '480px', paddingBottom: '10px' }}>
+                  <div style={{ height: '480px', paddingBottom: '5px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                         key={cashflowDateRange}
                       >
                     <defs>
@@ -1184,7 +1207,7 @@ export default function DashboardPage() {
                 const sign = isPositive ? '+' : ''
                 
                   return (
-                  <div className="mt-4 pt-4 border-t" style={{ borderColor: '#E3E8E5' }}>
+                  <div className="mt-2 pt-3 border-t" style={{ borderColor: '#E3E8E5' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
                         <p className="text-sm mb-1" style={{ color: '#0A2540', opacity: 0.7 }}>
