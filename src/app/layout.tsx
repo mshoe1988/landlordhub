@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://landlordhubapp.com'),
   applicationName: 'LandlordHub',
   title: {
-    default: 'LandlordHub',
+    default: 'LandlordHub Simplified property management',
     template: '%s | LandlordHub'
   },
   description: 'Manage your rental properties with ease. Track income, expenses, maintenance, and generate tax reports.',
