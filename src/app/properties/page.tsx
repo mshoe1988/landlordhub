@@ -10,7 +10,7 @@ import Layout from '@/components/Layout'
 import PropertyLimitModal from '@/components/PropertyLimitModal'
 import EmptyState from '@/components/EmptyState'
 import RentPaymentStatus from '@/components/RentPaymentStatus'
-import { Plus, Trash2, Edit, Upload, Search, CheckCircle2, XCircle, Settings, ChevronDown } from 'lucide-react'
+import { Plus, Trash2, Edit, Upload, Search, CheckCircle2, XCircle, Settings, ChevronDown, Mail } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { uploadFile } from '@/lib/storage'
 import { canAddProperty } from '@/lib/stripe'
@@ -848,17 +848,56 @@ export default function PropertiesPage() {
                                   {property.tenant_name || 'Vacant'}
                                 </p>
                                 {property.tenant_email && (
-                                  <p className="text-sm mt-1" style={{ color: '#7B8B8A', fontSize: '13px' }}>
-                                    {property.tenant_email}
-                                  </p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <p className="text-sm" style={{ color: '#7B8B8A', fontSize: '13px' }}>
+                                      {property.tenant_email}
+                                    </p>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        const subject = `Regarding ${property.nickname || property.address}`
+                                        const body = `Hello ${property.tenant_name || 'Tenant'},\n\n` +
+                                          `I hope this message finds you well. I'm writing regarding your tenancy at ${property.nickname || property.address}.\n\n` +
+                                          `Please let me know if you have any questions or concerns.\n\n` +
+                                          `Best regards,\n` +
+                                          `Your Landlord`
+                                        const mailtoLink = `mailto:${property.tenant_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+                                        window.open(mailtoLink, '_blank')
+                                      }}
+                                      className="p-1.5 transition-all duration-200 rounded"
+                                      title="Email tenant"
+                                      style={{ 
+                                        color: '#1C7C63',
+                                        borderRadius: '6px',
+                                        border: '1px solid #E6ECE9',
+                                        backgroundColor: 'transparent',
+                                        transform: 'translateY(0)',
+                                        padding: '4px 6px'
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.color = '#155A47'
+                                        e.currentTarget.style.backgroundColor = '#F7FBF9'
+                                        e.currentTarget.style.transform = 'translateY(-1px)'
+                                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)'
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.color = '#1C7C63'
+                                        e.currentTarget.style.backgroundColor = 'transparent'
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                        e.currentTarget.style.boxShadow = 'none'
+                                      }}
+                                    >
+                                      <Mail className="w-4 h-4" />
+                                    </button>
+                                  </div>
                                 )}
                                 {property.tenant_phone && (
                                   <p className="text-sm" style={{ color: '#7B8B8A', fontSize: '13px' }}>
                                     {property.tenant_phone}
                                   </p>
                                 )}
-                        </div>
-                      </div>
+                              </div>
+                            </div>
                             {property.lease_end_date && (
                               <div>
                                 <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Lease Ends</p>
