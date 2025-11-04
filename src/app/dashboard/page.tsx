@@ -1172,8 +1172,10 @@ export default function DashboardPage() {
                     </Bar>
                   </ComposedChart>
                 </ResponsiveContainer>
-          </div>
-
+                  </div>
+                )
+              })()}
+              
               {/* Summary Stats */}
               {(() => {
                 const summary = getCashflowSummary()
