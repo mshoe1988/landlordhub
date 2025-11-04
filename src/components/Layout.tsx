@@ -157,11 +157,13 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Navigation */}
       <div 
-        className="shadow-sm sticky top-0 z-50"
+        className="sticky top-0 z-50"
         style={{ 
           backgroundColor: '#FFFFFF',
           borderBottom: '1px solid rgba(28,124,99,0.1)',
-          backdropFilter: 'blur(10px)'
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)',
+          borderRadius: '0 0 8px 8px'
         }}
       >
         <div className="max-w-7xl mx-auto px-4">
@@ -191,25 +193,21 @@ export default function Layout({ children }: LayoutProps) {
                         }}
                         onMouseEnter={(e) => {
                           if (!isActive) {
+                            e.currentTarget.style.color = '#1C7C63'
                             e.currentTarget.style.transform = 'translateY(-1px)'
                           }
                         }}
                         onMouseLeave={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.color = '#6B7B7A'
+                          }
                           e.currentTarget.style.transform = 'translateY(0)'
                         }}
                       >
                         <Icon 
-                          className="w-5 h-5 transition-all duration-250"
+                          className="w-5 h-5 transition-all duration-200"
                           style={{
-                            transform: isActive ? 'scale(1.1)' : 'scale(1)'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'scale(1.15)'
-                            e.currentTarget.style.color = '#1C7C63'
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = isActive ? 'scale(1.1)' : 'scale(1)'
-                            e.currentTarget.style.color = ''
+                            transform: isActive ? 'translateY(-1px) scale(1.1)' : 'scale(1)'
                           }}
                         />
                         <span>{item.name}</span>
@@ -217,11 +215,13 @@ export default function Layout({ children }: LayoutProps) {
                           <div 
                             style={{
                               content: '',
-                              width: '28px',
+                              width: '30px',
                               height: '3px',
                               borderRadius: '3px',
                               background: 'linear-gradient(90deg, #1C7C63, #29A184)',
-                              marginTop: '4px'
+                              marginTop: '6px',
+                              marginLeft: 'auto',
+                              marginRight: 'auto'
                             }}
                           />
                         )}
@@ -283,25 +283,21 @@ export default function Layout({ children }: LayoutProps) {
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
+                          e.currentTarget.style.color = '#1C7C63'
                           e.currentTarget.style.transform = 'translateY(-1px)'
                         }
                       }}
                       onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.color = '#6B7B7A'
+                        }
                         e.currentTarget.style.transform = 'translateY(0)'
                       }}
                     >
                       <Icon 
-                        className="w-5 h-5 transition-all duration-250"
+                        className="w-5 h-5 transition-all duration-200"
                         style={{
-                          transform: isActive ? 'scale(1.1)' : 'scale(1)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'scale(1.15)'
-                          e.currentTarget.style.color = '#1C7C63'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = isActive ? 'scale(1.1)' : 'scale(1)'
-                          e.currentTarget.style.color = ''
+                          transform: isActive ? 'translateY(-1px) scale(1.1)' : 'scale(1)'
                         }}
                       />
                       <span>{item.name}</span>
@@ -309,11 +305,13 @@ export default function Layout({ children }: LayoutProps) {
                         <div 
                           style={{
                             content: '',
-                            width: '28px',
+                            width: '30px',
                             height: '3px',
                             borderRadius: '3px',
                             background: 'linear-gradient(90deg, #1C7C63, #29A184)',
-                            marginTop: '4px'
+                            marginTop: '6px',
+                            marginLeft: 'auto',
+                            marginRight: 'auto'
                           }}
                         />
                       )}
@@ -377,9 +375,9 @@ export default function Layout({ children }: LayoutProps) {
                   }}
                 >
                   <Icon 
-                    className="w-4 h-4 transition-all duration-250"
+                    className="w-4 h-4 transition-all duration-200"
                     style={{
-                      transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                      transform: isActive ? 'translateY(-1px) scale(1.1)' : 'scale(1)'
                     }}
                   />
                   <span className="text-xs">{item.name}</span>
@@ -387,10 +385,12 @@ export default function Layout({ children }: LayoutProps) {
                     <div 
                       style={{
                         width: '24px',
-                        height: '2px',
-                        borderRadius: '2px',
+                        height: '3px',
+                        borderRadius: '3px',
                         background: 'linear-gradient(90deg, #1C7C63, #29A184)',
-                        marginTop: '2px'
+                        marginTop: '4px',
+                        marginLeft: 'auto',
+                        marginRight: 'auto'
                       }}
                     />
                   )}
@@ -428,16 +428,23 @@ export default function Layout({ children }: LayoutProps) {
                 }
               }}
             >
-              <MoreVertical className="w-4 h-4 transition-all duration-250" />
+              <MoreVertical 
+                className="w-4 h-4 transition-all duration-200"
+                style={{
+                  transform: showMoreMenu ? 'translateY(-1px) scale(1.1)' : 'scale(1)'
+                }}
+              />
               <span className="text-xs">More</span>
               {showMoreMenu && (
                 <div 
                   style={{
                     width: '24px',
-                    height: '2px',
-                    borderRadius: '2px',
+                    height: '3px',
+                    borderRadius: '3px',
                     background: 'linear-gradient(90deg, #1C7C63, #29A184)',
-                    marginTop: '2px'
+                    marginTop: '4px',
+                    marginLeft: 'auto',
+                    marginRight: 'auto'
                   }}
                 />
               )}
