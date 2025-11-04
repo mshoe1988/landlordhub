@@ -939,7 +939,7 @@ export default function DashboardPage() {
             <div className="p-6 border-b" style={{ borderColor: '#E3E8E5' }}>
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
                 <div className="flex-1">
-                  <h2 className="text-lg font-bold mb-1" style={{ color: '#0A2540' }}>Cashflow Overview</h2>
+                  <h2 className="text-lg font-semibold mb-1" style={{ color: '#0A2540', opacity: 0.9, fontWeight: 600 }}>Cashflow Overview</h2>
                   <p className="text-sm" style={{ color: '#0A2540', opacity: 0.7 }}>
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
@@ -948,11 +948,11 @@ export default function DashboardPage() {
                 {/* Legend moved to header */}
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#1C7C63' }}></div>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#1C7C63', marginRight: '5px' }}></div>
                     <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cashflow</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent' }}></div>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent', marginRight: '5px' }}></div>
                     <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cumulative</span>
                   </div>
                 </div>
@@ -1006,10 +1006,10 @@ export default function DashboardPage() {
                 
                 if (!hasData) {
                   return (
-                    <div className="flex flex-col items-center justify-center py-16" style={{ height: '420px' }}>
+                    <div className="flex flex-col items-center justify-center py-16" style={{ height: '480px' }}>
                       <div className="text-center">
                         <DollarSign className="w-16 h-16 mx-auto mb-4" style={{ color: '#1C7C63', opacity: 0.3 }} />
-                        <h3 className="text-lg font-semibold mb-2" style={{ color: '#0A2540' }}>Start tracking income to see your cashflow grow</h3>
+                        <h3 className="text-lg font-semibold mb-2" style={{ color: '#0A2540' }}>Track your first rent payment to see your cashflow grow</h3>
                         <p className="text-sm" style={{ color: '#0A2540', opacity: 0.6 }}>
                           Add properties and record rent payments to visualize your cashflow over time
                         </p>
@@ -1019,11 +1019,12 @@ export default function DashboardPage() {
                 }
                 
                 return (
-                  <div style={{ height: '420px', paddingBottom: '30px' }}>
+                  <div style={{ height: '480px', paddingBottom: '30px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
                         margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                        key={cashflowDateRange}
                       >
                     <defs>
                       <linearGradient id="cashflowGradient" x1="0" y1="0" x2="0" y2="1">
@@ -1059,7 +1060,7 @@ export default function DashboardPage() {
                       width={80}
                       domain={['auto', 'auto']}
                       allowDataOverflow={false}
-                      tickCount={6}
+                      tickCount={5}
                     />
                     <Tooltip 
                       content={({ active, payload, label }: any) => {
@@ -1129,7 +1130,7 @@ export default function DashboardPage() {
                       animationDuration={700}
                       animationEasing="ease-out"
                       style={{
-                        filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))'
+                        filter: 'drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.1))'
                       }}
                     />
                     <Bar 
