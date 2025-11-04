@@ -308,7 +308,7 @@ export default function ExpensesPage() {
 
   const renderExpenseForm = () => (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
-      <h3 className="text-lg font-bold mb-4">
+      <h3 className="text-lg font-bold mb-4 text-gray-900">
         {editingExpense ? 'Edit Expense' : 'Add Expense'}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -441,12 +441,8 @@ export default function ExpensesPage() {
             </button>
           </div>
 
-          {/* Mobile: Show form right after header */}
-          {(showAddExpense || editingExpense) && (
-            <div className="md:hidden">
-              {renderExpenseForm()}
-            </div>
-          )}
+          {/* Show form right after header for both mobile and desktop */}
+          {(showAddExpense || editingExpense) && renderExpenseForm()}
 
           <DateRangeFilter 
             onDateRangeChange={setDateRange}
@@ -459,13 +455,6 @@ export default function ExpensesPage() {
             maintenanceTasks={maintenanceTasks}
             dateRange={dateRange}
           />
-
-          {/* Desktop: Show form after filters */}
-          {(showAddExpense || editingExpense) && (
-            <div className="hidden md:block">
-              {renderExpenseForm()}
-            </div>
-          )}
 
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
