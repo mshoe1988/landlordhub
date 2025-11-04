@@ -232,6 +232,23 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
       <div className="h-64 mb-4" style={{ backgroundColor: '#F7FBF9' }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
+            <defs>
+              {statusData.map((entry, index) => {
+                // Gradient colors for pie chart slices
+                const gradientColors: Record<string, { from: string; to: string }> = {
+                  '#10b981': { from: '#1C7C63', to: '#29A184' }, // Green -> Teal
+                  '#f59e0b': { from: '#F7A43F', to: '#FCD07D' }, // Orange gradient
+                  '#ef4444': { from: '#E45B56', to: '#F19C98' }  // Red gradient
+                }
+                const colorGradient = gradientColors[entry.color] || { from: entry.color, to: entry.color }
+                return (
+                  <linearGradient key={`gradient-${index}`} id={`pieGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={colorGradient.from} stopOpacity={0.9} />
+                    <stop offset="100%" stopColor={colorGradient.to} stopOpacity={0.6} />
+                  </linearGradient>
+                )
+              })}
+            </defs>
             <Pie
               data={statusData as any}
               cx="50%"
@@ -246,9 +263,17 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
               cursor="pointer"
             >
               {statusData.map((entry, index) => {
-                // Apply opacity: 0.8 to all colors
-                const colorWithOpacity = entry.color + 'CC' // CC = 80% opacity in hex
-                return <Cell key={`cell-${index}`} fill={colorWithOpacity} />
+                return (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={`url(#pieGradient-${index})`}
+                    style={{
+                      cursor: 'pointer',
+                      opacity: selectedSegment === entry.status ? 1 : 0.9,
+                      transition: 'opacity 0.2s ease'
+                    }}
+                  />
+                )
               })}
             </Pie>
             <Tooltip content={<CustomPieTooltip />} />

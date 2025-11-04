@@ -112,6 +112,21 @@ export default function DashboardPage() {
   // Calculate totals
   const totalMonthlyRent = properties.reduce((sum, p) => sum + p.monthly_rent, 0)
   
+  // Calculate rent collection percentage for smart insight
+  const getRentCollectionPercentage = () => {
+    const now = new Date()
+    const currentMonth = now.getMonth() + 1
+    const currentYear = now.getFullYear()
+    
+    const paidPayments = allRentPayments.filter(
+      p => p.status === 'paid' && p.month === currentMonth && p.year === currentYear
+    )
+    const paidAmount = paidPayments.reduce((sum, p) => sum + p.amount, 0)
+    
+    if (totalMonthlyRent === 0) return null
+    return Math.round((paidAmount / totalMonthlyRent) * 100)
+  }
+  
   // Calculate this month's expenses
   const currentDate = new Date()
   const currentMonth = currentDate.getMonth()
@@ -959,26 +974,30 @@ export default function DashboardPage() {
               <div 
                 className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
                 style={{ 
-                  borderRadius: '14px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.2s ease'
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.1)'
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)'
                   e.currentTarget.style.transform = 'translateY(-2px)'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)'
                   e.currentTarget.style.transform = 'translateY(0)'
                 }}
               onClick={() => router.push('/properties')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
-                      Total Properties
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Home className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                        Total Properties
+                      </p>
+                    </div>
                     <p className="font-bold text-gray-800 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{properties.length}</p>
                 </div>
                   <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
@@ -988,26 +1007,30 @@ export default function DashboardPage() {
             <div 
                 className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
                 style={{ 
-                  borderRadius: '14px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.2s ease'
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.1)'
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)'
                   e.currentTarget.style.transform = 'translateY(-2px)'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)'
                   e.currentTarget.style.transform = 'translateY(0)'
                 }}
                 onClick={() => router.push('/maintenance')}
               >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
-                      Upcoming Tasks
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Calendar className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                        Upcoming Tasks
+                      </p>
+                    </div>
                     <p className="font-bold text-orange-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{upcomingTasks}</p>
                   </div>
                   <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
@@ -1018,26 +1041,30 @@ export default function DashboardPage() {
               <div 
                 className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
                 style={{ 
-                  borderRadius: '14px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.2s ease'
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.1)'
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)'
                   e.currentTarget.style.transform = 'translateY(-2px)'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)'
                   e.currentTarget.style.transform = 'translateY(0)'
                 }}
               onClick={() => router.push('/reports')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
-                      Monthly Rent
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <DollarSign className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                        Monthly Rent
+                      </p>
+                    </div>
                     <p className="font-bold text-green-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${totalMonthlyRent.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
@@ -1047,26 +1074,30 @@ export default function DashboardPage() {
             <div 
                 className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
                 style={{ 
-                  borderRadius: '14px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.2s ease'
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.1)'
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)'
                   e.currentTarget.style.transform = 'translateY(-2px)'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)'
                   e.currentTarget.style.transform = 'translateY(0)'
                 }}
               onClick={() => router.push('/expenses')}
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
-                      This Month's Expenses
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <DollarSign className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                        This Month's Expenses
+                      </p>
+                    </div>
                     <p className="font-bold text-red-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${totalExpenses.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
@@ -1105,7 +1136,8 @@ export default function DashboardPage() {
               backgroundColor: '#FFFFFF',
               borderRadius: '14px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-              border: '1px solid rgba(227, 232, 229, 0.5)'
+              border: '1px solid rgba(227, 232, 229, 0.5)',
+              background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)'
             }}
           >
             <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
@@ -1151,14 +1183,16 @@ export default function DashboardPage() {
                           e.currentTarget.style.transform = 'scale(1)'
                         }, 150)
                       }}
-                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 relative"
                       style={{
                         backgroundColor: isActive ? '#1C7C63' : 'transparent',
                         color: isActive ? '#FFFFFF' : '#0A2540',
                         border: `1px solid ${isActive ? '#1C7C63' : '#E5E9E7'}`,
                         opacity: isActive ? 1 : 0.8,
                         transform: 'scale(1)',
-                        transition: 'all 0.15s ease'
+                        transition: 'all 0.15s ease',
+                        position: 'relative',
+                        paddingBottom: isActive ? '11px' : '8px'
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
@@ -1174,6 +1208,19 @@ export default function DashboardPage() {
                       }}
                     >
                       {labelMap[range]}
+                      {isActive && (
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            bottom: '0',
+                            left: '10%',
+                            right: '10%',
+                            height: '3px',
+                            background: 'linear-gradient(90deg, #1C7C63, #5DD39E)',
+                            borderRadius: '2px'
+                          }}
+                        />
+                      )}
                     </button>
                   )
                 })}
@@ -1208,22 +1255,26 @@ export default function DashboardPage() {
                         style={{ transition: 'all 0.3s ease' }}
                       >
                     <defs>
+                      {/* Cashflow bar gradient - matching expenses page style */}
                       <linearGradient id="cashflowGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="rgba(28, 124, 99, 0.85)" stopOpacity={1} />
-                        <stop offset="100%" stopColor="rgba(28, 124, 99, 0.6)" stopOpacity={1} />
+                        <stop offset="0%" stopColor="#1C7C63" stopOpacity={1} />
+                        <stop offset="100%" stopColor="#A7D6C9" stopOpacity={1} />
                       </linearGradient>
+                      {/* Expense bar gradient */}
                       <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="rgba(255, 123, 0, 0.85)" stopOpacity={1} />
-                        <stop offset="100%" stopColor="rgba(255, 123, 0, 0.6)" stopOpacity={1} />
+                        <stop offset="0%" stopColor="#F7A43F" stopOpacity={1} />
+                        <stop offset="100%" stopColor="#FCD07D" stopOpacity={1} />
                       </linearGradient>
+                      {/* Cumulative line area gradient */}
                       <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="rgba(28, 124, 99, 0.15)" stopOpacity={1} />
+                        <stop offset="0%" stopColor="rgba(28, 124, 99, 0.4)" stopOpacity={1} />
                         <stop offset="100%" stopColor="rgba(28, 124, 99, 0)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid 
                       strokeDasharray="3 3" 
                       stroke="#E3E8E5"
+                      strokeOpacity={0.1}
                       vertical={true}
                       horizontal={true}
                     />
@@ -1387,9 +1438,10 @@ export default function DashboardPage() {
                           <div 
                             className="px-4 py-2 rounded-lg flex items-center gap-2"
                             style={{ 
-                              backgroundColor: '#E7F2EF',
+                              background: 'linear-gradient(90deg, #E9FFF4, #F4FFFA)',
                               color: '#1C7C63',
-                              border: '1px solid rgba(28, 124, 99, 0.2)'
+                              borderLeft: '4px solid #1C7C63',
+                              fontWeight: 500
                             }}
                           >
                             <span className="text-base">🎉</span>
@@ -1416,6 +1468,22 @@ export default function DashboardPage() {
                   )
               })()}
             </div>
+            
+            {/* Smart Insight Card */}
+            {getRentCollectionPercentage() !== null && (
+              <div 
+                className="mt-4 p-4 rounded-lg"
+                style={{
+                  background: 'linear-gradient(90deg, #E9FFF4, #F4FFFA)',
+                  borderLeft: '4px solid #1C7C63',
+                  borderRadius: '8px'
+                }}
+              >
+                <p className="text-sm" style={{ color: '#1C7C63', fontWeight: 500 }}>
+                  💡 You earned {getRentCollectionPercentage()}% of expected rent this month — {getRentCollectionPercentage()! >= 90 ? 'keep up the momentum!' : 'track progress in Reports.'}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Upcoming Maintenance */}
@@ -1427,7 +1495,11 @@ export default function DashboardPage() {
             }}
           >
             <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
-              <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Upcoming Maintenance</h2>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">🔧</span>
+                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Upcoming Maintenance</h2>
+              </div>
+              <p className="text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>Track and manage repairs, upkeep, and maintenance tasks</p>
             </div>
             <div className="p-6">
               {maintenance.filter(m => m.status === 'pending').length === 0 ? (
@@ -1595,12 +1667,16 @@ export default function DashboardPage() {
               className="bg-white p-6 transition-all duration-200"
               style={{ 
                 borderRadius: '14px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)'
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)'
               }}
             >
               <div className="flex justify-between items-center mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
-                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Expenses by Category</h2>
-                <div className="text-sm" style={{ color: '#667680', fontWeight: 400 }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-lg">📊</span>
+                  <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Expenses by Category</h2>
+                </div>
+                <div className="text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>
                   Current: {getCurrentPieChartRangeLabel()}
                 </div>
               </div>
@@ -1720,11 +1796,16 @@ export default function DashboardPage() {
               className="bg-white p-6 transition-all duration-200"
               style={{ 
                 borderRadius: '14px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)'
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)'
               }}
             >
               <div className="mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
-                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cash Flow Forecast (Next 3 Months)</h2>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-lg">🧾</span>
+                  <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cash Flow Forecast (Next 3 Months)</h2>
+                </div>
+                <p className="text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>Projected income, expenses, and net cash flow</p>
               </div>
               
               <div className="h-80 md:h-96">
