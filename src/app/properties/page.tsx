@@ -639,7 +639,6 @@ export default function PropertiesPage() {
                   const now = new Date()
                   const isOverdue = !isPaid && !isPartial && property.rent_due_date && now.getDate() > property.rent_due_date
                   const paymentStatus = isPaid ? 'paid' : isPartial ? 'partial' : isOverdue ? 'overdue' : 'unpaid'
-                  const [showEditIcon, setShowEditIcon] = useState(false)
                   
                   return (
                     <div 
@@ -671,11 +670,11 @@ export default function PropertiesPage() {
                             </h3>
                             <button
                               onClick={() => handleEdit(property)}
-                              className="transition-opacity duration-200"
+                              className="edit-icon-btn transition-opacity duration-200"
                               style={{ 
-                                opacity: showEditIcon ? 1 : 0,
+                                opacity: 0,
                                 color: '#1C7C63',
-                                pointerEvents: showEditIcon ? 'auto' : 'none'
+                                pointerEvents: 'none'
                               }}
                               title="Edit property"
                             >
