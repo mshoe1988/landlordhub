@@ -30,7 +30,9 @@ import {
   AreaChart,
   Area,
   LineChart,
-  Line
+  Line,
+  BarChart,
+  Bar
 } from 'recharts'
 import CostInputModal from '@/components/CostInputModal'
 import RentCollectionStatusChart from '@/components/RentCollectionStatusChart'
@@ -60,6 +62,7 @@ export default function DashboardPage() {
   const [selectedTask, setSelectedTask] = useState<MaintenanceTask | null>(null)
   const [pieChartDateRange, setPieChartDateRange] = useState<{ start: string; end: string } | null>(null)
   const [lineChartDateRange, setLineChartDateRange] = useState<{ start: string; end: string } | null>(null)
+  const [cashflowDateRange, setCashflowDateRange] = useState<string>('all-time')
 
   useEffect(() => {
     if (user) {
@@ -557,6 +560,118 @@ export default function DashboardPage() {
     return forecast
   }
 
+  // Calculate cashflow data based on selected time period
+  const calculateCashflowData = () => {
+    const now = new Date()
+    const monthlyMap = new Map<string, { income: number; expenses: number; cashflow: number }>()
+    
+    // Determine date range based on selected period
+    let startDate: Date | null = null
+    let endDate: Date = new Date(now.getFullYear(), now.getMonth() + 1, 0) // End of current month
+    
+    switch (cashflowDateRange) {
+      case 'all-time':
+        // Find earliest date from expenses, properties, or rent payments
+        expenses.forEach(expense => {
+          const expenseDate = new Date(expense.date)
+          if (!startDate || expenseDate < startDate) {
+            startDate = expenseDate
+          }
+        })
+        properties.forEach(property => {
+          const createdDate = new Date(property.created_at)
+          if (!startDate || createdDate < startDate) {
+            startDate = createdDate
+          }
+        })
+        allRentPayments.forEach(payment => {
+          const paymentDate = new Date(payment.year, payment.month - 1, 1)
+          if (!startDate || paymentDate < startDate) {
+            startDate = paymentDate
+          }
+        })
+        if (!startDate) {
+          startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1) // Default to last 6 months
+        }
+        break
+      case 'this-month':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+        break
+      case 'last-month':
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+        endDate = new Date(now.getFullYear(), now.getMonth(), 0)
+        break
+      case 'last-quarter':
+        // Last quarter = last 3 months
+        startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1)
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+        break
+      case 'last-year':
+        startDate = new Date(now.getFullYear() - 1, 0, 1)
+        endDate = new Date(now.getFullYear() - 1, 11, 31)
+        break
+    }
+    
+    // Generate all months within the date range
+    let monthIterator = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+    const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1)
+    
+    while (monthIterator <= endMonth) {
+      const monthKey = monthIterator.toISOString().slice(0, 7) // YYYY-MM
+      monthlyMap.set(monthKey, { income: 0, expenses: 0, cashflow: 0 })
+      monthIterator.setMonth(monthIterator.getMonth() + 1)
+    }
+    
+    // Add expenses
+    expenses.forEach(expense => {
+      const expenseDate = new Date(expense.date)
+      if (expenseDate >= startDate! && expenseDate <= endDate) {
+        const monthKey = expenseDate.toISOString().slice(0, 7)
+        const existingMonth = monthlyMap.get(monthKey)
+        if (existingMonth) {
+          existingMonth.expenses += expense.amount
+        }
+      }
+    })
+    
+    // Add income from paid rent payments
+    const paidPayments = allRentPayments.filter(payment => payment.status === 'paid')
+    paidPayments.forEach(payment => {
+      const paymentDate = new Date(payment.year, payment.month - 1, 1)
+      if (paymentDate >= startDate! && paymentDate <= endMonth) {
+        const monthKey = `${payment.year}-${String(payment.month).padStart(2, '0')}`
+        const existingMonth = monthlyMap.get(monthKey)
+        if (existingMonth) {
+          existingMonth.income += payment.amount
+        } else {
+          monthlyMap.set(monthKey, { income: payment.amount, expenses: 0, cashflow: 0 })
+        }
+      }
+    })
+    
+    // Calculate cashflow (income - expenses) for each month
+    const result = Array.from(monthlyMap.entries())
+      .map(([monthKey, data]) => {
+        const cashflow = data.income - data.expenses
+        const monthDate = new Date(monthKey + '-01')
+        return {
+          monthKey, // Keep original key for sorting
+          month: monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          income: data.income,
+          expenses: data.expenses,
+          cashflow: cashflow
+        }
+      })
+      .sort((a, b) => {
+        // Sort by monthKey (YYYY-MM format)
+        return a.monthKey.localeCompare(b.monthKey)
+      })
+      .map(({ monthKey, ...rest }) => rest) // Remove monthKey from final result
+    
+    return result
+  }
+
   // Get consistent color for a category name
   const getCategoryColor = (categoryName: string): string => {
     // Predefined colors for common categories
@@ -671,94 +786,68 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Properties Overview */}
+          {/* Cashflow Bar Chart */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Properties Overview</h2>
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Cashflow</h2>
+                <select
+                  value={cashflowDateRange}
+                  onChange={(e) => setCashflowDateRange(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{ color: '#0A2540', borderColor: '#1C7C63' }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = '#1C7C63'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(28, 124, 99, 0.1)' }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = '' }}
+                >
+                  <option value="all-time">All Time</option>
+                  <option value="this-month">This Month</option>
+                  <option value="last-month">Last Month</option>
+                  <option value="last-quarter">Last Quarter</option>
+                  <option value="last-year">Last Year</option>
+                </select>
+              </div>
             </div>
             <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {properties.map(property => {
-                  const propertyExpenses = getExpensesByProperty(property.id)
-                  const netForProperty = property.monthly_rent - propertyExpenses
-                  return (
-                    <div 
-                      key={property.id} 
-                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => router.push('/properties')}
+              <div className="h-80 md:h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={calculateCashflowData() as any}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fill: '#0A2540', fontSize: 12 }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis 
+                      tick={{ fill: '#0A2540', fontSize: 12 }}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        color: '#0A2540'
+                      }}
+                      formatter={(value: any) => `$${value.toLocaleString()}`}
+                    />
+                    <Legend />
+                    <Bar 
+                      dataKey="cashflow" 
+                      name="Cashflow (Income - Expenses)"
+                      fill="#1C7C63"
+                      radius={[4, 4, 0, 0]}
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-gray-800">
-                              {property.nickname || property.address}
-                            </h3>
-                            {property.nickname && (
-                              <span className="text-xs text-gray-500">({property.address})</span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-500 mt-1">Tenant: {property.tenant_name || 'Vacant'}</p>
-                          {property.tenant_email && (
-                            <p className="text-sm text-gray-500">Email: {property.tenant_email}</p>
-                          )}
-                          <p className="text-sm text-gray-500">Rent Due: {property.rent_due_date ? `${property.rent_due_date}${property.rent_due_date === 1 ? 'st' : property.rent_due_date === 2 ? 'nd' : property.rent_due_date === 3 ? 'rd' : property.rent_due_date === 21 ? 'st' : property.rent_due_date === 22 ? 'nd' : property.rent_due_date === 23 ? 'rd' : property.rent_due_date === 31 ? 'st' : 'th'}` : '1st'} of each month</p>
-                          
-                          {/* Rent Payment Status */}
-                          {property.tenant_name && (() => {
-                            const payment = rentPayments[property.id]
-                            const isPaid = payment?.status === 'paid'
-                            const isOverdue = !isPaid && property.rent_due_date && currentDate.getDate() > property.rent_due_date
-                            return (
-                              <div className="mt-2">
-                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
-                                  isPaid 
-                                    ? 'bg-green-100 text-green-700' 
-                                    : isOverdue 
-                                      ? 'bg-red-100 text-red-700' 
-                                      : 'bg-gray-100 text-gray-700'
-                                }`}>
-                                  {isPaid ? (
-                                    <>
-                                      <CheckCircle2 className="w-3.5 h-3.5" />
-                                      <span>Rent Paid</span>
-                                    </>
-                                  ) : isOverdue ? (
-                                    <>
-                                      <AlertCircle className="w-3.5 h-3.5" />
-                                      <span>Overdue</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <XCircle className="w-3.5 h-3.5" />
-                                      <span>Unpaid</span>
-                                    </>
-                                  )}
-                                </span>
-                              </div>
-                            )
-                          })()}
-                          
-                          <div className="flex gap-4 mt-2 text-sm">
-                            <span className="text-green-600">Rent: ${property.monthly_rent}/mo</span>
-                            <span className="text-red-600">Expenses: ${propertyExpenses}</span>
-                            <span className={`font-semibold ${netForProperty >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              Net: ${netForProperty}
-                            </span>
-                          </div>
-                        </div>
-                        {property.tenant_email && (
-                          <button
-                            onClick={(e) => handleEmailTenant(property, e)}
-                            className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm"
-                          >
-                            <Mail className="w-4 h-4" />
-                            <span>Email Tenant</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
+                      {(calculateCashflowData() as any).map((entry: any, index: number) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.cashflow >= 0 ? '#1C7C63' : '#ef4444'} 
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
