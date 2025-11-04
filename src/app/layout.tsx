@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from '@vercel/analytics/react';
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import StructuredData from "@/components/StructuredData";
 import "./register-sw";
 
 const geistSans = Geist({
@@ -73,6 +74,8 @@ export default function RootLayout({
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
+            {/* Schema.org Structured Data */}
+            <StructuredData />
             <AuthProvider>
               {children}
               <Toaster
