@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import SocialShare from '@/components/SocialShare'
 
 // Disable caching for the homepage to ensure latest content
 export const dynamic = 'force-dynamic'
@@ -110,6 +111,14 @@ export default function Home() {
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Reports & Analytics</h2>
             <p className="text-gray-600">Generate comprehensive reports for tax filing, financial analysis, and property performance tracking.</p>
           </div>
+        </div>
+
+        {/* Social Sharing Section */}
+        <div className="mt-16 text-center">
+          <SocialShare 
+            title="LandlordHub - Property Management Software"
+            description="Streamline your property management with our comprehensive suite of tools. Track income, manage expenses, schedule maintenance, and generate detailed reports—all in one place."
+          />
         </div>
       </main>
     </div>
