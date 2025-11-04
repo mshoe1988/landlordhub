@@ -81,7 +81,7 @@ export default function SocialShare({
         >
           <Linkedin className="w-5 h-5" />
         </button>
-        {typeof navigator !== 'undefined' && navigator.share && (
+        {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
           <button
             onClick={() => handleShare('native')}
             aria-label="Share using native share"
