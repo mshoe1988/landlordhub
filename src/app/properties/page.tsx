@@ -655,22 +655,31 @@ export default function PropertiesPage() {
                   return (
                     <div 
                       key={property.id} 
-                      className="bg-white p-6 transition-all duration-200"
+                      className="bg-white p-6"
                       style={{ 
                         borderRadius: '12px',
-                        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+                        boxShadow: '0 3px 12px rgba(0, 0, 0, 0.05)',
                         border: '1px solid #E5EBE9',
-                        transform: 'translateY(0)'
+                        transform: 'translateY(0)',
+                        transition: 'all 0.2s ease-in-out'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.06)'
-                        e.currentTarget.style.transform = 'translateY(-2px)'
-                        setShowEditIcon(true)
+                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)'
+                        e.currentTarget.style.transform = 'translateY(-3px)'
+                        const editBtn = e.currentTarget.querySelector('.edit-icon-btn') as HTMLElement
+                        if (editBtn) {
+                          editBtn.style.opacity = '1'
+                          editBtn.style.pointerEvents = 'auto'
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)'
+                        e.currentTarget.style.boxShadow = '0 3px 12px rgba(0, 0, 0, 0.05)'
                         e.currentTarget.style.transform = 'translateY(0)'
-                        setShowEditIcon(false)
+                        const editBtn = e.currentTarget.querySelector('.edit-icon-btn') as HTMLElement
+                        if (editBtn) {
+                          editBtn.style.opacity = '0'
+                          editBtn.style.pointerEvents = 'none'
+                        }
                       }}
                     >
                       {/* Header Section */}
