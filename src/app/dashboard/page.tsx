@@ -572,6 +572,13 @@ export default function DashboardPage() {
   // Calculate cashflow data based on selected time period
   const calculateCashflowData = () => {
     const now = new Date()
+    // Debug: Log current date information
+    console.log('[Cashflow] Current date:', now)
+    console.log('[Cashflow] Current month (0-indexed):', now.getMonth())
+    console.log('[Cashflow] Current year:', now.getFullYear())
+    console.log('[Cashflow] Current month key:', getMonthKey(now))
+    console.log('[Cashflow] Selected range:', cashflowDateRange)
+    
     const monthlyMap = new Map<string, { income: number; expenses: number; cashflow: number }>()
     
     // Determine date range based on selected period
@@ -679,7 +686,9 @@ export default function DashboardPage() {
     let result = Array.from(monthlyMap.entries())
       .map(([monthKey, data]) => {
         const cashflow = data.income - data.expenses
-        const monthDate = new Date(monthKey + '-01')
+        // Parse monthKey (YYYY-MM) and create Date in local time, not UTC
+        const [year, month] = monthKey.split('-').map(Number)
+        const monthDate = new Date(year, month - 1, 1) // month is 0-indexed in Date constructor
         return {
           monthKey, // Keep original key for sorting
           month: monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
@@ -728,11 +737,17 @@ export default function DashboardPage() {
     // For "this-month", ensure we only show the current month
     if (cashflowDateRange === 'this-month') {
       const currentMonthKeyLocal = getMonthKey(now)
+      console.log('[Cashflow] Filtering for this-month, looking for key:', currentMonthKeyLocal)
+      console.log('[Cashflow] Available monthKeys before filter:', result.map(r => r.monthKey))
+      
       result = result.filter(entry => entry.monthKey === currentMonthKeyLocal)
+      console.log('[Cashflow] Result after filter:', result)
+      
       // If no data for current month, add it with zero values
       if (result.length === 0) {
         const currentMonthDate = new Date(now.getFullYear(), now.getMonth(), 1)
         const currentMonthLabel = currentMonthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        console.log('[Cashflow] No data found, adding current month with label:', currentMonthLabel)
         result = [{
           monthKey: currentMonthKeyLocal,
           month: currentMonthLabel,
@@ -818,6 +833,9 @@ export default function DashboardPage() {
         return { ...entry, cumulativeCashflow: cumulative }
       })
     }
+    
+    // Debug: Log final result before removing monthKey
+    console.log('[Cashflow] Final result before removing monthKey:', result.map(r => ({ monthKey: r.monthKey, month: r.month })))
     
     // Remove monthKey from final result
     return result.map(({ monthKey, ...rest }) => rest)
