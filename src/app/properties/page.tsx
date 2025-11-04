@@ -10,7 +10,7 @@ import Layout from '@/components/Layout'
 import PropertyLimitModal from '@/components/PropertyLimitModal'
 import EmptyState from '@/components/EmptyState'
 import RentPaymentStatus from '@/components/RentPaymentStatus'
-import { Plus, Trash2, Edit, Upload, Search, CheckCircle2, XCircle, Settings } from 'lucide-react'
+import { Plus, Trash2, Edit, Upload, Search, CheckCircle2, XCircle, Settings, ChevronDown } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { uploadFile } from '@/lib/storage'
 import { canAddProperty } from '@/lib/stripe'
@@ -415,22 +415,34 @@ export default function PropertiesPage() {
                     }}
                   />
                 </div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'rent' | 'tenant' | 'lease')}
-                  className="px-4 py-2.5 border rounded-lg"
-                  style={{
-                    borderColor: '#D7E2DF',
-                    color: '#0A2540',
-                    fontSize: '14px',
-                    backgroundColor: 'white',
-                    borderRadius: '8px'
-                  }}
-                >
-                  <option value="rent">Sort by Rent Amount</option>
-                  <option value="tenant">Sort by Tenant</option>
-                  <option value="lease">Sort by Lease End</option>
-                </select>
+                <div className="relative inline-block">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'rent' | 'tenant' | 'lease')}
+                    className="appearance-none px-4 py-2.5 pr-8 border rounded-full"
+                    style={{
+                      borderColor: '#D7E2DF',
+                      color: '#0A2540',
+                      fontSize: '14px',
+                      backgroundColor: '#F7FBF9',
+                      borderRadius: '20px',
+                      paddingRight: '32px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="rent">Sort by Rent Amount</option>
+                    <option value="tenant">Sort by Tenant</option>
+                    <option value="lease">Sort by Lease End</option>
+                  </select>
+                  <ChevronDown 
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" 
+                    style={{ 
+                      color: '#647474',
+                      width: '16px',
+                      height: '16px'
+                    }} 
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -850,53 +862,63 @@ export default function PropertiesPage() {
 
                           {/* Quick Actions */}
                           <div className="flex gap-2 mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
-                      <button
-                        onClick={() => handleEdit(property)}
-                              className="p-2 transition-all duration-200"
-                        title="Edit property"
+                            <button
+                              onClick={() => handleEdit(property)}
+                              className="p-2.5 transition-all duration-200"
+                              title="Edit property"
                               style={{ 
-                                color: '#1C7C63',
+                                color: '#647474',
                                 borderRadius: '6px',
+                                border: '1px solid #E6ECE9',
+                                backgroundColor: 'transparent',
                                 transform: 'translateY(0)',
-                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                                padding: '8px 10px'
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.color = '#155A47'
+                                e.currentTarget.style.color = '#0A2540'
+                                e.currentTarget.style.backgroundColor = '#F7FBF9'
                                 e.currentTarget.style.transform = 'translateY(-1px)'
                                 e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)'
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.color = '#1C7C63'
+                                e.currentTarget.style.color = '#647474'
+                                e.currentTarget.style.backgroundColor = 'transparent'
                                 e.currentTarget.style.transform = 'translateY(0)'
-                                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
+                                e.currentTarget.style.boxShadow = 'none'
                               }}
-                      >
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(property.id)}
-                              className="p-2 transition-all duration-200"
-                        title="Delete property"
+                            >
+                              <Edit className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(property.id)}
+                              className="p-2.5 transition-all duration-200"
+                              title="Delete property"
                               style={{ 
-                                color: '#D94A4A',
+                                color: '#EE5C4D',
                                 borderRadius: '6px',
+                                border: '1px solid #E6ECE9',
+                                backgroundColor: 'transparent',
                                 transform: 'translateY(0)',
-                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                                padding: '8px 10px'
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.color = '#B83232'
-                                e.currentTarget.style.transform = 'translateY(-1px)'
-                                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)'
-                              }}
-                              onMouseLeave={(e) => {
                                 e.currentTarget.style.color = '#D94A4A'
-                                e.currentTarget.style.transform = 'translateY(0)'
-                                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
+                                e.currentTarget.style.backgroundColor = '#FEF5F5'
+                                e.currentTarget.style.borderColor = '#F5C2BA'
+                                e.currentTarget.style.transform = 'translateY(-1px)'
+                                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)'
                               }}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = '#EE5C4D'
+                                e.currentTarget.style.backgroundColor = 'transparent'
+                                e.currentTarget.style.borderColor = '#E6ECE9'
+                                e.currentTarget.style.transform = 'translateY(0)'
+                                e.currentTarget.style.boxShadow = 'none'
+                              }}
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
                   </div>
                 </div>
                     </div>
