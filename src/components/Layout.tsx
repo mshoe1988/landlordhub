@@ -173,7 +173,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-6 mt-12">
+      <footer className="text-white py-8 mt-12" style={{ backgroundColor: '#0A2540' }}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div className="flex items-center gap-6">
