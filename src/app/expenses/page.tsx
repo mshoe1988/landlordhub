@@ -306,6 +306,126 @@ export default function ExpensesPage() {
     )
   }
 
+  const renderExpenseForm = () => (
+    <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <h3 className="text-lg font-bold mb-4">
+        {editingExpense ? 'Edit Expense' : 'Add Expense'}
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Property *</label>
+          <select
+            value={newExpense.property_id}
+            onChange={(e) => setNewExpense({ ...newExpense, property_id: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+          >
+            <option value="">Select Property</option>
+            {properties.map(p => (
+              <option key={p.id} value={p.id}>{p.address}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Amount *</label>
+          <input
+            type="number"
+            value={newExpense.amount}
+            onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+            placeholder="150.00"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+          <input
+            type="date"
+            value={newExpense.date}
+            onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <select
+            value={newExpense.category}
+            onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+          >
+            {EXPENSE_CATEGORIES.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <input
+            type="text"
+            value={newExpense.description}
+            onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+            placeholder="Plumbing repair - kitchen sink"
+          />
+        </div>
+        <div className="md:col-span-2">
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={newExpense.is_recurring}
+                onChange={(e) => setNewExpense({ ...newExpense, is_recurring: e.target.checked })}
+                className="mr-2"
+              />
+              <span className="text-sm font-medium text-gray-700">Recurring Expense</span>
+            </label>
+            {newExpense.is_recurring && (
+              <select
+                value={newExpense.recurring_frequency}
+                onChange={(e) => setNewExpense({ ...newExpense, recurring_frequency: e.target.value })}
+                className="border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm"
+              >
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            )}
+          </div>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Receipt (Optional)</label>
+          <FileUpload
+            onFileSelect={setSelectedFile}
+            onFileRemove={() => setSelectedFile(null)}
+            selectedFile={selectedFile}
+            accept=".pdf,.jpg,.jpeg,.png"
+            maxSize={5 * 1024 * 1024}
+            disabled={uploading}
+          />
+        </div>
+      </div>
+      <div className="flex gap-3 mt-4">
+        <button
+          onClick={editingExpense ? handleUpdateExpense : addExpense}
+          disabled={uploading}
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {uploading ? 'Saving...' : (editingExpense ? 'Update Expense' : 'Save Expense')}
+        </button>
+        <button
+          onClick={() => {
+            setShowAddExpense(false)
+            setEditingExpense(null)
+            setNewExpense({ property_id: '', date: new Date().toISOString().split('T')[0], amount: '', category: 'Repairs', description: '', is_recurring: false, recurring_frequency: 'monthly' })
+            setSelectedFile(null)
+          }}
+          className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+
   return (
     <ProtectedRoute>
       <Layout>
@@ -321,6 +441,13 @@ export default function ExpensesPage() {
             </button>
           </div>
 
+          {/* Mobile: Show form right after header */}
+          {(showAddExpense || editingExpense) && (
+            <div className="md:hidden">
+              {renderExpenseForm()}
+            </div>
+          )}
+
           <DateRangeFilter 
             onDateRangeChange={setDateRange}
             selectedRange={dateRange}
@@ -333,123 +460,10 @@ export default function ExpensesPage() {
             dateRange={dateRange}
           />
 
+          {/* Desktop: Show form after filters */}
           {(showAddExpense || editingExpense) && (
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-bold mb-4">
-                {editingExpense ? 'Edit Expense' : 'Add Expense'}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Property *</label>
-                  <select
-                    value={newExpense.property_id}
-                    onChange={(e) => setNewExpense({ ...newExpense, property_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
-                  >
-                    <option value="">Select Property</option>
-                    {properties.map(p => (
-                      <option key={p.id} value={p.id}>{p.address}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Amount *</label>
-                  <input
-                    type="number"
-                    value={newExpense.amount}
-                    onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
-                    placeholder="150.00"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
-                  <input
-                    type="date"
-                    value={newExpense.date}
-                    onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                  <select
-                    value={newExpense.category}
-                    onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
-                  >
-                    {EXPENSE_CATEGORIES.map(category => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <input
-                    type="text"
-                    value={newExpense.description}
-                    onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
-                    placeholder="Plumbing repair - kitchen sink"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <div className="flex items-center space-x-4">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={newExpense.is_recurring}
-                        onChange={(e) => setNewExpense({ ...newExpense, is_recurring: e.target.checked })}
-                        className="mr-2"
-                      />
-                      <span className="text-sm font-medium text-gray-700">Recurring Expense</span>
-                    </label>
-                    {newExpense.is_recurring && (
-                      <select
-                        value={newExpense.recurring_frequency}
-                        onChange={(e) => setNewExpense({ ...newExpense, recurring_frequency: e.target.value })}
-                        className="border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm"
-                      >
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="quarterly">Quarterly</option>
-                        <option value="yearly">Yearly</option>
-                      </select>
-                    )}
-                  </div>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Receipt (Optional)</label>
-                  <FileUpload
-                    onFileSelect={setSelectedFile}
-                    onFileRemove={() => setSelectedFile(null)}
-                    selectedFile={selectedFile}
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    maxSize={5 * 1024 * 1024}
-                    disabled={uploading}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={editingExpense ? handleUpdateExpense : addExpense}
-                  disabled={uploading}
-                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {uploading ? 'Saving...' : (editingExpense ? 'Update Expense' : 'Save Expense')}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowAddExpense(false)
-                    setEditingExpense(null)
-                    setNewExpense({ property_id: '', date: new Date().toISOString().split('T')[0], amount: '', category: 'Repairs', description: '', is_recurring: false, recurring_frequency: 'monthly' })
-                    setSelectedFile(null)
-                  }}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-              </div>
+            <div className="hidden md:block">
+              {renderExpenseForm()}
             </div>
           )}
 
