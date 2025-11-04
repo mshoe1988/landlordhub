@@ -6,10 +6,11 @@ import { getMaintenanceTasks, updateMaintenanceTask, deleteMaintenanceTask, getP
 import { MaintenanceTask, Property } from '@/lib/types'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
-import { Plus, Trash2, Check, X, Edit, Wrench, Droplets, Zap, Home, Filter, SortAsc, AlertCircle, Clock, CheckCircle2, Paperclip, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2, Check, X, Edit, Wrench, Droplets, Zap, Home, Filter, SortAsc, AlertCircle, Clock, CheckCircle2, Paperclip, AlertTriangle, Upload } from 'lucide-react'
 import CostInputModal from '@/components/CostInputModal'
 import EmptyState from '@/components/EmptyState'
 import toast from 'react-hot-toast'
+import { uploadFile } from '@/lib/storage'
 
 export default function MaintenancePage() {
   const { user } = useAuth()
@@ -22,8 +23,12 @@ export default function MaintenancePage() {
     property_id: '',
     task: '',
     due_date: '',
-    notes: ''
+    notes: '',
+    priority: '' as '' | 'low' | 'medium' | 'high',
+    attachment_url: ''
   })
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
   const [showCostModal, setShowCostModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<MaintenanceTask | null>(null)
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'completed' | 'overdue'>('all')
@@ -120,8 +125,11 @@ export default function MaintenancePage() {
       property_id: task.property_id,
       task: task.task,
       due_date: task.due_date,
-      notes: task.notes || ''
+      notes: task.notes || '',
+      priority: task.priority || '',
+      attachment_url: task.attachment_url || ''
     })
+    setSelectedFile(null) // Reset file selection when editing
   }
 
   const handleUpdateTask = async () => {
@@ -130,22 +138,43 @@ export default function MaintenancePage() {
       return
     }
     
+    setUploading(true)
+    
     try {
+      let attachmentUrl = newMaintenance.attachment_url || undefined
+      
+      // Upload file if selected
+      if (selectedFile) {
+        const uploadResult = await uploadFile(selectedFile, user!.id, 'documents')
+        if (!uploadResult.success) {
+          alert(`Upload failed: ${uploadResult.error}`)
+          setUploading(false)
+          return
+        }
+        attachmentUrl = uploadResult.url || undefined
+      }
+      
       const updatedTask = await updateMaintenanceTask(editingTask.id, {
         property_id: newMaintenance.property_id,
         task: newMaintenance.task,
         due_date: newMaintenance.due_date, // Already in YYYY-MM-DD format from date input
         notes: newMaintenance.notes || undefined,
+        priority: newMaintenance.priority || undefined,
+        attachment_url: attachmentUrl,
       })
       
       setTasks(tasks.map(task => 
         task.id === editingTask.id ? updatedTask : task
       ))
       setEditingTask(null)
-      setNewMaintenance({ property_id: '', task: '', due_date: '', notes: '' })
+      setNewMaintenance({ property_id: '', task: '', due_date: '', notes: '', priority: '', attachment_url: '' })
+      setSelectedFile(null)
+      toast.success('Task updated successfully')
     } catch (error) {
       console.error('Error updating task:', error)
       alert('Failed to update task')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -155,7 +184,22 @@ export default function MaintenancePage() {
       return
     }
     
+    setUploading(true)
+    
     try {
+      let attachmentUrl: string | undefined = undefined
+      
+      // Upload file if selected
+      if (selectedFile) {
+        const uploadResult = await uploadFile(selectedFile, user!.id, 'documents')
+        if (!uploadResult.success) {
+          alert(`Upload failed: ${uploadResult.error}`)
+          setUploading(false)
+          return
+        }
+        attachmentUrl = uploadResult.url || undefined
+      }
+      
       const { createMaintenanceTask } = await import('@/lib/database')
       
       // Ensure the date is stored as-is (YYYY-MM-DD format)
@@ -166,14 +210,20 @@ export default function MaintenancePage() {
         due_date: newMaintenance.due_date, // Already in YYYY-MM-DD format from date input
         status: 'pending',
         notes: newMaintenance.notes || undefined,
+        priority: newMaintenance.priority || undefined,
+        attachment_url: attachmentUrl,
       })
       
       setTasks([...tasks, task])
-      setNewMaintenance({ property_id: '', task: '', due_date: '', notes: '' })
+      setNewMaintenance({ property_id: '', task: '', due_date: '', notes: '', priority: '', attachment_url: '' })
+      setSelectedFile(null)
       setShowAddMaintenance(false)
+      toast.success('Maintenance task created successfully')
     } catch (error) {
       console.error('Error creating maintenance task:', error)
       alert('Failed to create maintenance task')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -267,8 +317,8 @@ export default function MaintenancePage() {
                   Track and manage repairs, upkeep, and maintenance for your properties.
                 </p>
               </div>
-              <button
-                onClick={() => setShowAddMaintenance(true)}
+            <button
+              onClick={() => setShowAddMaintenance(true)}
                 className="text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all duration-200 font-medium"
                 style={{
                   backgroundColor: '#1C7C63',
@@ -283,10 +333,10 @@ export default function MaintenancePage() {
                   e.currentTarget.style.backgroundColor = '#1C7C63'
                   e.currentTarget.style.transform = 'scale(1)'
                 }}
-              >
-                <Plus className="w-5 h-5" />
-                Add Task
-              </button>
+            >
+              <Plus className="w-5 h-5" />
+              Add Task
+            </button>
             </div>
 
             {/* Filter and Sort Controls */}
@@ -374,6 +424,19 @@ export default function MaintenancePage() {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Priority</label>
+                  <select
+                    value={newMaintenance.priority}
+                    onChange={(e) => setNewMaintenance({ ...newMaintenance, priority: e.target.value as '' | 'low' | 'medium' | 'high' })}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900"
+                  >
+                    <option value="">Select Priority (Optional)</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">Notes</label>
                   <input
                     type="text"
@@ -383,21 +446,70 @@ export default function MaintenancePage() {
                     placeholder="Additional details..."
                   />
                 </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Attachment (Optional)</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="file"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        setSelectedFile(file)
+                        if (file) {
+                          toast.success(`File selected: ${file.name}`)
+                        }
+                      }}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    />
+                    {selectedFile && (
+                      <span className="text-sm text-gray-600 flex items-center gap-1">
+                        <Paperclip className="w-4 h-4" />
+                        {selectedFile.name}
+                      </span>
+                    )}
+                    {newMaintenance.attachment_url && !selectedFile && (
+                      <a
+                        href={newMaintenance.attachment_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        <Paperclip className="w-4 h-4" />
+                        View current attachment
+                      </a>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Upload photos, invoices, or other documents related to this maintenance task
+                  </p>
+                </div>
               </div>
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={editingTask ? handleUpdateTask : addMaintenance}
-                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                  disabled={uploading}
+                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      {editingTask ? 'Updating...' : 'Creating...'}
+                    </>
+                  ) : (
+                    <>
                   {editingTask ? 'Update Task' : 'Save Task'}
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={() => {
                     setShowAddMaintenance(false)
                     setEditingTask(null)
-                    setNewMaintenance({ property_id: '', task: '', due_date: '', notes: '' })
+                    setNewMaintenance({ property_id: '', task: '', due_date: '', notes: '', priority: '', attachment_url: '' })
+                    setSelectedFile(null)
                   }}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+                  disabled={uploading}
+                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
@@ -468,12 +580,12 @@ export default function MaintenancePage() {
                         >
                           {/* Card Header */}
                           <div className="flex justify-between items-start mb-2 pb-2" style={{ borderBottom: '1px solid #EAEAEA' }}>
-                            <div className="flex-1">
+                  <div className="flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
                                 {getTaskIcon(task.task)}
                                 <h3 className="font-bold" style={{ color: '#0A2540', fontSize: '16px', fontWeight: 600 }}>
-                                  {task.task}
-                                </h3>
+                        {task.task}
+                      </h3>
                                 {/* Badges aligned horizontally on same line */}
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   {taskOverdue ? (
@@ -516,27 +628,31 @@ export default function MaintenancePage() {
                                     </span>
                                   )}
                                   {task.attachment_url && (
-                                    <span 
-                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
+                                    <a
+                                      href={task.attachment_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity"
                                       style={{ 
                                         backgroundColor: '#E7F2EF', 
                                         color: '#1C7C63', 
                                         borderRadius: '8px', 
                                         fontWeight: 500 
                                       }}
-                                      title="Attachment available"
+                                      title="View attachment"
                                     >
                                       <Paperclip className="w-3 h-3" />
-                                    </span>
-                                  )}
-                                </div>
+                                      Attachment
+                                    </a>
+                      )}
+                    </div>
                               </div>
-                            </div>
+                  </div>
                             <div className="flex gap-1">
-                              <button
-                                onClick={() => handleEdit(task)}
+                    <button
+                      onClick={() => handleEdit(task)}
                                 className="p-1.5 rounded transition-all duration-200"
-                                title="Edit task"
+                      title="Edit task"
                                 aria-label="Edit task"
                                 style={{ 
                                   opacity: 0.8,
@@ -557,8 +673,8 @@ export default function MaintenancePage() {
                                 }}
                               >
                                 <Edit className="w-4 h-4" />
-                              </button>
-                              <button
+                    </button>
+                    <button
                                 onClick={() => {
                                   if (task.status === 'pending') {
                                     handleStatusToggle(task)
@@ -586,11 +702,11 @@ export default function MaintenancePage() {
                                 }}
                               >
                                 {task.status === 'pending' ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                              </button>
-                              <button
-                                onClick={() => handleDelete(task.id)}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(task.id)}
                                 className="p-1.5 rounded transition-all duration-200"
-                                title="Delete task"
+                      title="Delete task"
                                 aria-label="Delete task"
                                 style={{ 
                                   opacity: 0.8,
@@ -611,7 +727,7 @@ export default function MaintenancePage() {
                                 }}
                               >
                                 <Trash2 className="w-4 h-4" />
-                              </button>
+                    </button>
                             </div>
                           </div>
 
@@ -721,18 +837,22 @@ export default function MaintenancePage() {
                                     </span>
                                   )}
                                   {task.attachment_url && (
-                                    <span 
-                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded"
+                                    <a
+                                      href={task.attachment_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity"
                                       style={{ 
                                         backgroundColor: '#E7F2EF', 
                                         color: '#1C7C63', 
                                         borderRadius: '8px', 
                                         fontWeight: 500 
                                       }}
-                                      title="Attachment available"
+                                      title="View attachment"
                                     >
                                       <Paperclip className="w-3 h-3" />
-                                    </span>
+                                      Attachment
+                                    </a>
                                   )}
                                 </div>
                               </div>
@@ -812,8 +932,8 @@ export default function MaintenancePage() {
                         </div>
                       )
                     })}
-                  </div>
-                </div>
+              </div>
+          </div>
               )}
             </>
           )}
