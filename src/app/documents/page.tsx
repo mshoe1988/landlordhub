@@ -8,7 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import FileUpload from '@/components/FileUpload'
 import { uploadFile } from '@/lib/storage'
-import { Plus, Trash2, FileText, Download, ChevronUp, ChevronDown, Eye, Filter, SortAsc, FolderOpen, FileType, HardDrive, Calendar } from 'lucide-react'
+import { Plus, Trash2, FileText, Download, ChevronUp, ChevronDown, Eye, Filter, SortAsc, FolderOpen, FileType, HardDrive, Calendar, Search } from 'lucide-react'
 
 const DOCUMENT_TYPES = [
   'Lease',
@@ -36,6 +36,7 @@ export default function DocumentsPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [filterProperty, setFilterProperty] = useState<string>('')
   const [filterType, setFilterType] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
   useEffect(() => {
     if (user) {
@@ -150,6 +151,15 @@ export default function DocumentsPage() {
       filtered = filtered.filter(doc => doc.type === filterType)
     }
     
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(doc => 
+        doc.name.toLowerCase().includes(query) ||
+        doc.type.toLowerCase().includes(query)
+      )
+    }
+    
     // Sort
     return filtered.sort((a, b) => {
       let aValue: string | number
@@ -239,8 +249,8 @@ export default function DocumentsPage() {
             </p>
           </div>
 
-          {/* Add Document Button */}
-          <div className="flex justify-end mb-6">
+          {/* Add Document Button - Desktop */}
+          <div className="hidden md:flex justify-end mb-6 relative">
             <button
               onClick={() => setShowAddDocument(true)}
               className="text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-200 font-semibold"
@@ -266,8 +276,36 @@ export default function DocumentsPage() {
             </button>
           </div>
 
+          {/* Floating Add Button - Mobile */}
+          <button
+            onClick={() => setShowAddDocument(true)}
+            className="md:hidden fixed bottom-6 right-6 z-50 text-white rounded-full p-4 shadow-lg transition-all duration-200"
+            style={{
+              background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+              border: 'none',
+              boxShadow: '0 4px 12px rgba(28,124,99,0.4)',
+              width: '56px',
+              height: '56px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.filter = 'brightness(1.1)'
+              e.currentTarget.style.transform = 'scale(1.1)'
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(28,124,99,0.5)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.filter = 'brightness(1)'
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(28,124,99,0.4)'
+            }}
+          >
+            <Plus className="w-6 h-6" />
+          </button>
+
           {/* Document Summary Card */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div 
               className="bg-white rounded-lg transition-all duration-250"
               style={{
@@ -374,56 +412,207 @@ export default function DocumentsPage() {
             </div>
           </div>
 
-          {/* Filter and Sort Controls */}
-          <div className="bg-white p-4 rounded-lg mb-6" style={{ borderRadius: '12px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4" style={{ color: '#1C7C63' }} />
-                <span className="text-sm font-medium" style={{ color: '#0A2540' }}>Filters:</span>
-              </div>
-              <div className="flex flex-wrap gap-3 flex-1">
-                <select
-                  value={filterProperty}
-                  onChange={(e) => setFilterProperty(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                  style={{ backgroundColor: '#F9FCFB', borderColor: '#E5E9E7', color: '#0A2540' }}
-                >
-                  <option value="">All Properties</option>
-                  {properties.map(p => (
-                    <option key={p.id} value={p.id}>{p.nickname || p.address}</option>
-                  ))}
-                </select>
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                  style={{ backgroundColor: '#F9FCFB', borderColor: '#E5E9E7', color: '#0A2540' }}
-                >
-                  <option value="">All Types</option>
-                  {DOCUMENT_TYPES.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex items-center gap-2">
-                <SortAsc className="w-4 h-4" style={{ color: '#1C7C63' }} />
-                <select
-                  value={`${sortField}-${sortDirection}`}
-                  onChange={(e) => {
-                    const [field, dir] = e.target.value.split('-')
-                    setSortField(field as 'name' | 'type' | 'property' | 'upload_date')
-                    setSortDirection(dir as 'asc' | 'desc')
+          {/* Search and Filter Bar */}
+          <div 
+            className="bg-white rounded-lg mb-6"
+            style={{ 
+              borderRadius: '12px', 
+              boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+              padding: '12px 16px'
+            }}
+          >
+            {/* Search Field */}
+            <div className="mb-4 md:mb-0 md:absolute md:right-6 md:top-4 md:w-64">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: '#6B7B7A' }} />
+                <input
+                  type="text"
+                  placeholder="Search documents..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm"
+                  style={{ 
+                    backgroundColor: '#F9FCFB', 
+                    borderColor: '#E5E9E7', 
+                    color: '#0A2540',
+                    fontSize: '0.9rem'
                   }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                  style={{ backgroundColor: '#F9FCFB', borderColor: '#E5E9E7', color: '#0A2540' }}
+                />
+              </div>
+            </div>
+
+            {/* Filter and Sort Controls */}
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center md:justify-between">
+              <div className="flex items-center gap-2 mb-2 md:mb-0">
+                <Filter className="w-4 h-4" style={{ color: '#1C7C63' }} />
+                <span className="text-sm font-medium" style={{ color: '#0A2540' }}>Filter:</span>
+              </div>
+              <div className="flex flex-wrap gap-2 flex-1 overflow-x-auto md:overflow-x-visible">
+                <button
+                  onClick={() => setFilterProperty('')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    !filterProperty ? 'text-white' : 'text-gray-700'
+                  }`}
+                  style={{
+                    background: !filterProperty 
+                      ? 'linear-gradient(90deg, #1C7C63, #29A184)' 
+                      : 'linear-gradient(180deg, #F9FCFB, #EEF9F4)',
+                    border: !filterProperty ? 'none' : '1px solid #D8EAE2',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (filterProperty) {
+                      e.currentTarget.style.borderColor = '#1C7C63'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (filterProperty) {
+                      e.currentTarget.style.borderColor = '#D8EAE2'
+                    }
+                  }}
                 >
-                  <option value="upload_date-desc">Newest First</option>
-                  <option value="upload_date-asc">Oldest First</option>
-                  <option value="name-asc">Name A-Z</option>
-                  <option value="name-desc">Name Z-A</option>
-                  <option value="type-asc">Type A-Z</option>
-                  <option value="type-desc">Type Z-A</option>
-                </select>
+                  All Properties
+                </button>
+                {properties.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => setFilterProperty(filterProperty === p.id ? '' : p.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      filterProperty === p.id ? 'text-white' : 'text-gray-700'
+                    }`}
+                    style={{
+                      background: filterProperty === p.id 
+                        ? 'linear-gradient(90deg, #1C7C63, #29A184)' 
+                        : 'linear-gradient(180deg, #F9FCFB, #EEF9F4)',
+                      border: filterProperty === p.id ? 'none' : '1px solid #D8EAE2',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (filterProperty !== p.id) {
+                        e.currentTarget.style.borderColor = '#1C7C63'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (filterProperty !== p.id) {
+                        e.currentTarget.style.borderColor = '#D8EAE2'
+                      }
+                    }}
+                  >
+                    {p.nickname || p.address}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setFilterType('')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    !filterType ? 'text-white' : 'text-gray-700'
+                  }`}
+                  style={{
+                    background: !filterType 
+                      ? 'linear-gradient(90deg, #1C7C63, #29A184)' 
+                      : 'linear-gradient(180deg, #F9FCFB, #EEF9F4)',
+                    border: !filterType ? 'none' : '1px solid #D8EAE2',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (filterType) {
+                      e.currentTarget.style.borderColor = '#1C7C63'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (filterType) {
+                      e.currentTarget.style.borderColor = '#D8EAE2'
+                    }
+                  }}
+                >
+                  All Types
+                </button>
+                {DOCUMENT_TYPES.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setFilterType(filterType === type ? '' : type)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      filterType === type ? 'text-white' : 'text-gray-700'
+                    }`}
+                    style={{
+                      background: filterType === type 
+                        ? 'linear-gradient(90deg, #1C7C63, #29A184)' 
+                        : 'linear-gradient(180deg, #F9FCFB, #EEF9F4)',
+                      border: filterType === type ? 'none' : '1px solid #D8EAE2',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (filterType !== type) {
+                        e.currentTarget.style.borderColor = '#1C7C63'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (filterType !== type) {
+                        e.currentTarget.style.borderColor = '#D8EAE2'
+                      }
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <SortAsc className="w-4 h-4" style={{ color: '#1C7C63' }} />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setSortField('upload_date')
+                      setSortDirection('desc')
+                    }}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      sortField === 'upload_date' && sortDirection === 'desc' ? 'text-white' : 'text-gray-700'
+                    }`}
+                    style={{
+                      background: sortField === 'upload_date' && sortDirection === 'desc'
+                        ? 'linear-gradient(90deg, #1C7C63, #29A184)' 
+                        : 'linear-gradient(180deg, #F9FCFB, #EEF9F4)',
+                      border: sortField === 'upload_date' && sortDirection === 'desc' ? 'none' : '1px solid #D8EAE2',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Newest
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSortField('upload_date')
+                      setSortDirection('asc')
+                    }}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      sortField === 'upload_date' && sortDirection === 'asc' ? 'text-white' : 'text-gray-700'
+                    }`}
+                    style={{
+                      background: sortField === 'upload_date' && sortDirection === 'asc'
+                        ? 'linear-gradient(90deg, #1C7C63, #29A184)' 
+                        : 'linear-gradient(180deg, #F9FCFB, #EEF9F4)',
+                      border: sortField === 'upload_date' && sortDirection === 'asc' ? 'none' : '1px solid #D8EAE2',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Oldest
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSortField('type')
+                      setSortDirection('asc')
+                    }}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      sortField === 'type' ? 'text-white' : 'text-gray-700'
+                    }`}
+                    style={{
+                      background: sortField === 'type'
+                        ? 'linear-gradient(90deg, #1C7C63, #29A184)' 
+                        : 'linear-gradient(180deg, #F9FCFB, #EEF9F4)',
+                      border: sortField === 'type' ? 'none' : '1px solid #D8EAE2',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    By Type
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -516,31 +705,56 @@ export default function DocumentsPage() {
           <div className="bg-white rounded-lg shadow overflow-hidden" style={{ borderRadius: '12px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
             {/* Mobile Card View */}
             <div className="md:hidden p-4 space-y-4">
-              {getFilteredAndSortedDocuments().map(doc => (
-                <div 
-                  key={doc.id} 
-                  className="rounded-lg p-4 transition-all duration-200"
-                  style={{
-                    background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
-                    borderRadius: '12px',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                    padding: '14px 20px'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
-                  }}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center flex-1">
-                      <FileText className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: '#1C7C63' }} />
-                      <div className="text-sm font-medium" style={{ color: '#0A2540' }}>{doc.name}</div>
+              {getFilteredAndSortedDocuments().map(doc => {
+                // Estimate file size (in real app, get from metadata)
+                const fileSize = '2.4 MB' // Placeholder
+                return (
+                  <div 
+                    key={doc.id} 
+                    className="rounded-lg p-4 transition-all duration-200"
+                    style={{
+                      background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
+                      borderRadius: '12px',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                      padding: '14px 20px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(180deg, #FFFFFF 0%, #F3FBF8 100%)'
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.04)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
+                    }}
+                  >
+                    {/* Title */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center flex-1">
+                        <FileText className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: '#1C7C63' }} />
+                        <div className="text-sm font-medium" style={{ color: '#0A2540' }}>{doc.name}</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: '#E7F2EF', color: '#1C7C63' }}>
+                        {doc.type}
+                      </span>
+                      <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: '#F7FBF9', color: '#647474' }}>
+                        {getPropertyAddress(doc.property_id)}
+                      </span>
+                    </div>
+                    
+                    {/* Metadata */}
+                    <div className="flex items-center gap-4 text-xs mb-3" style={{ color: '#647474' }}>
+                      <span>{fileSize}</span>
+                      <span>{doc.upload_date}</span>
+                    </div>
+                    
+                    {/* Action Icons */}
+                    <div className="flex items-center gap-3 pt-2 border-t" style={{ borderColor: '#E5E9E7' }}>
                       <a
                         href={doc.file_url}
                         target="_blank"
@@ -567,93 +781,173 @@ export default function DocumentsPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div>
-                      <span className="text-xs font-medium" style={{ color: '#647474' }}>Type:</span>
-                      <span className="ml-2 px-2 py-1 text-xs rounded-full" style={{ backgroundColor: '#E7F2EF', color: '#1C7C63' }}>
-                        {doc.type}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-medium" style={{ color: '#647474' }}>Property:</span>
-                      <span className="ml-2 text-sm" style={{ color: '#0A2540' }}>{getPropertyAddress(doc.property_id)}</span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-medium" style={{ color: '#647474' }}>Upload Date:</span>
-                      <span className="ml-2 text-sm" style={{ color: '#0A2540' }}>{doc.upload_date}</span>
+                )
+              })}
+              {getFilteredAndSortedDocuments().length === 0 && (
+                <div className="text-center py-16">
+                  <div className="mb-6">
+                    <div 
+                      className="mx-auto mb-4"
+                      style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #E7F2EF 0%, #F3FBF8 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <FileText className="w-16 h-16" style={{ color: '#1C7C63', opacity: 0.4 }} />
                     </div>
                   </div>
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: '#0A2540' }}>🗂 No documents uploaded yet</h3>
+                  <p className="text-gray-600 mb-6 text-sm px-4">
+                    Upload leases, receipts, and forms to keep everything in one place.
+                  </p>
+                  <button
+                    onClick={() => setShowAddDocument(true)}
+                    className="text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-200 font-semibold mx-auto"
+                    style={{
+                      background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                      border: 'none',
+                      fontWeight: 600,
+                      boxShadow: '0 3px 8px rgba(28,124,99,0.25)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.filter = 'brightness(1.08)'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.filter = 'brightness(1)'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    <Plus className="w-5 h-5" />
+                    Upload Document
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Desktop Card View */}
             <div className="hidden md:block p-6">
               <div className="space-y-3">
-                {getFilteredAndSortedDocuments().map(doc => (
-                  <div 
-                    key={doc.id}
-                    className="flex justify-between items-center transition-all duration-200"
-                    style={{
-                      background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
-                      borderRadius: '12px',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                      padding: '14px 20px'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
-                    }}
-                  >
-                    <div className="flex items-center gap-4 flex-1">
-                      <FileText className="w-5 h-5 flex-shrink-0" style={{ color: '#1C7C63' }} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium mb-1" style={{ color: '#0A2540' }}>{doc.name}</div>
-                        <div className="flex items-center gap-4 text-xs" style={{ color: '#647474' }}>
-                          <span className="px-2 py-1 rounded-full" style={{ backgroundColor: '#E7F2EF', color: '#1C7C63' }}>
-                            {doc.type}
-                          </span>
-                          <span>{getPropertyAddress(doc.property_id)}</span>
-                          <span>{doc.upload_date}</span>
+                {getFilteredAndSortedDocuments().map(doc => {
+                  // Estimate file size (in real app, get from metadata)
+                  const fileSize = '2.4 MB' // Placeholder
+                  return (
+                    <div 
+                      key={doc.id}
+                      className="flex justify-between items-center transition-all duration-200 cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
+                        borderRadius: '12px',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                        padding: '14px 20px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'linear-gradient(180deg, #FFFFFF 0%, #F3FBF8 100%)'
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.04)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)'
+                        e.currentTarget.style.transform = 'translateY(0)'
+                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'
+                      }}
+                    >
+                      <div className="flex items-center gap-4 flex-1">
+                        <FileText className="w-5 h-5 flex-shrink-0" style={{ color: '#1C7C63' }} />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium mb-1" style={{ color: '#0A2540' }}>{doc.name}</div>
+                          <div className="flex items-center gap-4 text-xs" style={{ color: '#647474' }}>
+                            <span className="px-2 py-1 rounded-full" style={{ backgroundColor: '#E7F2EF', color: '#1C7C63' }}>
+                              {doc.type}
+                            </span>
+                            <span>{getPropertyAddress(doc.property_id)}</span>
+                            <span>{fileSize}</span>
+                            <span>{doc.upload_date}</span>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-3">
+                        <a
+                          href={doc.file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="View Document"
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Eye className="w-5 h-5" />
+                        </a>
+                        <a
+                          href={doc.file_url}
+                          download
+                          title="Download Document"
+                          className="text-green-600 hover:text-green-800 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Download className="w-5 h-5" />
+                        </a>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDelete(doc.id)
+                          }}
+                          title="Delete Document"
+                          className="text-red-600 hover:text-red-800 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <a
-                        href={doc.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="View Document"
-                        className="text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        <Eye className="w-5 h-5" />
-                      </a>
-                      <a
-                        href={doc.file_url}
-                        download
-                        title="Download Document"
-                        className="text-green-600 hover:text-green-800 transition-colors"
-                      >
-                        <Download className="w-5 h-5" />
-                      </a>
-                      <button
-                        onClick={() => handleDelete(doc.id)}
-                        title="Delete Document"
-                        className="text-red-600 hover:text-red-800 transition-colors"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
                 {getFilteredAndSortedDocuments().length === 0 && (
-                  <div className="text-center py-12">
-                    <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" style={{ color: '#1C7C63' }} />
-                    <p className="text-gray-500">No documents found. {filterProperty || filterType ? 'Try adjusting your filters.' : 'Add your first document to get started.'}</p>
+                  <div className="text-center py-16">
+                    <div className="mb-6">
+                      <div 
+                        className="mx-auto mb-4"
+                        style={{
+                          width: '120px',
+                          height: '120px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #E7F2EF 0%, #F3FBF8 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <FileText className="w-16 h-16" style={{ color: '#1C7C63', opacity: 0.4 }} />
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>🗂 No documents uploaded yet</h3>
+                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                      Upload leases, receipts, and forms to keep everything in one place.
+                    </p>
+                    <button
+                      onClick={() => setShowAddDocument(true)}
+                      className="text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-200 font-semibold mx-auto"
+                      style={{
+                        background: 'linear-gradient(90deg, #1C7C63, #29A184)',
+                        border: 'none',
+                        fontWeight: 600,
+                        boxShadow: '0 3px 8px rgba(28,124,99,0.25)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.filter = 'brightness(1.08)'
+                        e.currentTarget.style.transform = 'translateY(-1px)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.filter = 'brightness(1)'
+                        e.currentTarget.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      <Plus className="w-5 h-5" />
+                      Upload Document
+                    </button>
                   </div>
                 )}
               </div>
