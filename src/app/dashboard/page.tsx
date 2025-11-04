@@ -1236,7 +1236,7 @@ export default function DashboardPage() {
             <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
                 <div className="flex-1">
-                  <h2 className="mb-1" style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cashflow Overview</h2>
+                  <h2 className="mb-1" style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cashflow Summary</h2>
                   <p className="text-sm" style={{ color: '#667680', fontWeight: 400 }}>
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
@@ -1306,20 +1306,6 @@ export default function DashboardPage() {
                       }}
                     >
                       {labelMap[range]}
-                      {isActive && (
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            bottom: '0',
-                            left: '10%',
-                            right: '10%',
-                            height: '3px',
-                            background: 'linear-gradient(90deg, #1C7C63, #5DD39E)',
-                            borderRadius: '2px',
-                            boxShadow: '0 0 8px rgba(93, 211, 158, 0.5)'
-                          }}
-                        />
-                      )}
                     </button>
                   )
                 })}
@@ -1354,10 +1340,10 @@ export default function DashboardPage() {
                         style={{ transition: 'all 0.3s ease' }}
                       >
                     <defs>
-                      {/* Cashflow bar gradient - matching expenses page style */}
+                      {/* Cashflow bar gradient - soft vertical gradient */}
                       <linearGradient id="cashflowGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#1C7C63" stopOpacity={1} />
-                        <stop offset="100%" stopColor="#A7D6C9" stopOpacity={1} />
+                        <stop offset="100%" stopColor="#A1E6C6" stopOpacity={1} />
                       </linearGradient>
                       {/* Expense bar gradient */}
                       <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
@@ -1400,34 +1386,35 @@ export default function DashboardPage() {
                           const cumulativeValue = data.cumulativeCashflow || 0
                           return (
                             <div style={{ 
-                              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                              backgroundColor: '#F7FBFA',
                               backdropFilter: 'blur(10px)',
-                              border: '1px solid #E3E8E5',
-                              borderRadius: '12px',
-                              padding: '14px 18px',
-                              boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
+                              border: '1px solid #D8EAE2',
+                              borderRadius: '6px',
+                              padding: '8px 10px',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                              fontSize: '0.9rem'
                             }}>
-                              <div style={{ color: '#0A2540', fontWeight: 'bold', marginBottom: '14px', fontSize: '14px' }}>
+                              <div style={{ color: '#0A2540', fontWeight: 'bold', marginBottom: '8px', fontSize: '0.9rem' }}>
                                 {label}
                               </div>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
-                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Income:</span>
-                                  <span style={{ color: '#1C7C63', fontWeight: '600', fontSize: '12px' }}>${(data.income || 0).toLocaleString()}</span>
+                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '0.85rem' }}>Income:</span>
+                                  <span style={{ color: '#1C7C63', fontWeight: '600', fontSize: '0.85rem' }}>${(data.income || 0).toLocaleString()}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
-                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Expenses:</span>
-                                  <span style={{ color: '#FF7B00', fontWeight: '600', fontSize: '12px' }}>${(data.expenses || 0).toLocaleString()}</span>
+                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '0.85rem' }}>Expenses:</span>
+                                  <span style={{ color: '#FF7B00', fontWeight: '600', fontSize: '0.85rem' }}>${(data.expenses || 0).toLocaleString()}</span>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '6px', paddingTop: '10px', borderTop: '1px solid #E3E8E5' }}>
-                                  <span style={{ color: '#0A2540', fontWeight: 'bold', fontSize: '12px' }}>Net:</span>
-                                  <span style={{ color: (data.cashflow || 0) >= 0 ? '#1C7C63' : '#FF7B00', fontWeight: 'bold', fontSize: '13px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '4px', paddingTop: '6px', borderTop: '1px solid #D8EAE2' }}>
+                                  <span style={{ color: '#0A2540', fontWeight: 'bold', fontSize: '0.85rem' }}>Net:</span>
+                                  <span style={{ color: (data.cashflow || 0) >= 0 ? '#1C7C63' : '#FF7B00', fontWeight: 'bold', fontSize: '0.9rem' }}>
                                     ${(data.cashflow || 0) >= 0 ? '+' : ''}${(data.cashflow || 0).toLocaleString()}
                                   </span>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '4px', paddingTop: '10px', borderTop: '1px solid #E3E8E5' }}>
-                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '12px' }}>Cumulative:</span>
-                                  <span style={{ color: '#1C7C63', fontWeight: 'bold', fontSize: '13px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '2px', paddingTop: '6px', borderTop: '1px solid #D8EAE2' }}>
+                                  <span style={{ color: '#0A2540', opacity: 0.7, fontSize: '0.85rem' }}>Cumulative:</span>
+                                  <span style={{ color: '#1C7C63', fontWeight: 'bold', fontSize: '0.9rem' }}>
                                     ${cumulativeValue >= 0 ? '+' : ''}${cumulativeValue.toLocaleString()}
                                   </span>
                                 </div>
@@ -1447,22 +1434,6 @@ export default function DashboardPage() {
                       isAnimationActive={true}
                       animationDuration={700}
                       animationEasing="ease-out"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="cumulativeCashflow" 
-                      stroke="#1C7C63" 
-                      strokeWidth={2.5}
-                      dot={false}
-                      strokeDasharray="0"
-                      name="Cumulative Balance"
-                      legendType="line"
-                      isAnimationActive={true}
-                      animationDuration={700}
-                      animationEasing="ease-out"
-                      style={{
-                        filter: 'drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.1))'
-                      }}
                     />
                     <Bar 
                       dataKey="cashflow" 
@@ -1518,18 +1489,27 @@ export default function DashboardPage() {
                 const sign = isPositive ? '+' : ''
                 
                   return (
-                  <div className="mt-0 pt-2 border-t" style={{ borderColor: '#E5E9E7' }}>
+                  <div className="mt-0 pt-2 border-t" style={{ borderColor: '#E5E9E7', marginTop: '24px', marginBottom: '24px' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
-                        <p className="text-sm mb-1" style={{ color: '#7A8A8A' }}>
+                        <p className="text-sm mb-2" style={{ color: '#7A8A8A' }}>
                           Net Cashflow ({periodLabel})
                         </p>
-                        <p 
-                          className="font-bold"
-                          style={{ color: isPositive ? '#1C7C63' : '#EF4444', fontSize: '18px' }}
-                        >
-                          {sign}${summary.totalCashflow.toLocaleString()}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <span 
+                            className="font-bold"
+                            style={{ 
+                              color: isPositive ? '#1C7C63' : '#EF4444', 
+                              fontSize: '18px',
+                              backgroundColor: isPositive ? 'rgba(28, 124, 99, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                              borderRadius: '6px',
+                              padding: '2px 6px',
+                              fontWeight: 600
+                            }}
+                          >
+                            {sign}${summary.totalCashflow.toLocaleString()}
+                          </span>
+                        </div>
                       </div>
                       
                       {summary.percentageChange !== null && summary.percentageChange > 0 && (
