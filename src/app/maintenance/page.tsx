@@ -179,8 +179,69 @@ export default function MaintenancePage() {
 
   const getPropertyAddress = (propertyId: string) => {
     const property = properties.find(p => p.id === propertyId)
-    return property ? property.address : 'Unknown Property'
+    return property ? (property.nickname || property.address) : 'Unknown Property'
   }
+
+  const getProperty = (propertyId: string) => {
+    return properties.find(p => p.id === propertyId)
+  }
+
+  // Get task type icon based on task name
+  const getTaskIcon = (taskName: string) => {
+    const lowerName = taskName.toLowerCase()
+    if (lowerName.includes('hvac') || lowerName.includes('heat') || lowerName.includes('air') || lowerName.includes('cooling')) {
+      return <Zap className="w-4 h-4" style={{ color: '#1C7C63' }} />
+    } else if (lowerName.includes('plumb') || lowerName.includes('pipe') || lowerName.includes('water') || lowerName.includes('faucet')) {
+      return <Droplets className="w-4 h-4" style={{ color: '#1C7C63' }} />
+    } else if (lowerName.includes('electric') || lowerName.includes('wiring') || lowerName.includes('outlet')) {
+      return <Zap className="w-4 h-4" style={{ color: '#1C7C63' }} />
+    }
+    return <Wrench className="w-4 h-4" style={{ color: '#1C7C63' }} />
+  }
+
+  // Check if task is overdue
+  const isOverdue = (task: MaintenanceTask) => {
+    if (task.status === 'completed') return false
+    const dueDate = new Date(task.due_date + 'T00:00:00')
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return dueDate < today
+  }
+
+  // Check if task is due soon (<48 hours)
+  const isDueSoon = (task: MaintenanceTask) => {
+    if (task.status === 'completed') return false
+    const dueDate = new Date(task.due_date + 'T00:00:00')
+    const now = new Date()
+    const hoursUntilDue = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+    return hoursUntilDue > 0 && hoursUntilDue < 48
+  }
+
+  // Filter and sort tasks
+  const filteredAndSortedTasks = tasks
+    .filter(task => {
+      if (filterStatus === 'all') return true
+      if (filterStatus === 'pending') return task.status === 'pending' && !isOverdue(task)
+      if (filterStatus === 'completed') return task.status === 'completed'
+      if (filterStatus === 'overdue') return isOverdue(task)
+      return true
+    })
+    .sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+      } else if (sortBy === 'property') {
+        const aProp = getPropertyAddress(a.property_id)
+        const bProp = getPropertyAddress(b.property_id)
+        return aProp.localeCompare(bProp)
+      } else if (sortBy === 'type') {
+        return a.task.localeCompare(b.task)
+      }
+      return 0
+    })
+
+  const pendingTasks = filteredAndSortedTasks.filter(t => t.status === 'pending' && !isOverdue(t))
+  const overdueTasks = filteredAndSortedTasks.filter(t => isOverdue(t))
+  const completedTasks = filteredAndSortedTasks.filter(t => t.status === 'completed')
 
   if (loading) {
     return (
