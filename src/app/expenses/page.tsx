@@ -10,7 +10,7 @@ import FileUpload from '@/components/FileUpload'
 import DateRangeFilter from '@/components/DateRangeFilter'
 import ExportButtons from '@/components/ExportButtons'
 import { uploadFile } from '@/lib/storage'
-import { Plus, Trash2, Download, Eye, Edit, DollarSign, Home, Calendar, FileText, Filter } from 'lucide-react'
+import { Plus, Trash2, Download, Eye, Edit, DollarSign, Home, Calendar, FileText, Filter, MoreVertical, Tag, Receipt, Clock } from 'lucide-react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 const EXPENSE_CATEGORIES = [
@@ -47,7 +47,7 @@ export default function ExpensesPage() {
   const [uploading, setUploading] = useState(false)
   const [sortField, setSortField] = useState<'date' | 'property' | 'category' | 'amount'>('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-  const [activeFilter, setActiveFilter] = useState<'all' | 'this-month' | 'last-month' | 'this-year' | null>(null)
+  const [activeFilter, setActiveFilter] = useState<'all' | 'this-month' | 'last-month' | 'this-quarter' | 'this-year' | 'custom' | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -372,6 +372,37 @@ export default function ExpensesPage() {
   // Chart colors
   const CHART_COLORS = ['#1C7C63', '#FF7B00', '#0A2540', '#E7F2EF', '#10b981', '#F6BD16', '#5B8FF9', '#06b6d4', '#6DC8A0', '#f97316', '#ec4899']
 
+  // Calculate monthly comparison
+  const getMonthlyComparison = () => {
+    const filtered = getFilteredExpenses()
+    const now = new Date()
+    const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    
+    const currentMonthExpenses = filtered
+      .filter(e => {
+        const expenseDate = new Date(e.date)
+        return expenseDate >= currentMonth && expenseDate < new Date(now.getFullYear(), now.getMonth() + 1, 1)
+      })
+      .reduce((sum, e) => sum + e.amount, 0)
+    
+    const lastMonthExpenses = filtered
+      .filter(e => {
+        const expenseDate = new Date(e.date)
+        return expenseDate >= lastMonth && expenseDate < currentMonth
+      })
+      .reduce((sum, e) => sum + e.amount, 0)
+    
+    if (lastMonthExpenses === 0) return null
+    
+    const change = ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
+    return {
+      change: Math.round(change),
+      current: currentMonthExpenses,
+      last: lastMonthExpenses
+    }
+  }
+
   if (loading) {
     return (
       <ProtectedRoute>
@@ -522,97 +553,167 @@ export default function ExpensesPage() {
           {/* Show form right after header for both mobile and desktop */}
           {(showAddExpense || editingExpense) && renderExpenseForm()}
 
-          {/* Quick Summary Stats */}
-          <div 
-            className="bg-white rounded-lg shadow p-4 mb-6 transition-all duration-200"
-            style={{ 
-              borderRadius: '12px',
-              boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
-            }}
-          >
-            <div className="flex flex-wrap items-center gap-4 md:gap-6">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5" style={{ color: '#1C7C63' }} />
-                <span className="text-sm font-medium text-gray-900">Total Expenses:</span>
-                <span className="text-lg font-bold" style={{ color: '#1C7C63' }}>${getTotalExpenses().toFixed(2)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Home className="w-5 h-5" style={{ color: '#1C7C63' }} />
-                <span className="text-sm font-medium text-gray-900">Properties:</span>
-                <span className="text-lg font-bold" style={{ color: '#1C7C63' }}>{getUniquePropertiesCount()}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" style={{ color: '#1C7C63' }} />
-                <span className="text-sm font-medium text-gray-900">Time Frame:</span>
-                <span className="text-lg font-bold" style={{ color: '#1C7C63' }}>{getTimeFrameLabel()}</span>
+          {/* Financial Overview Section */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-3" style={{ color: '#0A2540', fontWeight: 600 }}>Financial Overview</h2>
+            
+            {/* Monthly Comparison Banner */}
+            {getMonthlyComparison() && (
+              <div 
+                className="mb-4 p-3 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: getMonthlyComparison()!.change > 0 ? '#FFF3E6' : '#E6F5EA',
+                  border: `1px solid ${getMonthlyComparison()!.change > 0 ? '#FFE6CC' : '#D4F4E0'}`,
+                  borderRadius: '8px'
+                }}
+              >
+                <p className="text-sm" style={{ color: '#0A2540' }}>
+                  <span style={{ fontWeight: 600 }}>
+                    Expenses {getMonthlyComparison()!.change > 0 ? 'up' : 'down'} {Math.abs(getMonthlyComparison()!.change)}%
+                  </span>
+                  {' vs last month'} — track your trend in{' '}
+                  <a href="/reports" className="underline" style={{ color: '#1C7C63' }}>Reports</a>.
+                </p>
+            </div>
+          )}
+
+            {/* Quick Summary Stats */}
+            <div 
+              className="p-4 transition-all duration-200"
+              style={{ 
+                backgroundColor: '#F8FAF9',
+                borderRadius: '8px',
+                border: '1px solid #E5E9E7'
+              }}
+            >
+              <div className="flex flex-wrap items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">💰</span>
+                  <span className="text-sm font-medium text-gray-900">Total Expenses:</span>
+                  <span className="text-lg font-bold" style={{ color: '#1C7C63', fontWeight: 700 }}>${getTotalExpenses().toFixed(2)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🏠</span>
+                  <span className="text-sm font-medium text-gray-900">Properties:</span>
+                  <span className="text-lg font-bold" style={{ color: '#1C7C63', fontWeight: 700 }}>{getUniquePropertiesCount()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🕒</span>
+                  <span className="text-sm font-medium text-gray-900">Time Frame:</span>
+                  <span className="text-lg font-bold" style={{ color: '#1C7C63', fontWeight: 700 }}>{getTimeFrameLabel()}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Pie Chart - Category Breakdown */}
-            <div 
-              className="bg-white rounded-lg shadow p-6 transition-all duration-200"
-              style={{ 
-                borderRadius: '12px',
-                boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
-              }}
-            >
-              <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>Expenses by Category</h3>
-              {getCategoryData().length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={getCategoryData()}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(entry: any) => `${entry.name} ${((entry.percent || 0) * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {getCategoryData().map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <p className="text-gray-500 text-center py-8">No expenses to display</p>
-              )}
-            </div>
+          {/* Expense Breakdown Section */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-3" style={{ color: '#0A2540', fontWeight: 600 }}>Expense Breakdown</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Pie Chart - Category Breakdown */}
+              <div 
+                className="bg-white rounded-lg shadow p-6 transition-all duration-200"
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
+                }}
+              >
+                <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>Expenses by Category</h3>
+                {getCategoryData().length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <defs>
+                        {getCategoryData().map((entry, index) => (
+                          <linearGradient key={`gradient-${index}`} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={CHART_COLORS[index % CHART_COLORS.length]} stopOpacity={0.8} />
+                            <stop offset="100%" stopColor={CHART_COLORS[index % CHART_COLORS.length]} stopOpacity={0.3} />
+                          </linearGradient>
+                        ))}
+                      </defs>
+                      <Pie
+                        data={getCategoryData()}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={(entry: any) => `${entry.name} ${((entry.percent || 0) * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        animationBegin={0}
+                        animationDuration={750}
+                      >
+                        {getCategoryData().map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={`url(#gradient-${index})`}
+                            style={{
+                              cursor: 'pointer',
+                              transition: 'transform 0.2s ease'
+                            }}
+                            onMouseEnter={(e: any) => {
+                              if (e.target) {
+                                e.target.style.transform = 'scale(1.05)'
+                              }
+                            }}
+                            onMouseLeave={(e: any) => {
+                              if (e.target) {
+                                e.target.style.transform = 'scale(1)'
+                              }
+                            }}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: any) => `$${value.toFixed(2)}`} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No expenses to display</p>
+                )}
+              </div>
 
-            {/* Bar Chart - Monthly Trend */}
-            <div 
-              className="bg-white rounded-lg shadow p-6 transition-all duration-200"
-              style={{ 
-                borderRadius: '12px',
-                boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
-              }}
-            >
-              <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>Monthly Expense Trend</h3>
-              {getMonthlyExpenseData().length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={getMonthlyExpenseData()}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E7ECEA" />
-                    <XAxis dataKey="month" stroke="#667680" />
-                    <YAxis stroke="#667680" />
-                    <Tooltip />
-                    <Bar dataKey="amount" fill="#1C7C63" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <p className="text-gray-500 text-center py-8">No expenses to display</p>
-              )}
+              {/* Bar Chart - Monthly Trend */}
+              <div 
+                className="bg-white rounded-lg shadow p-6 transition-all duration-200"
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
+                }}
+              >
+                <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>Monthly Expense Trend</h3>
+                {getMonthlyExpenseData().length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={getMonthlyExpenseData()}>
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="rgba(28,124,99,0.8)" stopOpacity={0.8} />
+                          <stop offset="100%" stopColor="rgba(28,124,99,0.2)" stopOpacity={0.2} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E7ECEA" />
+                      <XAxis dataKey="month" stroke="#667680" />
+                      <YAxis stroke="#667680" />
+                      <Tooltip 
+                        formatter={(value: any) => `$${value.toFixed(2)}`}
+                        labelFormatter={(label) => label}
+                      />
+                      <Bar 
+                        dataKey="amount" 
+                        fill="url(#barGradient)" 
+                        radius={[6, 6, 0, 0]}
+                        animationBegin={0}
+                        animationDuration={750}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No expenses to display</p>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Filter and Export Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Filter Section */}
+          <div className="mb-6">
             <div 
               className="bg-white rounded-lg shadow p-6 transition-all duration-200"
               style={{ 
@@ -620,20 +721,35 @@ export default function ExpensesPage() {
                 boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
               }}
             >
-              <div className="flex items-center gap-2 mb-4">
-                <Filter className="w-4 h-4" style={{ color: '#1C7C63' }} />
-                <h3 className="text-sm font-medium text-gray-900">Quick Filters</h3>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4" style={{ color: '#1C7C63' }} />
+                  <h3 className="text-sm font-medium text-gray-900" style={{ fontWeight: 600 }}>Filter Expenses</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" style={{ color: '#1C7C63' }} />
+                  <h3 className="text-sm font-medium text-gray-900" style={{ fontWeight: 600 }}>Export</h3>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              
+              {/* Merged Filter Bar */}
+              <div className="flex flex-wrap gap-2 mb-4">
                 {[
                   { label: 'All Time', value: 'all' as const },
                   { label: 'This Month', value: 'this-month' as const },
                   { label: 'Last Month', value: 'last-month' as const },
-                  { label: 'This Year', value: 'this-year' as const }
+                  { label: 'This Quarter', value: 'this-quarter' as const },
+                  { label: 'This Year', value: 'this-year' as const },
+                  { label: 'Custom Range', value: 'custom' as const }
                 ].map(filter => (
                   <button
                     key={filter.value}
                     onClick={() => {
+                      if (filter.value === 'custom') {
+                        // Custom range will be handled by DateRangeFilter
+                        setActiveFilter('custom')
+                        return
+                      }
                       setActiveFilter(filter.value)
                       const now = new Date()
                       if (filter.value === 'all') {
@@ -645,6 +761,11 @@ export default function ExpensesPage() {
                       } else if (filter.value === 'last-month') {
                         const start = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0]
                         const end = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0]
+                        setDateRange({ start, end })
+                      } else if (filter.value === 'this-quarter') {
+                        const quarter = Math.floor(now.getMonth() / 3)
+                        const start = new Date(now.getFullYear(), quarter * 3, 1).toISOString().split('T')[0]
+                        const end = new Date(now.getFullYear(), (quarter + 1) * 3, 0).toISOString().split('T')[0]
                         setDateRange({ start, end })
                       } else if (filter.value === 'this-year') {
                         const start = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0]
@@ -665,30 +786,24 @@ export default function ExpensesPage() {
                   </button>
                 ))}
               </div>
-              <div className="mt-4">
-                <DateRangeFilter 
-                  onDateRangeChange={(range) => {
-                    setDateRange(range)
-                    setActiveFilter(null)
-                  }}
-                  selectedRange={dateRange}
-                />
-              </div>
-            </div>
-
-            {/* Export Section */}
-            <div 
-              className="bg-white rounded-lg shadow p-6 transition-all duration-200"
-              style={{ 
-                borderRadius: '12px',
-                boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
-              }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <FileText className="w-4 h-4" style={{ color: '#1C7C63' }} />
-                <h3 className="text-sm font-medium text-gray-900">Export</h3>
-              </div>
-              <div className="flex flex-wrap gap-2 mb-3">
+              
+              {/* Custom Date Range */}
+              {(activeFilter === 'custom' || (dateRange && activeFilter !== 'all' && activeFilter !== 'this-month' && activeFilter !== 'last-month' && activeFilter !== 'this-quarter' && activeFilter !== 'this-year' && activeFilter !== null)) && (
+                <div className="mb-4">
+                  <DateRangeFilter 
+                    onDateRangeChange={(range) => {
+                      setDateRange(range)
+                      if (range) {
+                        setActiveFilter('custom')
+                      }
+                    }}
+                    selectedRange={dateRange}
+                  />
+                </div>
+              )}
+              
+              {/* Export Buttons */}
+              <div className="flex flex-wrap gap-2">
                 <ExportButtons 
                   expenses={expenses}
                   properties={properties}
@@ -696,29 +811,34 @@ export default function ExpensesPage() {
                   dateRange={dateRange}
                 />
               </div>
-              <div className="text-xs text-gray-500 mt-3 pt-3 border-t" style={{ borderColor: '#E5E9E7' }}>
+              
+              {/* Summary Stats */}
+              <div className="text-xs text-gray-500 mt-4 pt-4 border-t" style={{ borderColor: '#E5E9E7' }}>
                 {getFilteredExpenses().length} Expenses · {getUniquePropertiesCount()} Properties · {maintenanceTasks.filter(t => t.status === 'pending').length} Tasks
               </div>
             </div>
           </div>
 
-          <div 
-            className="bg-white rounded-lg shadow overflow-hidden transition-all duration-200"
-            style={{ 
-              borderRadius: '12px',
-              boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
-            }}
-          >
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900" style={{ fontWeight: 600, color: '#0A2540' }}>
-                  Expenses {dateRange ? `(${dateRange.start} to ${dateRange.end})` : '(All Time)'}
-                </h3>
-                <div className="text-sm text-gray-500">
-                  {getFilteredExpenses().length} of {expenses.length} expenses
+          {/* Expense Records Section */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-3" style={{ color: '#0A2540', fontWeight: 600 }}>Expense Records</h2>
+            <div 
+              className="bg-white rounded-lg shadow overflow-hidden transition-all duration-200"
+              style={{ 
+                borderRadius: '12px',
+                boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
+              }}
+            >
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium text-gray-900" style={{ fontWeight: 600, color: '#0A2540' }}>
+                    Expenses {dateRange ? `(${dateRange.start} to ${dateRange.end})` : '(All Time)'}
+                  </h3>
+                  <div className="text-sm text-gray-500">
+                    {getFilteredExpenses().length} of {expenses.length} expenses
+                  </div>
                 </div>
               </div>
-            </div>
             
             {/* Mobile Card View */}
             <div className="md:hidden p-4 space-y-4">
@@ -829,10 +949,17 @@ export default function ExpensesPage() {
               })}
               {/* Mobile Totals */}
               {getFilteredExpenses().length > 0 && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 font-semibold" style={{ borderRadius: '12px' }}>
+                <div 
+                  className="rounded-lg p-4 border font-semibold" 
+                  style={{ 
+                    backgroundColor: '#F3FAF7',
+                    borderColor: '#E5E9E7',
+                    borderRadius: '12px' 
+                  }}
+                >
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-900" style={{ fontWeight: 600 }}>TOTAL</span>
-                    <span className="text-lg font-semibold text-red-600">${getTotalExpenses().toFixed(2)}</span>
+                    <span className="text-sm" style={{ fontWeight: 600, color: '#1C7C63' }}>TOTAL</span>
+                    <span className="text-lg font-bold" style={{ color: '#1C7C63' }}>${getTotalExpenses().toFixed(2)}</span>
                   </div>
                 </div>
               )}
@@ -854,7 +981,8 @@ export default function ExpensesPage() {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAF9'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9FAFB'}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
+                      <span>📅</span>
                       <span>Date</span>
                       <span className="text-sm">{getSortIcon('date')}</span>
                     </div>
@@ -870,7 +998,8 @@ export default function ExpensesPage() {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAF9'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9FAFB'}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
+                      <span>🏠</span>
                       <span>Property</span>
                       <span className="text-sm">{getSortIcon('property')}</span>
                     </div>
@@ -886,7 +1015,8 @@ export default function ExpensesPage() {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAF9'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9FAFB'}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
+                      <span>🏷️</span>
                       <span>Category</span>
                       <span className="text-sm">{getSortIcon('category')}</span>
                     </div>
@@ -912,7 +1042,8 @@ export default function ExpensesPage() {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAF9'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9FAFB'}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
+                      <span>💵</span>
                       <span>Amount</span>
                       <span className="text-sm">{getSortIcon('amount')}</span>
                     </div>
@@ -997,40 +1128,69 @@ export default function ExpensesPage() {
                             href={expense.receipt_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 transition-colors"
-                              title="View receipt"
+                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                            title="View receipt"
                           >
                             <Eye className="w-4 h-4" />
                           </a>
                           <a
                             href={expense.receipt_url}
                             download
-                              className="text-green-600 hover:text-green-800 transition-colors"
-                              title="Download receipt"
+                            className="text-green-600 hover:text-green-800 transition-colors"
+                            title="Download receipt"
                           >
                             <Download className="w-4 h-4" />
                           </a>
                         </div>
                       ) : (
-                          <span className="text-gray-400 text-xs">No receipt</span>
+                        <span 
+                          className="text-gray-400 cursor-pointer transition-colors hover:text-gray-600"
+                          title="Click to upload receipt"
+                        >
+                          🧾
+                        </span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex space-x-3">
+                      <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleEdit(expense)}
-                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                          className="text-blue-600 hover:text-blue-800 transition-all duration-200"
                           title="Edit expense"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)'
+                          }}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(expense.id)}
-                            className="text-red-600 hover:text-red-800 transition-colors"
+                          className="text-red-600 hover:text-red-800 transition-all duration-200"
                           title="Delete expense"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)'
+                          }}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
+                        <div className="relative inline-block">
+                          <button
+                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                            title="More actions"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              // Future: Open dropdown menu
+                            }}
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -1038,11 +1198,11 @@ export default function ExpensesPage() {
                 })}
                 {/* Totals Row */}
                 {getFilteredExpenses().length > 0 && (
-                  <tr className="bg-gray-50 font-semibold">
-                    <td colSpan={4} className="px-6 py-4 text-sm text-gray-900" style={{ fontWeight: 600 }}>
+                  <tr style={{ backgroundColor: '#F3FAF7' }}>
+                    <td colSpan={4} className="px-6 py-4 text-sm" style={{ fontWeight: 600, color: '#1C7C63' }}>
                       TOTAL
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold" style={{ color: '#1C7C63' }}>
                       ${getTotalExpenses().toFixed(2)}
                     </td>
                     <td colSpan={2} className="px-6 py-4"></td>
@@ -1050,6 +1210,7 @@ export default function ExpensesPage() {
                 )}
               </tbody>
             </table>
+            </div>
             </div>
           </div>
         </div>
