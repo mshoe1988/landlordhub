@@ -22,7 +22,7 @@ import {
   LineChart,
   Line
 } from 'recharts'
-import { Download, TrendingUp, TrendingDown, DollarSign, FileDown, FileSpreadsheet } from 'lucide-react'
+import { Download, TrendingUp, TrendingDown, DollarSign, FileDown, FileSpreadsheet, Home, ArrowUpRight, TrendingUp as TrendingUpIcon } from 'lucide-react'
 import { generateTaxReportPDF } from '@/lib/pdfExport'
 
 interface ProfitLossData {
@@ -457,6 +457,61 @@ export default function ReportsPage() {
   const monthlyNetIncomeTrend = calculateMonthlyNetIncomeTrend()
   const taxSummary = calculateTaxSummary()
 
+  // Calculate KPI metrics (client-side only to avoid hydration mismatch)
+  const [kpiMetrics, setKpiMetrics] = useState({
+    roiGrowth: 0,
+    expenseRatio: 0,
+    topProperty: '—',
+    projectedYearEnd: 0
+  })
+
+  useEffect(() => {
+    // ROI Growth vs last month
+    const now = new Date()
+    const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const lastMonthKey = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`
+    
+    const trendMap = new Map<string, number>()
+    monthlyNetIncomeTrend.forEach(m => {
+      const d = new Date(m.month)
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      trendMap.set(key, m.netIncome)
+    })
+    
+    const currentNetIncome = trendMap.get(currentMonthKey) ?? 0
+    const lastMonthNetIncome = trendMap.get(lastMonthKey) ?? 0
+    const roiGrowthPercent = lastMonthNetIncome !== 0 
+      ? ((currentNetIncome - lastMonthNetIncome) / Math.abs(lastMonthNetIncome)) * 100 
+      : 0
+
+    // Expense Ratio
+    const totalIncome = monthlyData.reduce((sum, m) => sum + m.income, 0)
+    const totalExpenses = monthlyData.reduce((sum, m) => sum + m.expenses, 0)
+    const expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0
+
+    // Top Property
+    const topProperty = profitLossData.length > 0 ? profitLossData[0].property : '—'
+
+    // Projected Year-End Income
+    const ytdMonths = monthlyNetIncomeTrend.filter(m => {
+      const d = new Date(m.month)
+      return d.getFullYear() === now.getFullYear() && d.getMonth() <= now.getMonth()
+    })
+    const ytdSum = ytdMonths.reduce((sum, m) => sum + m.netIncome, 0)
+    const monthsElapsed = now.getMonth() + 1
+    const avgMonthly = monthsElapsed > 0 ? ytdSum / monthsElapsed : 0
+    const remainingMonths = 12 - monthsElapsed
+    const projectedYearEnd = ytdSum + avgMonthly * remainingMonths
+
+    setKpiMetrics({
+      roiGrowth: roiGrowthPercent,
+      expenseRatio,
+      topProperty,
+      projectedYearEnd
+    })
+  }, [profitLossData, monthlyData, monthlyNetIncomeTrend])
+
   return (
     <ProtectedRoute>
       <Layout>
@@ -474,6 +529,107 @@ export default function ReportsPage() {
             onDateRangeChange={setDateRange}
             selectedRange={dateRange}
           />
+
+          {/* KPI Summary Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {/* ROI Growth */}
+            <div 
+              className="rounded-xl p-4 cursor-pointer transition-all hover:shadow-md"
+              style={{ 
+                backgroundColor: 'rgba(26, 95, 122, 0.05)',
+                border: '1px solid rgba(26, 95, 122, 0.1)'
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-medium text-gray-600">ROI Growth</div>
+                <ArrowUpRight className="w-4 h-4" style={{ color: '#10B981' }} />
+              </div>
+              <div className="text-xl font-bold" style={{ color: '#10B981' }}>
+                {kpiMetrics.roiGrowth >= 0 ? '+' : ''}{kpiMetrics.roiGrowth.toFixed(1)}%
+              </div>
+              <div className="text-xs text-gray-500 mt-1">vs last month</div>
+            </div>
+
+            {/* Expense Ratio */}
+            <div 
+              className="rounded-xl p-4 cursor-pointer transition-all hover:shadow-md"
+              style={{ 
+                backgroundColor: 'rgba(100, 116, 139, 0.05)',
+                border: '1px solid rgba(100, 116, 139, 0.1)'
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-medium text-gray-600">Expense Ratio</div>
+                <div className="relative w-8 h-8">
+                  <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#E5E7EB"
+                      strokeWidth="3"
+                    />
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#1A5F7A"
+                      strokeWidth="3"
+                      strokeDasharray={`${(kpiMetrics.expenseRatio / 100) * 100.53} 100.53`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-[10px] font-semibold" style={{ color: '#1A5F7A' }}>
+                      {Math.round(kpiMetrics.expenseRatio)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-xl font-bold" style={{ color: '#0A2540' }}>
+                {Math.round(kpiMetrics.expenseRatio)}%
+              </div>
+              <div className="text-xs text-gray-500 mt-1">of income</div>
+            </div>
+
+            {/* Top Property */}
+            <div 
+              className="rounded-xl p-4 cursor-pointer transition-all hover:shadow-md"
+              style={{ 
+                backgroundColor: 'rgba(26, 95, 122, 0.05)',
+                border: '1px solid rgba(26, 95, 122, 0.1)'
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-medium text-gray-600">Top Property</div>
+                <Home className="w-4 h-4" style={{ color: '#1A5F7A' }} />
+              </div>
+              <div className="text-lg font-bold truncate" style={{ color: '#0A2540' }}>
+                {kpiMetrics.topProperty}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">Best performer</div>
+            </div>
+
+            {/* Projected Year-End Income */}
+            <div 
+              className="rounded-xl p-4 cursor-pointer transition-all hover:shadow-md"
+              style={{ 
+                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                border: '1px solid rgba(16, 185, 129, 0.1)'
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-medium text-gray-600">Projected Year-End</div>
+                <TrendingUpIcon className="w-4 h-4" style={{ color: '#10B981' }} />
+              </div>
+              <div className="text-xl font-bold" style={{ color: '#10B981' }}>
+                ${kpiMetrics.projectedYearEnd.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">Net Income</div>
+            </div>
+          </div>
 
           {/* Tax Summary Card */}
           <div className="rounded-2xl p-6 transition-all mb-8" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
