@@ -3,8 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
-import { Analytics } from '@vercel/analytics/react';
-import GoogleAnalytics from "@/components/GoogleAnalytics";
 import StructuredData from "@/components/StructuredData";
 import "./register-sw";
 
@@ -151,8 +149,8 @@ export default function RootLayout({
                   },
                 }}
               />
-              <Analytics />
-              <GoogleAnalytics />
+              
+              
             </AuthProvider>
           </body>
         </html>
