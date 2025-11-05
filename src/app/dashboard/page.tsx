@@ -132,6 +132,34 @@ export default function DashboardPage() {
     }
   }, [loading, properties.length, upcomingTasks, totalMonthlyRent, totalExpenses])
 
+  // Memoized chart data and labels (must be before any early returns)
+  const categoryData = useMemo(() => calculateCategoryData(), [expenses, pieChartDateRange])
+  const monthlyData = useMemo(() => calculateMonthlyData(), [expenses, properties, allRentPayments, lineChartDateRange])
+  const cashFlowForecast = useMemo(() => calculateCashFlowForecast(), [expenses, properties])
+  const cashflowDataMemo = useMemo(() => calculateCashflowData(), [expenses, allRentPayments, cashflowDateRange, properties])
+  const hasCashflowData = useMemo(
+    () => cashflowDataMemo.length > 0 && cashflowDataMemo.some((entry: any) => entry.income > 0 || entry.expenses > 0),
+    [cashflowDataMemo]
+  )
+  const cashflowSummary = useMemo(() => {
+    const data = cashflowDataMemo
+    if (data.length === 0) return null
+    const totalCashflow = data.reduce((sum: number, entry: any) => sum + entry.cashflow, 0)
+    const lastEntry = data[data.length - 1]
+    const secondLastEntry = data.length > 1 ? data[data.length - 2] : null
+    let percentageChange: number | null = null
+    if (secondLastEntry && secondLastEntry.cashflow !== 0) {
+      percentageChange = ((lastEntry.cashflow - secondLastEntry.cashflow) / Math.abs(secondLastEntry.cashflow)) * 100
+    }
+    return {
+      totalCashflow,
+      lastMonthCashflow: lastEntry.cashflow,
+      percentageChange,
+      isPositive: totalCashflow > 0
+    }
+  }, [cashflowDataMemo])
+  const cashflowPeriodLabel = useMemo(() => getCashflowPeriodLabel(), [cashflowDateRange])
+
   const loadDashboardData = async () => {
     try {
       const [propertiesData, maintenanceData, expensesData, paymentsData, allPaymentsData] = await Promise.all([
@@ -1065,17 +1093,7 @@ export default function DashboardPage() {
     }
   }
 
-  // Calculate chart data (memoized)
-  const categoryData = useMemo(() => calculateCategoryData(), [expenses, pieChartDateRange])
-  const monthlyData = useMemo(() => calculateMonthlyData(), [expenses, properties, allRentPayments, lineChartDateRange])
-  const cashFlowForecast = useMemo(() => calculateCashFlowForecast(), [expenses, properties])
-  const cashflowDataMemo = useMemo(() => calculateCashflowData(), [expenses, allRentPayments, cashflowDateRange, properties])
-  const hasCashflowData = useMemo(
-    () => cashflowDataMemo.length > 0 && cashflowDataMemo.some((entry: any) => entry.income > 0 || entry.expenses > 0),
-    [cashflowDataMemo]
-  )
-  const cashflowSummary = useMemo(() => getCashflowSummary(), [cashflowDateRange, expenses, allRentPayments, properties])
-  const cashflowPeriodLabel = useMemo(() => getCashflowPeriodLabel(), [cashflowDateRange])
+  // moved above early return
   const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
 
   return (
