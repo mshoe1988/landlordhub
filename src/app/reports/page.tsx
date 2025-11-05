@@ -249,7 +249,11 @@ export default function ReportsPage() {
       percentage: total > 0 ? (value / total) * 100 : 0
     })).sort((a, b) => b.value - a.value)
   }
-  const totalCategoryAmount = useMemo(() => categoryData.reduce((s, c) => s + c.value, 0), [expenses, pieChartDateRange])
+  // Compute total using the pure calculator to avoid referring to variables declared later
+  const totalCategoryAmount = useMemo(() => {
+    const data = calculateCategoryData()
+    return data.reduce((sum, c) => sum + c.value, 0)
+  }, [expenses, pieChartDateRange])
 
   const calculateMonthlyData = (): MonthlyData[] => {
     // Use all expenses for monthly data, not filtered ones
