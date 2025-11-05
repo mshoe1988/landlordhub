@@ -15,7 +15,6 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  Legend, 
   ResponsiveContainer,
   AreaChart,
   Area,
@@ -858,15 +857,6 @@ export default function ReportsPage() {
                         ]
                       }}
                       labelFormatter={() => ''}
-                    />
-                    <Legend 
-                      verticalAlign="bottom" 
-                      height={36}
-                      formatter={(value, entry: any) => {
-                        const data = categoryData.find((d: CategoryData) => d.name === value)
-                        return `${value} (${data?.percentage.toFixed(1) || 0}%)`
-                      }}
-                      iconType="circle"
                     />
                   </PieChart>
                 </ResponsiveContainer>
