@@ -413,7 +413,7 @@ export default function DashboardPage() {
     return `Custom: ${lineChartDateRange.start} to ${lineChartDateRange.end}`
   }
 
-  const calculateCategoryData = (): CategoryData[] => {
+  function calculateCategoryData(): CategoryData[] {
     const categoryMap = new Map<string, number>()
     
     // Filter expenses by date range if set
@@ -440,7 +440,7 @@ export default function DashboardPage() {
     })).sort((a, b) => b.value - a.value)
   }
 
-  const calculateMonthlyData = (): MonthlyData[] => {
+  function calculateMonthlyData(): MonthlyData[] {
     const monthlyMap = new Map<string, { income: number; expenses: number }>()
     const now = new Date()
     
@@ -598,7 +598,7 @@ export default function DashboardPage() {
   }
 
   // Calculate cash flow forecast for next 3 months
-  const calculateCashFlowForecast = () => {
+  function calculateCashFlowForecast() {
     const now = new Date()
     const forecast = []
     
@@ -687,14 +687,14 @@ export default function DashboardPage() {
   }
 
   // Helper function to get monthKey (YYYY-MM) using local time (not UTC)
-  const getMonthKey = (date: Date): string => {
+  function getMonthKey(date: Date): string {
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
     return `${year}-${month}`
   }
 
   // Calculate cashflow data based on selected time period
-  const calculateCashflowData = () => {
+  function calculateCashflowData() {
     const now = new Date()
     // Debug: Log current date information
     console.log('[Cashflow] Current date:', now)
@@ -966,7 +966,7 @@ export default function DashboardPage() {
   }
 
   // Calculate cashflow summary statistics
-  const getCashflowSummary = () => {
+  function getCashflowSummary() {
     const data = calculateCashflowData()
     if (data.length === 0) return null
     
@@ -988,7 +988,7 @@ export default function DashboardPage() {
   }
 
   // Get time period label
-  const getCashflowPeriodLabel = () => {
+  function getCashflowPeriodLabel() {
     switch (cashflowDateRange) {
       case 'all-time':
         return 'All Time'
