@@ -192,10 +192,10 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 pb-4 border-b gap-3" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
         <div className="flex-1">
-          <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Rent Collection Status</h2>
-          <p className="text-sm mt-1" style={{ color: '#7A8A8A' }}>{monthName}</p>
+          <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1rem', lineHeight: '1.3' }}>Rent Collection Status</h2>
+          <p className="text-xs md:text-sm mt-1" style={{ color: '#7A8A8A' }}>{monthName}</p>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
           {/* Month/Year Selector */}
@@ -282,11 +282,11 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
       </div>
 
       {/* Summary Stats */}
-      <div className="flex justify-center gap-4 mb-4">
+      <div className="flex flex-wrap justify-center gap-2 mb-4 px-2">
         {statusData.map((status) => (
           <div
             key={status.status}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg border cursor-pointer transition-all flex-shrink-0 ${
               selectedSegment === status.status
                 ? 'border-gray-800 shadow-lg bg-gray-50'
                 : 'border-gray-200 hover:border-gray-400'
@@ -299,11 +299,11 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
               }
             }}
           >
-            {status.status === 'Paid' && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-            {status.status === 'Unpaid' && <AlertCircle className="h-4 w-4 text-yellow-600" />}
-            {status.status === 'Overdue' && <XCircle className="h-4 w-4 text-red-600" />}
-            <span className="text-sm font-semibold text-gray-800">{status.status}</span>
-            <span className="text-sm text-gray-600">({status.count})</span>
+            {status.status === 'Paid' && <CheckCircle2 className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-600 flex-shrink-0" />}
+            {status.status === 'Unpaid' && <AlertCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-yellow-600 flex-shrink-0" />}
+            {status.status === 'Overdue' && <XCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-red-600 flex-shrink-0" />}
+            <span className="text-xs md:text-sm font-semibold text-gray-800 whitespace-nowrap">{status.status}</span>
+            <span className="text-xs md:text-sm text-gray-600 whitespace-nowrap">({status.count})</span>
           </div>
         ))}
       </div>

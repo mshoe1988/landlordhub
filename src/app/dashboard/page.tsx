@@ -1062,7 +1062,7 @@ export default function DashboardPage() {
           {/* Top Section: Stats Cards and Rent Collection Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '12px' }}>
             {/* Left Side: Stats Cards (2x2 grid on desktop, 1 column on mobile) */}
-            <div className="grid grid-cols-2 md:grid-cols-2" style={{ gap: '12px' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '12px' }}>
               {/* Top Row */}
               <div 
                 className="bg-white p-3 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[100px] md:min-h-[140px]"
@@ -1322,7 +1322,7 @@ export default function DashboardPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+                        margin={{ top: 20, right: 10, left: 10, bottom: 30 }}
                         key={cashflowDateRange}
                         style={{ transition: 'all 0.3s ease' }}
                       >
@@ -1357,11 +1357,17 @@ export default function DashboardPage() {
                       textAnchor="end"
                       height={80}
                       style={{ color: 'rgba(10, 37, 64, 0.7)' }}
+                      interval={0}
                     />
                     <YAxis 
                       tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 10 }}
-                      tickFormatter={(value) => `$${value.toLocaleString()}`}
-                      width={60}
+                      tickFormatter={(value) => {
+                        if (Math.abs(value) >= 1000) {
+                          return `$${(value / 1000).toFixed(1)}k`
+                        }
+                        return `$${value.toLocaleString()}`
+                      }}
+                      width={50}
                       domain={['auto', 'auto']}
                       allowDataOverflow={false}
                       tickCount={5}
@@ -1762,14 +1768,16 @@ export default function DashboardPage() {
                     />
                     <Legend 
                       verticalAlign="bottom" 
-                      height={60}
+                      height={80}
                       wrapperStyle={{ 
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
                         flexWrap: 'wrap',
-                        gap: '8px',
-                        paddingTop: '16px'
+                        gap: '6px',
+                        paddingTop: '16px',
+                        paddingLeft: '8px',
+                        paddingRight: '8px'
                       }}
                       iconType="circle"
                       formatter={(value, entry) => {
@@ -1780,10 +1788,11 @@ export default function DashboardPage() {
                             style={{
                               background: '#F9FCFB',
                               borderRadius: '12px',
-                              padding: '4px 10px',
-                              fontSize: '0.85rem',
+                              padding: '3px 8px',
+                              fontSize: '0.75rem',
                               color: '#0A2540',
-                              fontWeight: 500
+                              fontWeight: 500,
+                              whiteSpace: 'nowrap'
                             }}
                           >
                             {value}: {percentage}%
@@ -2040,7 +2049,14 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2 mb-4" style={{ color: taskOverdue ? '#B0372A' : '#647474', fontSize: '14px' }}>
                           <span>🗓</span>
                           <span>
-                            {new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            {(() => {
+                              // Parse the date string and create a date in local timezone
+                              const dateStr = task.due_date
+                              // If it's just a date string (YYYY-MM-DD), parse it correctly
+                              const [year, month, day] = dateStr.split('-').map(Number)
+                              const date = new Date(year, month - 1, day) // month is 0-indexed
+                              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                            })()}
                           </span>
                         </div>
 
