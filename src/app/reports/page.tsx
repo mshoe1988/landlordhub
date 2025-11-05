@@ -22,7 +22,7 @@ import {
   LineChart,
   Line
 } from 'recharts'
-import { Download, TrendingUp, TrendingDown, DollarSign, FileDown, FileSpreadsheet } from 'lucide-react'
+import { Download, TrendingUp, TrendingDown, DollarSign, FileDown, FileSpreadsheet, FileJson, Share2, ChevronDown } from 'lucide-react'
 import { generateTaxReportPDF } from '@/lib/pdfExport'
 
 interface ProfitLossData {
@@ -59,6 +59,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
   const [pieChartDateRange, setPieChartDateRange] = useState<{ start: string; end: string } | null>(null)
   const [showExportMenu, setShowExportMenu] = useState(false)
+  const [compareMode, setCompareMode] = useState(false)
   
   // Initialize date range to this month by default
   const getThisMonthRange = () => {
@@ -83,6 +84,20 @@ export default function ReportsPage() {
       loadData()
     }
   }, [user])
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (showExportMenu && !target.closest('.export-menu-container')) {
+        setShowExportMenu(false)
+      }
+    }
+    if (showExportMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showExportMenu])
 
   const loadData = async () => {
     try {
@@ -475,26 +490,52 @@ export default function ReportsPage() {
             selectedRange={dateRange}
           />
 
+          {/* Comparison Toggle */}
+          <div className="flex items-center gap-3 mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={compareMode}
+                onChange={(e) => setCompareMode(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300"
+                style={{ accentColor: '#1A5F7A' }}
+              />
+              <span className="text-sm font-medium" style={{ color: '#0A2540' }}>
+                Compare vs Last Month
+              </span>
+            </label>
+          </div>
+
           {/* Tax Summary Card */}
-          <div className="rounded-2xl p-6 transition-all mb-8" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+          <div className="rounded-2xl p-6 transition-all mb-8 shadow-sm hover:shadow-md" style={{ backgroundColor: '#FCFDFD', transition: 'box-shadow 0.2s ease' }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Tax Summary</h2>
-              <div className="relative">
+              <div className="relative export-menu-container">
                 <button
                   onClick={() => setShowExportMenu(v => !v)}
-                  className="px-4 py-2 rounded-full flex items-center gap-2 text-sm"
-                  style={{ background: '#0F3D3E', color: 'white' }}
+                  className="px-4 py-2 rounded-full flex items-center gap-2 text-sm shadow-sm hover:shadow-md transition-shadow"
+                  style={{ background: '#1A5F7A', color: 'white' }}
                 >
                   <Download className="w-4 h-4" />
                   Export
+                  <ChevronDown className="w-4 h-4" />
                 </button>
                 {showExportMenu && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-lg border z-50" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
-                    <button onClick={handleExportPDF} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50">
+                  <div className="absolute right-0 mt-2 w-48 rounded-lg border z-50 shadow-md" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
+                    <button onClick={handleExportPDF} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors">
                       <FileDown className="w-4 h-4 text-gray-600" /> PDF
                     </button>
-                    <button onClick={() => exportCSV(profitLossData)} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50">
+                    <button onClick={() => exportCSV(profitLossData)} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors">
                       <FileSpreadsheet className="w-4 h-4 text-gray-600" /> CSV
+                    </button>
+                    <button onClick={() => alert('QuickBooks export coming soon')} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors">
+                      <FileJson className="w-4 h-4 text-gray-600" /> QuickBooks
+                    </button>
+                    <button onClick={() => {
+                      navigator.clipboard.writeText(window.location.href)
+                      setShowExportMenu(false)
+                    }} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors">
+                      <Share2 className="w-4 h-4 text-gray-600" /> Share Link
                     </button>
                   </div>
                 )}
@@ -514,7 +555,7 @@ export default function ReportsPage() {
                 <div className="text-sm" style={{ color: '#64748b' }}>Deductible Expenses (YTD)</div>
               </div>
               <div className="text-center">
-                <div className="font-bold" style={{ fontSize: '18px', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#F87171', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(248,113,113,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
+                <div className="font-bold" style={{ fontSize: '18px', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#EF4444', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
                   ${taxSummary.netTaxableIncome.toLocaleString()}
                 </div>
                 <div className="text-sm" style={{ color: '#64748b' }}>Net Taxable Income</div>
@@ -523,7 +564,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Profit & Loss by Property */}
-          <div className="rounded-2xl mb-8" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+          <div className="rounded-2xl mb-8 shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#FCFDFD' }}>
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Profit & Loss by Property</h2>
             </div>
@@ -539,19 +580,40 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody style={{ backgroundColor: '#FCFDFD' }} className="divide-y divide-gray-200">
-                  {profitLossData.map((row, index) => (
-                    <tr key={index} className="hover:bg-gray-50" style={{ backgroundColor: index === 0 && row.netIncome > 0 ? 'rgba(16,185,129,0.06)' : 'transparent' }}>
-                      <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>{row.property}</td>
+                  {profitLossData.map((row, index) => {
+                    const property = properties.find(p => p.address === row.property)
+                    const occupancyRate = property?.tenant_name ? 100 : 0 // Simple: has tenant = 100%
+                    const tooltipText = property ? 
+                      `Address: ${property.address}\nUnits: 1\nRent Due Date: Day ${property.rent_due_date || 'N/A'}\nOccupancy: ${occupancyRate}%` :
+                      `Address: ${row.property}\nUnits: 1\nRent Due Date: N/A\nOccupancy: N/A`
+                    
+                    return (
+                    <tr 
+                      key={index} 
+                      className="hover:bg-gray-50 transition-colors" 
+                      style={{ 
+                        backgroundColor: index === 0 && row.netIncome > 0 ? 'rgba(16,185,129,0.06)' : 'transparent',
+                        '--hover-bg': 'rgba(26,95,122,0.05)'
+                      } as React.CSSProperties}
+                    >
+                      <td 
+                        className="px-6 py-4 text-sm font-medium cursor-help" 
+                        style={{ color: '#0A2540' }}
+                        title={tooltipText}
+                      >
+                        {row.property}
+                      </td>
                       <td className="px-6 py-4 text-sm" style={{ color: '#0A2540' }}>${row.monthlyRent.toLocaleString()}</td>
                       <td className="px-6 py-4 text-sm" style={{ color: '#E8684A' }}>${row.totalExpenses.toLocaleString()}</td>
-                      <td className={`px-6 py-4 text-sm font-semibold ${row.netIncome >= 0 ? '' : ''}`} style={{ color: row.netIncome >= 0 ? '#10B981' : '#F87171' }}>
+                      <td className={`px-6 py-4 text-sm font-semibold ${row.netIncome >= 0 ? '' : ''}`} style={{ color: row.netIncome >= 0 ? '#10B981' : '#EF4444' }}>
                         ${row.netIncome.toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: row.roi >= 0 ? '#10B981' : '#F87171' }}>
+                      <td className="px-6 py-4 text-sm" style={{ color: row.roi >= 0 ? '#10B981' : '#EF4444' }}>
                         {row.roi >= 0 ? '↑' : '↓'} {Math.abs(row.roi).toFixed(1)}%
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                   <tr className="bg-gray-50 font-semibold">
                     <td className="px-6 py-4 text-sm text-gray-900">TOTAL</td>
                     <td className="px-6 py-4 text-sm text-gray-900">
@@ -573,7 +635,7 @@ export default function ReportsPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
-            <div className="rounded-2xl p-6" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+            <div className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#FCFDFD' }}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Expenses by Category</h2>
                 <div className="text-sm text-gray-600">
@@ -696,7 +758,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="rounded-2xl p-6" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+            <div className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#FCFDFD' }}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Monthly Net Income Trend</h2>
                 {monthlyNetIncomeTrend.length >= 2 && (
