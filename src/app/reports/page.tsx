@@ -22,7 +22,7 @@ import {
   LineChart,
   Line
 } from 'recharts'
-import { Download, TrendingUp, TrendingDown, DollarSign, FileDown, FileSpreadsheet } from 'lucide-react'
+import { Download, TrendingUp, DollarSign, FileDown, FileSpreadsheet, Home, PieChart as PieChartIcon, Share2, FileJson, AlertTriangle } from 'lucide-react'
 import { generateTaxReportPDF } from '@/lib/pdfExport'
 
 interface ProfitLossData {
@@ -59,6 +59,8 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
   const [pieChartDateRange, setPieChartDateRange] = useState<{ start: string; end: string } | null>(null)
   const [showExportMenu, setShowExportMenu] = useState(false)
+  const [compareEnabled, setCompareEnabled] = useState(false)
+  const [fadeOnRange, setFadeOnRange] = useState(true)
   
   // Initialize date range to this month by default
   const getThisMonthRange = () => {
@@ -78,6 +80,27 @@ export default function ReportsPage() {
       loadData()
     }
   }, [user])
+
+  // Fade transition when date range changes
+  useEffect(() => {
+    setFadeOnRange(false)
+    const t = setTimeout(() => setFadeOnRange(true), 10)
+    return () => clearTimeout(t)
+  }, [dateRange, pieChartDateRange])
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (showExportMenu && !target.closest('.export-menu-container')) {
+        setShowExportMenu(false)
+      }
+    }
+    if (showExportMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showExportMenu])
 
   const loadData = async () => {
     try {
@@ -451,6 +474,41 @@ export default function ReportsPage() {
   const monthlyData = calculateMonthlyData()
   const monthlyNetIncomeTrend = calculateMonthlyNetIncomeTrend()
   const taxSummary = calculateTaxSummary()
+  
+  // Derived KPI metrics
+  const kpi = (() => {
+    const trend = monthlyNetIncomeTrend
+    const latest = trend[trend.length - 1]?.netIncome ?? 0
+    const prev = trend[trend.length - 2]?.netIncome ?? 0
+    const roiGrowthPercent = prev !== 0 ? ((latest - prev) / Math.abs(prev)) * 100 : 0
+    const totalIncome = monthlyData.reduce((s, m) => s + (m.income || 0), 0)
+    const totalExpenses = monthlyData.reduce((s, m) => s + (m.expenses || 0), 0)
+    const expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0
+    const topProperty = profitLossData[0]?.property || '—'
+    const negativeMonths = monthlyNetIncomeTrend.filter(m => m.netIncome < 0).length
+    const avgNetIncome = trend.length ? trend.reduce((s, m) => s + m.netIncome, 0) / trend.length : 0
+    return { roiGrowthPercent, expenseRatio, topProperty, negativeMonths, avgNetIncome, latest, prev }
+  })()
+
+  // Compare: This Month vs Last Month (for caption and KPI context)
+  const comparison = useMemo(() => {
+    const now = new Date()
+    const thisMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const lastMonthKey = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`
+    const map = new Map<string, number>()
+    monthlyNetIncomeTrend.forEach(m => {
+      // m.month is like 'Nov 2025'
+      const d = new Date(m.month)
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      map.set(key, m.netIncome)
+    })
+    const thisVal = map.get(thisMonthKey) ?? 0
+    const lastVal = map.get(lastMonthKey) ?? 0
+    const delta = thisVal - lastVal
+    const pct = lastVal !== 0 ? (delta / Math.abs(lastVal)) * 100 : 0
+    return { thisVal, lastVal, delta, pct }
+  }, [monthlyNetIncomeTrend])
 
   return (
     <ProtectedRoute>
@@ -458,10 +516,111 @@ export default function ReportsPage() {
         <div className="space-y-6" key={`reports-${Date.now()}`} style={{ background: '#F8FBFA' }}>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold" style={{ color: '#0A2540' }}>Financial Reports</h1>
-              <p className="mt-1 text-sm" style={{ color: '#64748b' }}>
+              <h1 className="text-[22px] font-bold flex items-center gap-2" style={{ color: '#0A2540' }}>
+                <DollarSign className="w-5 h-5 text-[#1A5F7A]" /> Financial Reports
+              </h1>
+              <p className="mt-1 text-[13px]" style={{ color: '#64748b' }}>
                 Comprehensive financial analysis and reporting
               </p>
+            </div>
+          </div>
+
+          {/* Forecast Widget */}
+          <div className="card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[20px] font-bold flex items-center gap-2" style={{ color: '#0A2540' }}>🎯 Projected Year-End Net Income</h2>
+            </div>
+            {(() => {
+              const now = new Date()
+              const year = now.getFullYear()
+              // Build YTD net income from trend using actual months in current year
+              const ytd = monthlyNetIncomeTrend.filter(m => {
+                const d = new Date(m.month)
+                return d.getFullYear() === year && d.getMonth() <= now.getMonth()
+              })
+              const ytdSum = ytd.reduce((s, m) => s + m.netIncome, 0)
+              const monthsElapsed = now.getMonth() + 1
+              const avg = monthsElapsed > 0 ? ytdSum / monthsElapsed : 0
+              const remaining = 12 - monthsElapsed
+              const projected = ytdSum + avg * remaining
+              const target = Math.max(projected, 1) // avoid 0 target for gauge math
+              const pct = Math.max(0, Math.min(100, (projected / target) * 100))
+              const radius = 56
+              const circumference = 2 * Math.PI * radius
+              const dash = (pct / 100) * circumference
+              return (
+                <div className="flex items-center gap-6">
+                  <svg width="150" height="150" viewBox="0 0 150 150">
+                    <circle cx="75" cy="75" r={radius} stroke="#E5E7EB" strokeWidth="12" fill="none" />
+                    <circle
+                      cx="75" cy="75" r={radius}
+                      stroke="#1A5F7A"
+                      strokeWidth="12"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeDasharray={`${dash} ${circumference - dash}`}
+                      transform="rotate(-90 75 75)"
+                    />
+                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 14, fill: '#1F2937' }}>
+                      ${projected.toLocaleString()}
+                    </text>
+                  </svg>
+                  <div>
+                    <div className="text-[13px] text-gray-600">YTD Net Income</div>
+                    <div className="text-[18px] font-semibold mb-2">${ytdSum.toLocaleString()}</div>
+                    <div className="text-[13px] text-gray-600">Avg Monthly</div>
+                    <div className="text-[18px] font-semibold">${avg.toLocaleString()}</div>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+
+          {/* KPI Summary */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" style={{ opacity: fadeOnRange ? 1 : 0, transition: 'opacity 200ms ease' }}>
+            <div className="card p-4 flex items-start gap-3">
+              <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(16,185,129,0.12)', color: '#10B981' }}>
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-[17px] font-bold" style={{ color: kpi.roiGrowthPercent >= 0 ? '#10B981' : '#EF4444' }}>
+                  {kpi.roiGrowthPercent >= 0 ? '+' : '−'}{Math.abs(kpi.roiGrowthPercent).toFixed(0)}%
+                </div>
+                <div className="text-[13px] text-gray-600">ROI Growth vs last month</div>
+              </div>
+            </div>
+            <div className="card p-4 flex items-start gap-3">
+              <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(26,95,122,0.10)', color: '#1A5F7A' }}>
+                <PieChartIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-[17px] font-bold" style={{ color: '#1F2937' }}>
+                  {Math.round(kpi.expenseRatio)}%
+                </div>
+                <div className="text-[13px] text-gray-600">Expense Ratio</div>
+              </div>
+            </div>
+            <div className="card p-4 flex items-start gap-3">
+              <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(26,95,122,0.10)', color: '#1A5F7A' }}>
+                <Home className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-[15px] font-bold" style={{ color: '#0A2540' }}>
+                  {kpi.topProperty}
+                </div>
+                <div className="text-[13px] text-gray-600">Top Performing Property</div>
+              </div>
+            </div>
+            <div className="card p-4 flex items-start gap-3">
+              <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.12)', color: '#EF4444' }}>
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-[17px] font-bold" style={{ color: '#EF4444' }}>
+                  {kpi.negativeMonths}
+                </div>
+                <div className="text-[13px] text-gray-600">Negative Months</div>
+              </div>
             </div>
           </div>
 
@@ -470,26 +629,49 @@ export default function ReportsPage() {
             selectedRange={dateRange}
           />
 
-          {/* Tax Summary Card */}
-          <div className="bg-white rounded-xl p-6 transition-all" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+          {/* Compare Toggle */}
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-[13px] text-gray-700">
+              <input type="checkbox" checked={compareEnabled} onChange={e => setCompareEnabled(e.target.checked)} />
+              Compare This Month vs Last Month
+            </label>
+            {compareEnabled && (
+              <div className="text-[13px]">
+                {comparison.delta >= 0 ? (
+                  <span className="text-green-600">+${Math.abs(comparison.delta).toLocaleString()} ({Math.abs(Math.round(comparison.pct))}%)</span>
+                ) : (
+                  <span className="text-red-600">−${Math.abs(comparison.delta).toLocaleString()} ({Math.abs(Math.round(comparison.pct))}%)</span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Tax & Income Summary */}
+          <div className="card p-6 section-mint">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Tax Summary</h2>
-              <div className="relative">
+              <h2 className="text-[20px] font-bold flex items-center gap-2" style={{ color: '#0A2540' }}>💰 Tax & Income Summary</h2>
+              <div className="relative export-menu-container">
                 <button
                   onClick={() => setShowExportMenu(v => !v)}
                   className="px-4 py-2 rounded-full flex items-center gap-2 shadow-sm"
-                  style={{ background: '#0F3D3E', color: 'white' }}
+                  style={{ background: '#1A5F7A', color: 'white' }}
                 >
                   <Download className="w-4 h-4" />
-                  Export
+                  Export ▼
                 </button>
                 {showExportMenu && (
-                  <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg border" style={{ boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg border z-50" style={{ boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
                     <button onClick={handleExportPDF} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50">
                       <FileDown className="w-4 h-4 text-gray-600" /> PDF
                     </button>
                     <button onClick={() => exportCSV(profitLossData)} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50">
                       <FileSpreadsheet className="w-4 h-4 text-gray-600" /> CSV
+                    </button>
+                    <button onClick={() => alert('QuickBooks export coming soon')} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50">
+                      <FileJson className="w-4 h-4 text-gray-600" /> QuickBooks
+                    </button>
+                    <button onClick={() => navigator.clipboard.writeText(window.location.href)} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50">
+                      <Share2 className="w-4 h-4 text-gray-600" /> Share Link
                     </button>
                   </div>
                 )}
@@ -517,10 +699,10 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Profit & Loss by Property */}
-          <div className="bg-white rounded-xl" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+          {/* Property Performance */}
+          <div className="card" style={{ opacity: fadeOnRange ? 1 : 0, transition: 'opacity 200ms ease' }}>
             <div className="p-6 border-b">
-              <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Profit & Loss by Property</h2>
+              <h2 className="text-[20px] font-bold flex items-center gap-2" style={{ color: '#0A2540' }}>🏠 Property Performance</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -535,7 +717,12 @@ export default function ReportsPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {profitLossData.map((row, index) => (
-                    <tr key={index} className="hover:bg-gray-50" style={{ backgroundColor: index === 0 && row.netIncome > 0 ? 'rgba(16,185,129,0.06)' : 'transparent' }}>
+                    <tr
+                      key={index}
+                      className="hover:bg-gray-50"
+                      style={{ backgroundColor: index === 0 && row.netIncome > 0 ? 'rgba(16,185,129,0.06)' : 'transparent' }}
+                      title={`${row.property} • Next rent due: ${properties.find(p => p.address === row.property)?.rent_due_date ? `day ${properties.find(p => p.address === row.property)?.rent_due_date}` : 'n/a'}`}
+                    >
                       <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>{row.property}</td>
                       <td className="px-6 py-4 text-sm" style={{ color: '#0A2540' }}>${row.monthlyRent.toLocaleString()}</td>
                       <td className="px-6 py-4 text-sm" style={{ color: '#E8684A' }}>${row.totalExpenses.toLocaleString()}</td>
@@ -565,12 +752,12 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Insights & Trends */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" style={{ opacity: fadeOnRange ? 1 : 0, transition: 'opacity 200ms ease' }}>
             {/* Expenses by Category Pie Chart */}
-            <div className="bg-white rounded-xl p-6" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+            <div className="card p-6 section-gray">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Expenses by Category</h2>
+                <h2 className="text-[20px] font-bold flex items-center gap-2" style={{ color: '#0A2540' }}>📊 Expenses by Category</h2>
                 <div className="text-sm text-gray-600">
                   Current: {getCurrentPieChartRangeLabel()}
                 </div>
@@ -622,6 +809,28 @@ export default function ReportsPage() {
               <div className="h-80 md:h-96">
                 <ResponsiveContainer width="100%" height="100%" key={`pie-chart-${Date.now()}`}>
                   <PieChart>
+                    <defs>
+                      <linearGradient id="gradTeal" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#14b8a6" stopOpacity={1} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={1} />
+                      </linearGradient>
+                      <linearGradient id="gradGreen" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#22c55e" />
+                      </linearGradient>
+                      <linearGradient id="gradYellow" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#f59e0b" />
+                        <stop offset="100%" stopColor="#fde047" />
+                      </linearGradient>
+                      <linearGradient id="gradCoral" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#fb7185" />
+                        <stop offset="100%" stopColor="#f97316" />
+                      </linearGradient>
+                      <linearGradient id="gradPurple" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#8b5cf6" />
+                        <stop offset="100%" stopColor="#a78bfa" />
+                      </linearGradient>
+                    </defs>
                     <Pie
                       data={categoryData as any}
                       cx="50%"
@@ -632,36 +841,42 @@ export default function ReportsPage() {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name)} />
-                      ))}
+                      {categoryData.map((entry, index) => {
+                        const fills = ['url(#gradTeal)','url(#gradGreen)','url(#gradYellow)','url(#gradCoral)','url(#gradPurple)']
+                        return <Cell key={`cell-${index}`} fill={fills[index % fills.length]} />
+                      })}
                     </Pie>
                     {/* Center total */}
-                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '18px', fill: '#0A2540', fontWeight: 700 }}>
-                      ${totalCategoryAmount.toLocaleString()}
+                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '16px', fill: '#0A2540', fontWeight: 700 }}>
+                      Total: ${totalCategoryAmount.toLocaleString()}
                     </text>
-                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
+                    <Tooltip formatter={(value, _name, { payload }) => {
+                      const pct = payload?.percentage ? `${payload.percentage.toFixed(1)}%` : ''
+                      return [
+                        `$${Number(value).toLocaleString()} (${pct})`,
+                        payload?.name || 'Amount'
+                      ]
+                    }} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="bg-white rounded-xl p-6" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Monthly Net Income Trend</h2>
+            <div className="card p-6 section-mint">
+              <div className="flex justify-between items-center mb-1">
+                <h2 className="text-[20px] font-bold flex items-center gap-2" style={{ color: '#0A2540' }}>📈 Monthly Net Income Trend</h2>
                 {monthlyNetIncomeTrend.length >= 2 && (
-                  <div className="text-sm text-gray-600">
+                  <div className="text-[13px] text-gray-600">
                     {(() => {
-                      const firstQuarter = monthlyNetIncomeTrend.slice(0, 3).reduce((sum, m) => sum + m.netIncome, 0) / 3
-                      const lastQuarter = monthlyNetIncomeTrend.slice(-3).reduce((sum, m) => sum + m.netIncome, 0) / 3
-                      const percentChange = firstQuarter !== 0 
-                        ? ((lastQuarter - firstQuarter) / Math.abs(firstQuarter) * 100).toFixed(1)
-                        : '0.0'
-                      const isPositive = lastQuarter > firstQuarter
+                      const latest = kpi.latest
+                      const prev = kpi.prev
+                      const delta = latest - prev
+                      const pct = prev !== 0 ? Math.round((delta / Math.abs(prev)) * 100) : 0
+                      const isUp = delta >= 0
                       return (
-                        <span className={isPositive ? 'text-green-600' : 'text-red-600'}>
-                          {isPositive ? '↑' : '↓'} {Math.abs(parseFloat(percentChange))}% vs last quarter
+                        <span className={isUp ? 'text-green-600' : 'text-red-600'}>
+                          Net Income {isUp ? 'increased' : 'decreased'} {isUp ? '+' : '−'}{Math.abs(pct)}% since last month
                         </span>
                       )
                     })()}
@@ -671,7 +886,7 @@ export default function ReportsPage() {
               
               <div className="h-80 md:h-96">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={monthlyNetIncomeTrend}>
+                  <AreaChart data={monthlyNetIncomeTrend.map(d => ({ ...d, avg: kpi.avgNetIncome }))}>
                     <defs>
                       <linearGradient id="colorNetIncomePositive" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -698,28 +913,31 @@ export default function ReportsPage() {
                     <Area
                       type="monotone"
                       dataKey="netIncome"
-                      stroke="#10b981"
+                      stroke="#1A5F7A"
                       fillOpacity={1}
-                      fill="url(#colorNetIncomePositive)"
+                      fill="rgba(26, 95, 122, 0.10)"
                       strokeWidth={2}
-                      strokeDasharray=""
                       dot={(props: any) => {
-                        const { cx, cy, payload } = props
-                        const color = payload.netIncome < 0 ? '#ef4444' : '#10b981'
+                        const { cx, cy, index } = props
+                        const isLatest = index === monthlyNetIncomeTrend.length - 1
+                        if (!isLatest) return <circle cx={cx} cy={cy} r={3} fill="#1A5F7A" />
                         return (
-                          <circle cx={cx} cy={cy} r={5} fill={color} stroke={color} strokeWidth={2} />
+                          <g>
+                            <circle cx={cx} cy={cy} r={6} fill="#1A5F7A" />
+                            <circle cx={cx} cy={cy} r={10} fill="rgba(26,95,122,0.3)" />
+                          </g>
                         )
                       }}
                     />
-                    {/* Zero line reference */}
+                    {/* Average line */}
                     <Line
-                      type="linear"
-                      dataKey={() => 0}
+                      type="monotone"
+                      dataKey="avg"
                       stroke="#9ca3af"
-                      strokeWidth={1}
-                      strokeDasharray="5 5"
+                      strokeWidth={1.5}
+                      strokeDasharray="6 6"
                       dot={false}
-                      legendType="none"
+                      name="Average"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
