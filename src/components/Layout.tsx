@@ -131,7 +131,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#E7F2EF' }}>
       {/* Header */}
-      <div className="py-2 px-4 md:px-6 shadow-lg" style={{ background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)', color: '#0A2540', boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)' }}>
+      <div className="py-2 px-4 md:px-6 shadow-lg" style={{ background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)', color: '#0A2540', boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
         <div className="flex items-center justify-center">
           <Link href="/dashboard" className="transition-all duration-300" style={{ filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.3))' }}
             onMouseEnter={(e) => {

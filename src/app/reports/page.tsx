@@ -527,9 +527,9 @@ export default function ReportsPage() {
           </div>
 
           {/* Tax Summary Card */}
-          <div className="rounded-2xl p-6 transition-all mb-5 hover:scale-[1.01]" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+          <div className="rounded-2xl p-6 transition-all mb-5 hover:scale-[1.01]" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'}
           >
             <div className="flex justify-between items-center mb-4" style={{ paddingLeft: '24px' }}>
               <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Tax Summary</h2>
@@ -592,9 +592,9 @@ export default function ReportsPage() {
           <div className="border-t border-slate-100 mt-4 mb-5"></div>
 
           {/* Profit & Loss by Property */}
-          <div className="mb-5 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+          <div className="mb-5 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'}
           >
             <div className="p-6 border-b" style={{ borderColor: '#E5E7EB' }}>
               <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600, paddingLeft: '24px' }}>Profit & Loss by Property</h2>
@@ -703,20 +703,20 @@ export default function ReportsPage() {
             const isExpensePositive = false
             
             return (
-              <div className="mb-3 py-2 px-3 rounded-lg text-sm font-medium text-center shadow-sm" style={{ backgroundColor: '#F8FAFC', color: '#334155', letterSpacing: '0.01em' }}>
-                <span className="mr-4 inline-flex items-center gap-1">
+              <div className="mb-3 p-2 rounded-lg text-sm font-medium text-center shadow-sm" style={{ backgroundColor: '#F8FAFC', color: '#334155', letterSpacing: '0.01em' }}>
+                <span className="mr-6 inline-flex items-center gap-1">
                   <DollarSign className="w-4 h-4" style={{ color: '#94A3B8' }} />
                   <span className="font-semibold">Net Income</span>{' '}
                   <span style={{ color: isNetIncomePositive ? '#10B981' : '#EF4444', fontWeight: 600 }}>
                     {isNetIncomePositive ? '↑' : '↓'} {Math.abs(parseFloat(netIncomeChange))}%
                   </span>
                 </span>
-                <span className="mr-4 inline-flex items-center gap-1">
+                <span className="mr-6 inline-flex items-center gap-1">
                   <Wrench className="w-4 h-4" style={{ color: '#94A3B8' }} />
                   <span className="font-semibold">Expenses</span>{' '}
                   <span style={{ color: '#EF4444', fontWeight: 600 }}>↓ {expenseChange}%</span>
                 </span>
-                <span className="mr-4 inline-flex items-center gap-1">
+                <span className="mr-6 inline-flex items-center gap-1">
                   <TrendingUpIcon className="w-4 h-4" style={{ color: '#94A3B8' }} />
                   <span className="font-semibold">ROI</span>{' '}
                   <span style={{ color: '#10B981', fontWeight: 600 }}>{avgROI.toFixed(1)}%</span>
@@ -735,9 +735,9 @@ export default function ReportsPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
-            <div className="p-6 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+            <div className="p-6 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'}
             >
               <div className="flex justify-between items-center mb-4" style={{ paddingLeft: '24px' }}>
                 <h2 className="text-lg font-semibold" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Expenses by Category</h2>
@@ -789,7 +789,7 @@ export default function ReportsPage() {
                 })}
               </div>
               
-              <div className="h-80 md:h-96" style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 0.3s ease', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.05))' }}>
+              <div className="h-80 md:h-96" style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 0.3s ease', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.08))' }}>
                 <ResponsiveContainer width="100%" height="100%" key={`pie-chart-${chartKey}`}>
                   <PieChart>
                     <defs>
@@ -844,7 +844,7 @@ export default function ReportsPage() {
                       <text x="50%" y="45%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '16px', fill: '#0F172A', fontWeight: 700, lineHeight: '1.2' }}>
                         ${totalCategoryAmount.toLocaleString()}
                       </text>
-                      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '13px', fill: '#94A3B8', fontWeight: 500, letterSpacing: '0.01em' }}>
+                      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '13px', fill: '#94A3B8', fontWeight: 400, letterSpacing: '0.01em' }}>
                         Total Expenses
                       </text>
                     </g>
@@ -894,14 +894,14 @@ export default function ReportsPage() {
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="p-6 transition-transform hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+            <div className="p-6 transition-transform hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)'}
             >
               <div className="mb-4" style={{ paddingLeft: '24px' }}>
                 <h2 className="text-lg font-semibold mb-1" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>
                   Monthly Net Income Trend
-                  <small className="block mt-1" style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 400, fontStyle: 'normal' }}>
+                  <small className="block mt-1" style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 400, fontStyle: 'normal', letterSpacing: '0.01em' }}>
                     Updated automatically every month
                   </small>
                 </h2>
@@ -954,19 +954,19 @@ export default function ReportsPage() {
                       <>
                         <div>
                           <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginBottom: '4px' }}>Total Net Income</p>
-                          <p className={`font-bold ${totalNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: totalNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
+                          <p className={`font-bold ${totalNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: totalNetIncome >= 0 ? '#10B981' : '#EF4444', letterSpacing: '0.01em' }}>
                             ${totalNetIncome.toLocaleString()}
                           </p>
                         </div>
                         <div>
                           <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginBottom: '4px' }}>Average Monthly</p>
-                          <p className={`font-bold ${averageNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: averageNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
+                          <p className={`font-bold ${averageNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: averageNetIncome >= 0 ? '#10B981' : '#EF4444', letterSpacing: '0.01em' }}>
                             ${averageNetIncome.toLocaleString()}
                           </p>
                         </div>
                         <div>
                           <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginBottom: '4px' }}>Negative Months</p>
-                          <p className={`font-bold ${negativeMonths === 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: negativeMonths === 0 ? '#10B981' : '#EF4444' }}>
+                          <p className={`font-bold ${negativeMonths === 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: negativeMonths === 0 ? '#10B981' : '#EF4444', letterSpacing: '0.01em' }}>
                             {negativeMonths}
                           </p>
                         </div>
@@ -984,6 +984,13 @@ export default function ReportsPage() {
                         <stop offset="5%" stopColor="#1A5F7A" stopOpacity={0.1}/>
                         <stop offset="95%" stopColor="#1A5F7A" stopOpacity={0}/>
                       </linearGradient>
+                      <filter id="glowStrong">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
                       <filter id="glow">
                         <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
                         <feMerge>
@@ -1045,9 +1052,9 @@ export default function ReportsPage() {
                         if (isLatest) {
                           // Glowing dot for latest point
                           return (
-                            <g filter="url(#glow)">
-                              <circle cx={cx} cy={cy} r={10} fill="rgba(26, 95, 122, 0.2)" />
-                              <circle cx={cx} cy={cy} r={6} fill={color} stroke={color} strokeWidth={4} />
+                            <g filter="url(#glowStrong)">
+                              <circle cx={cx} cy={cy} r={12} fill="rgba(26, 95, 122, 0.25)" />
+                              <circle cx={cx} cy={cy} r={7} fill={color} stroke={color} strokeWidth={4} />
                               <circle cx={cx} cy={cy} r={4} fill="#fff" />
                             </g>
                           )
@@ -1084,8 +1091,8 @@ export default function ReportsPage() {
               : '12'
             
             return (
-              <div className="mt-6 p-3 rounded-lg text-sm" style={{ backgroundColor: '#F8FAFC', color: '#334155', fontStyle: 'italic', letterSpacing: '0.01em' }}>
-                <span className="font-semibold not-italic" style={{ color: '#1E293B' }}>AI Insight:</span>{' '}
+              <div className="mt-6 rounded-xl" style={{ backgroundColor: '#F9FAFB', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '13px', fontStyle: 'italic', color: '#475569', letterSpacing: '0.01em' }}>
+                <span className="font-semibold not-italic" style={{ color: '#1E293B' }}>✨ AI Insight:</span>{' '}
                 Your ROI increased {roiChange}% this month.{' '}
                 {topExpense && `Top expense: ${topExpense.name} ($${topExpense.value.toLocaleString()}).`}{' '}
                 Net income was consistent across {profitLossData.length} {profitLossData.length === 1 ? 'property' : 'properties'}.
