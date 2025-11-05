@@ -527,21 +527,23 @@ export default function ReportsPage() {
           </div>
 
           {/* Tax Summary Card */}
-          <div className="rounded-2xl p-6 transition-all mb-8 hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
-            <div className="flex justify-between items-center mb-4">
+          <div className="rounded-2xl p-6 transition-all mb-5 hover:scale-[1.01]" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+            <div className="flex justify-between items-center mb-4" style={{ paddingLeft: '24px' }}>
               <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Tax Summary</h2>
               <div className="relative export-menu-container">
                 <button
                   onClick={() => setShowExportMenu(v => !v)}
-                  className="px-4 py-2 rounded-full flex items-center gap-2 text-sm shadow-sm hover:shadow-md transition-shadow"
-                  style={{ background: '#1A5F7A', color: 'white' }}
+                  className="px-4 py-2 rounded-full flex items-center gap-2 text-sm shadow-sm hover:shadow-md transition-all"
+                  style={{ background: '#1A5F7A', color: 'white', transition: 'background 0.2s' }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#164D61'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = '#1A5F7A'}
                 >
                   <Download className="w-4 h-4" />
                   Export
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showExportMenu && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-lg border z-50 shadow-md" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
+                  <div className="absolute right-0 mt-2 w-48 rounded-lg border z-50 shadow-md" style={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
                     <button onClick={handleExportPDF} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors">
                       <FileDown className="w-4 h-4 text-gray-600" /> PDF
                     </button>
@@ -563,30 +565,33 @@ export default function ReportsPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700, lineHeight: '1.3' }}>
+                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 600, lineHeight: '1.3' }}>
                   ${taxSummary.totalIncome.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginTop: '4px' }}>Total Income (YTD)</div>
+                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.02em', marginTop: '4px' }}>Total Income (YTD)</div>
               </div>
               <div className="text-center">
-                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700, lineHeight: '1.3' }}>
+                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 600, lineHeight: '1.3' }}>
                   ${taxSummary.totalExpenses.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginTop: '4px' }}>Deductible Expenses (YTD)</div>
+                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.02em', marginTop: '4px' }}>Deductible Expenses (YTD)</div>
               </div>
               <div className="text-center">
-                <div className="font-bold" style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#EF4444', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
+                <div className="font-bold" style={{ fontSize: '16px', fontWeight: 600, lineHeight: '1.3', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#EF4444', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
                   ${taxSummary.netTaxableIncome.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginTop: '4px' }}>Net Taxable Income</div>
+                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.02em', marginTop: '4px' }}>Net Taxable Income</div>
               </div>
             </div>
           </div>
 
+          {/* Divider */}
+          <div className="border-t border-slate-100 mt-4 mb-5"></div>
+
           {/* Profit & Loss by Property */}
-          <div className="mb-8 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FFFFFF', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Profit & Loss by Property</h2>
+          <div className="mb-5 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#E5E7EB' }}>
+              <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600, paddingLeft: '24px' }}>Profit & Loss by Property</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -599,7 +604,7 @@ export default function ReportsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI %</th>
                   </tr>
                 </thead>
-                <tbody style={{ backgroundColor: '#FFFFFF' }} className="divide-y divide-gray-200">
+                <tbody style={{ backgroundColor: '#FAFBFB' }} className="divide-y divide-gray-200">
                   {profitLossData.map((row, index) => {
                     const property = properties.find(p => p.address === row.property)
                     const occupancyRate = property?.tenant_name ? 100 : 0 // Simple: has tenant = 100%
@@ -652,11 +657,61 @@ export default function ReportsPage() {
             </div>
           </div>
 
+          {/* Divider */}
+          <div className="border-t border-slate-100 mt-4 mb-5"></div>
+
+          {/* Compact Summary Bar */}
+          {(() => {
+            const totalNetIncome = monthlyNetIncomeTrend.reduce((sum, m) => sum + m.netIncome, 0)
+            const totalExpenses = getFilteredExpenses().reduce((sum, e) => sum + e.amount, 0)
+            const totalIncome = profitLossData.reduce((sum, p) => sum + p.monthlyRent, 0)
+            const avgROI = profitLossData.length > 0 ? profitLossData.reduce((sum, p) => sum + p.roi, 0) / profitLossData.length : 0
+            const topProperty = profitLossData.length > 0 ? profitLossData.reduce((best, p) => p.netIncome > best.netIncome ? p : best, profitLossData[0]) : null
+            
+            // Calculate month-over-month change for net income
+            const lastMonth = monthlyNetIncomeTrend[monthlyNetIncomeTrend.length - 1]
+            const prevMonth = monthlyNetIncomeTrend.length >= 2 ? monthlyNetIncomeTrend[monthlyNetIncomeTrend.length - 2] : null
+            const netIncomeChange = prevMonth && prevMonth.netIncome !== 0 
+              ? ((lastMonth.netIncome - prevMonth.netIncome) / Math.abs(prevMonth.netIncome) * 100).toFixed(1)
+              : '0.0'
+            const isNetIncomePositive = lastMonth && lastMonth.netIncome > (prevMonth?.netIncome || 0)
+            
+            // Calculate expense change (simplified - would need historical data)
+            const expenseChange = '0.0'
+            const isExpensePositive = false
+            
+            return (
+              <div className="mb-5 p-2 rounded-lg text-sm text-center" style={{ backgroundColor: '#F8FAFC', color: '#334155' }}>
+                <span className="mr-4">
+                  <span className="font-semibold">This Month:</span>{' '}
+                  <span className="font-bold" style={{ color: '#0F172A' }}>Net Income</span>{' '}
+                  <span style={{ color: isNetIncomePositive ? '#10B981' : '#EF4444' }}>
+                    {isNetIncomePositive ? '↑' : '↓'} {Math.abs(parseFloat(netIncomeChange))}%
+                  </span>
+                </span>
+                <span className="mr-4">
+                  <span className="font-bold" style={{ color: '#0F172A' }}>Expenses</span>{' '}
+                  <span style={{ color: '#EF4444' }}>↓ {expenseChange}%</span>
+                </span>
+                <span className="mr-4">
+                  <span className="font-bold" style={{ color: '#0F172A' }}>ROI</span>{' '}
+                  <span style={{ color: '#10B981' }}>{avgROI.toFixed(1)}%</span>
+                </span>
+                {topProperty && (
+                  <span>
+                    <span className="font-bold" style={{ color: '#0F172A' }}>Top Property:</span>{' '}
+                    <span style={{ color: '#64748B' }}>{topProperty.property}</span>
+                  </span>
+                )}
+              </div>
+            )
+          })()}
+
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
-            <div className="p-6 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
-              <div className="flex justify-between items-center mb-4">
+            <div className="p-6 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+              <div className="flex justify-between items-center mb-4" style={{ paddingLeft: '24px' }}>
                 <h2 className="text-lg font-semibold" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Expenses by Category</h2>
                 <div className="text-sm text-gray-600">
                   Current: {getCurrentPieChartRangeLabel()}
@@ -706,17 +761,19 @@ export default function ReportsPage() {
                 })}
               </div>
               
-              <div className="h-80 md:h-96" style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 0.3s ease' }}>
+              <div className="h-80 md:h-96" style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 0.3s ease', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.05))' }}>
                 <ResponsiveContainer width="100%" height="100%" key={`pie-chart-${chartKey}`}>
                   <PieChart>
                     <defs>
                       {categoryData.map((entry, index) => {
                         const color = getCategoryColor(entry.name)
                         const gradientId = `gradient-${index}`
+                        // Create gradient from lighter to darker shade
+                        const lighterColor = color.includes('#') ? color : `#${color}`
                         return (
                           <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor={color} stopOpacity={1} />
-                            <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                            <stop offset="0%" stopColor={lighterColor} stopOpacity={1} />
+                            <stop offset="100%" stopColor={color} stopOpacity={0.8} />
                           </linearGradient>
                         )
                       })}
@@ -738,8 +795,18 @@ export default function ReportsPage() {
                           key={`cell-${index}`} 
                           fill={`url(#gradient-${index})`}
                           style={{ 
-                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'transform 0.2s ease'
+                          }}
+                          onMouseEnter={(e: any) => {
+                            if (e?.target) {
+                              e.target.style.transform = 'scale(1.05)'
+                            }
+                          }}
+                          onMouseLeave={(e: any) => {
+                            if (e?.target) {
+                              e.target.style.transform = 'scale(1)'
+                            }
                           }}
                         />
                       ))}
@@ -799,12 +866,26 @@ export default function ReportsPage() {
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="p-6 transition-transform hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
-              <div className="mb-4">
+            <div className="p-6 transition-transform hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+              <div className="mb-4" style={{ paddingLeft: '24px' }}>
                 <h2 className="text-lg font-semibold mb-1" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>
                   Monthly Net Income Trend
+                </h2>
                 {monthlyNetIncomeTrend.length >= 2 && (
-                    <span className="ml-2" style={{ fontSize: '14px', fontWeight: 500 }}>
+                  <div className="mt-2 inline-block px-3 py-1 rounded-full text-sm font-medium" style={{
+                    backgroundColor: (() => {
+                      const firstQuarter = monthlyNetIncomeTrend.slice(0, 3).reduce((sum, m) => sum + m.netIncome, 0) / 3
+                      const lastQuarter = monthlyNetIncomeTrend.slice(-3).reduce((sum, m) => sum + m.netIncome, 0) / 3
+                      const isPositive = lastQuarter > firstQuarter
+                      return isPositive ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'
+                    })(),
+                    color: (() => {
+                      const firstQuarter = monthlyNetIncomeTrend.slice(0, 3).reduce((sum, m) => sum + m.netIncome, 0) / 3
+                      const lastQuarter = monthlyNetIncomeTrend.slice(-3).reduce((sum, m) => sum + m.netIncome, 0) / 3
+                      const isPositive = lastQuarter > firstQuarter
+                      return isPositive ? '#10B981' : '#EF4444'
+                    })()
+                  }}>
                     {(() => {
                       const firstQuarter = monthlyNetIncomeTrend.slice(0, 3).reduce((sum, m) => sum + m.netIncome, 0) / 3
                       const lastQuarter = monthlyNetIncomeTrend.slice(-3).reduce((sum, m) => sum + m.netIncome, 0) / 3
@@ -813,14 +894,18 @@ export default function ReportsPage() {
                         : '0.0'
                       const isPositive = lastQuarter > firstQuarter
                       return (
-                          <span style={{ color: isPositive ? '#10B981' : '#EF4444' }}>
-                            {isPositive ? '+' : ''}{percentChange}% vs last quarter
-                        </span>
+                        <>
+                          <span style={{ fontSize: '14px', fontWeight: 600 }}>
+                            {isPositive ? '+' : ''}{percentChange}%
+                          </span>
+                          <span className="ml-1" style={{ fontSize: '12px' }}>
+                            {isPositive ? '↑' : '↓'} since last quarter
+                          </span>
+                        </>
                       )
                     })()}
-                    </span>
-                  )}
-                </h2>
+                  </div>
+                )}
               </div>
               
               {/* Summary Stats - moved above chart */}
@@ -862,7 +947,7 @@ export default function ReportsPage() {
                   <AreaChart data={monthlyNetIncomeTrend}>
                     <defs>
                       <linearGradient id="colorNetIncomeTeal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1A5F7A" stopOpacity={0.15}/>
+                        <stop offset="5%" stopColor="#1A5F7A" stopOpacity={0.08}/>
                         <stop offset="95%" stopColor="#1A5F7A" stopOpacity={0}/>
                       </linearGradient>
                       <filter id="glow">

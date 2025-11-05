@@ -131,7 +131,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#E7F2EF' }}>
       {/* Header */}
-      <div className="p-4 md:p-6 shadow-lg" style={{ backgroundColor: '#E7F2EF', color: '#0A2540' }}>
+      <div className="p-4 md:p-6 shadow-lg" style={{ background: 'linear-gradient(90deg, #1A5F7A 0%, #145162 100%)', color: '#0A2540' }}>
         <div className="flex items-center justify-center">
           <Link href="/dashboard" className="hover:opacity-90 transition-opacity">
             <Image
