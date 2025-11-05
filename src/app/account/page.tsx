@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
-import { CreditCard, Calendar, Settings, ExternalLink } from 'lucide-react'
+import { CreditCard, Calendar, Settings, ExternalLink, CheckCircle2, FileText, Sparkles, Lightbulb, Rocket, Zap } from 'lucide-react'
 import { PRICING_PLANS } from '@/lib/stripe'
 import { supabase } from '@/lib/supabase'
 import { trackEvent } from '@/lib/analytics'
@@ -164,37 +164,61 @@ export default function AccountPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto" style={{ padding: '24px' }}>
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-            <p className="mt-2 text-gray-600">Manage your subscription and billing</p>
+            <h1 className="text-3xl font-bold" style={{ color: '#1E293B' }}>Account Settings</h1>
+            <p className="mt-2" style={{ color: '#64748B' }}>Manage your subscription and billing</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Current Plan */}
-            <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center mb-4">
-              <CreditCard className="w-6 h-6 text-blue-600 mr-2" />
-              <h2 className="text-xl font-semibold text-gray-900">Current Plan</h2>
-            </div>
-              
-              <div className="mb-4">
-                <div className="text-2xl font-bold text-gray-900">{planInfo.name}</div>
-                <div className="text-gray-600">
-                  {planInfo.properties === -1 ? 'Unlimited' : `Up to ${planInfo.properties}`} Properties
+            <div className="rounded-2xl" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 4px 10px rgba(0,0,0,0.04)', padding: '24px' }}>
+              {/* Gradient Header */}
+              <div className="mb-6 pb-4 border-b" style={{ background: 'linear-gradient(90deg, #F0F9FA 0%, #FFFFFF 100%)', padding: '16px', margin: '-24px -24px 24px -24px', borderRadius: '16px 16px 0 0', borderBottom: '1px solid #E5E7EB' }}>
+                <div className="flex items-center mb-2">
+                  <CreditCard className="w-5 h-5 mr-2" style={{ color: '#1A5F7A' }} />
+                  <h2 className="text-lg font-semibold" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Current Plan</h2>
                 </div>
-                {subscription?.current_period_end && (
-                  <div className="text-sm text-gray-500 mt-2">
-                    <Calendar className="w-4 h-4 inline mr-1" />
-                    {subscription?.status === 'active' ? 'Next billing date:' : 'Billing date:'} {getDisplayedBillingDate(subscription.current_period_end, subscription?.status)}
-                  </div>
-                )}
+              </div>
+              
+              {/* Plan Badge */}
+              <div className="mb-4">
+                <span className="text-xs px-2 py-1 rounded-full font-medium inline-block mb-3" style={{ backgroundColor: '#D1FAE5', color: '#065F46' }}>
+                  ACTIVE PLAN: {planInfo.name.toUpperCase()}
+                </span>
               </div>
 
-              <div className="space-y-2">
+              {/* Price Visual */}
+              <div className="mb-4">
+                <div className="text-3xl font-bold mb-2" style={{ color: '#1E293B' }}>
+                  ${planInfo.price}
+                  <span className="text-base font-normal ml-1" style={{ color: '#94A3B8' }}>/month</span>
+                </div>
+              </div>
+
+              {/* Progress Indicator */}
+              <div className="mb-6 flex items-center gap-2 text-sm">
+                {['Free', 'Basic', 'Growth', 'Pro'].map((tier, index) => {
+                  const tiers = ['free', 'basic', 'growth', 'pro']
+                  const currentTier = subscription?.plan?.toLowerCase() || 'free'
+                  const isActive = tiers[index] === currentTier
+                  return (
+                    <span key={tier} className="flex items-center gap-1">
+                      <span style={{ color: isActive ? '#1A5F7A' : '#94A3B8', fontWeight: isActive ? 600 : 400 }}>
+                        {tier}
+                      </span>
+                      {isActive && <span style={{ color: '#1A5F7A' }}>●</span>}
+                      {index < 3 && <span style={{ color: '#E5E7EB' }}>|</span>}
+                    </span>
+                  )
+                })}
+              </div>
+
+              {/* Features List */}
+              <div className="space-y-3">
                 {planInfo.features.map((feature, index) => (
-                  <div key={index} className="flex items-center text-sm text-gray-600">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                  <div key={index} className="flex items-center text-sm" style={{ color: '#64748B' }}>
+                    <CheckCircle2 className="w-4 h-4 mr-2 flex-shrink-0" style={{ color: '#10B981' }} />
                     {feature}
                   </div>
                 ))}
@@ -212,9 +236,12 @@ export default function AccountPage() {
                         conversion_type: 'free_to_paid_intent'
                       })
                     }}
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="inline-flex items-center px-4 py-2 rounded-lg transition-colors"
+                    style={{ backgroundColor: '#1A5F7A', color: 'white' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#164D61'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1A5F7A'}
                   >
-                    Upgrade Plan (Free User)
+                    Upgrade Plan
                     <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </div>
@@ -223,40 +250,57 @@ export default function AccountPage() {
             </div>
 
             {/* Billing Management */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center mb-4">
-                <Settings className="w-6 h-6 text-blue-600 mr-2" />
-                <h2 className="text-xl font-semibold text-gray-900">Billing Management</h2>
+            <div className="rounded-2xl" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 4px 10px rgba(0,0,0,0.04)', padding: '24px' }}>
+              {/* Gradient Header */}
+              <div className="mb-6 pb-4 border-b" style={{ background: 'linear-gradient(90deg, #F0F9FA 0%, #FFFFFF 100%)', padding: '16px', margin: '-24px -24px 24px -24px', borderRadius: '16px 16px 0 0', borderBottom: '1px solid #E5E7EB' }}>
+                <div className="flex items-center mb-2">
+                  <Settings className="w-5 h-5 mr-2" style={{ color: '#1A5F7A' }} />
+                  <h2 className="text-lg font-semibold" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Billing Management</h2>
+                </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Payment Method</h3>
-                  <p className="text-sm text-gray-600">
+                  <div className="flex items-center mb-2">
+                    <CreditCard className="w-4 h-4 mr-2" style={{ color: '#64748B' }} />
+                    <h3 className="font-medium" style={{ color: '#1E293B' }}>Payment Method</h3>
+                  </div>
+                  <p className="text-sm" style={{ color: '#64748B' }}>
                     Manage your payment methods and billing information
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Billing History</h3>
-                  <p className="text-sm text-gray-600">
+                  <div className="flex items-center mb-2">
+                    <FileText className="w-4 h-4 mr-2" style={{ color: '#64748B' }} />
+                    <h3 className="font-medium" style={{ color: '#1E293B' }}>Billing History</h3>
+                  </div>
+                  <p className="text-sm" style={{ color: '#64748B' }}>
                     View and download your billing history and invoices
                   </p>
                 </div>
 
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Subscription Changes</h3>
-                  <p className="text-sm text-gray-600">
-                    Upgrade, downgrade, or cancel your subscription
-                  </p>
-                </div>
+                {subscription?.current_period_end && subscription?.status === 'active' && (
+                  <div>
+                    <div className="flex items-center mb-2">
+                      <Calendar className="w-4 h-4 mr-2" style={{ color: '#64748B' }} />
+                      <h3 className="font-medium" style={{ color: '#1E293B' }}>Next Billing Date</h3>
+                    </div>
+                    <p className="text-sm" style={{ color: '#64748B' }}>
+                      {getDisplayedBillingDate(subscription.current_period_end, subscription?.status)}
+                    </p>
+                  </div>
+                )}
 
                 {subscription?.plan !== 'free' && (
                   <div className="mt-4 space-y-3">
                     <button
                       onClick={handleManageBilling}
                       disabled={portalLoading}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                      style={{ backgroundColor: '#1A5F7A', color: 'white' }}
+                      onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = '#164D61')}
+                      onMouseLeave={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = '#1A5F7A')}
                     >
                       {portalLoading ? (
                         <>
@@ -281,7 +325,16 @@ export default function AccountPage() {
                           conversion_type: 'plan_change_intent'
                         })
                       }}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg transition-colors border"
+                      style={{ borderColor: '#1A5F7A', color: '#1A5F7A', backgroundColor: 'white' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#F8FBFB'
+                        e.currentTarget.style.borderColor = '#164D61'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white'
+                        e.currentTarget.style.borderColor = '#1A5F7A'
+                      }}
                     >
                       Change Plan
                       <ExternalLink className="w-4 h-4 ml-2" />
@@ -301,26 +354,77 @@ export default function AccountPage() {
           </div>
 
           {/* Usage Information */}
-          <div className="mt-8 bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Usage Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {planInfo.properties === -1 ? '∞' : String(planInfo.properties)}
-                </div>
-                <div className="text-sm text-gray-600">Property Limit</div>
+          <div className="mt-8 rounded-2xl" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 4px 10px rgba(0,0,0,0.04)', padding: '24px' }}>
+            {/* Gradient Header */}
+            <div className="mb-6 pb-4 border-b" style={{ background: 'linear-gradient(90deg, #F0F9FA 0%, #FFFFFF 100%)', padding: '16px', margin: '-24px -24px 24px -24px', borderRadius: '16px 16px 0 0', borderBottom: '1px solid #E5E7EB' }}>
+              <div className="flex items-center mb-2">
+                <Zap className="w-5 h-5 mr-2" style={{ color: '#1A5F7A' }} />
+                <h2 className="text-lg font-semibold" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Usage Information</h2>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {subscription?.status === 'active' ? 'Active' : 'Inactive'}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium" style={{ color: '#64748B' }}>Properties</span>
+                  <CheckCircle2 className="w-4 h-4" style={{ color: '#10B981' }} />
                 </div>
-                <div className="text-sm text-gray-600">Subscription Status</div>
+                <div className="text-2xl font-bold mb-1" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700 }}>
+                  {planInfo.properties === -1 ? 'Unlimited' : String(planInfo.properties)}
+                </div>
+                <div className="text-xs" style={{ color: '#94A3B8' }}>✅ Active</div>
+                {planInfo.properties !== -1 && (
+                  <div className="mt-2 h-1 rounded-full" style={{ backgroundColor: '#E5E7EB' }}>
+                    <div className="h-1 rounded-full" style={{ backgroundColor: '#1A5F7A', width: '100%' }}></div>
+                  </div>
+                )}
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {planInfo.price === 0 ? 'Free' : `$${planInfo.price}`}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium" style={{ color: '#64748B' }}>Subscription</span>
+                  <span className="text-lg">💎</span>
                 </div>
-                <div className="text-sm text-gray-600">Monthly Cost</div>
+                <div className="text-2xl font-bold mb-1" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700 }}>
+                  {planInfo.name}
+                </div>
+                <div className="text-xs" style={{ color: '#94A3B8' }}>💎 Premium</div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium" style={{ color: '#64748B' }}>Billing</span>
+                  <Calendar className="w-4 h-4" style={{ color: '#64748B' }} />
+                </div>
+                <div className="text-2xl font-bold mb-1" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700 }}>
+                  {planInfo.price === 0 ? 'Free' : `$${planInfo.price}`}/month
+                </div>
+                {subscription?.current_period_end && (
+                  <div className="text-xs" style={{ color: '#94A3B8' }}>
+                    📅 Next: {new Date(subscription.current_period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Smart Insight Card */}
+          <div className="mt-8 rounded-xl p-4" style={{ backgroundColor: '#F8FBFB', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
+            <div className="flex items-start gap-3">
+              <Lightbulb className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#1A5F7A' }} />
+              <div className="flex-1">
+                <p className="text-sm mb-2" style={{ color: '#475569', fontStyle: 'italic' }}>
+                  <span className="font-semibold not-italic" style={{ color: '#1E293B' }}>💡 Pro Tip:</span>{' '}
+                  You're saving an average of 3 hours/week with LandlordHub Pro. Explore "Reports" to see your ROI in action.
+                </p>
+                <a 
+                  href="/reports"
+                  className="inline-flex items-center text-sm font-medium mt-2 transition-colors"
+                  style={{ color: '#1A5F7A' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#164D61'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#1A5F7A'}
+                >
+                  View Reports
+                  <ExternalLink className="w-3 h-3 ml-1" />
+                </a>
               </div>
             </div>
           </div>
