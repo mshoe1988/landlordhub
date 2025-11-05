@@ -1085,12 +1085,9 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
-                      <Home className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
-                        Total Properties
-                      </p>
-                </div>
+                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                      Total Properties
+                    </p>
                     <p className="font-bold text-gray-800 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>{countUpValues.properties}</p>
                 </div>
                   <Home className="w-6 h-6 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
@@ -1118,12 +1115,9 @@ export default function DashboardPage() {
               >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
-                      <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
-                        Upcoming Tasks
-                      </p>
-                    </div>
+                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                      Upcoming Tasks
+                    </p>
                     <p className="font-bold text-orange-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>{countUpValues.tasks}</p>
                   </div>
                   <Calendar className="w-6 h-6 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
@@ -1152,12 +1146,9 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
-                      <DollarSign className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
-                        Monthly Rent
-                      </p>
-                </div>
+                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                      Monthly Rent
+                    </p>
                     <p className="font-bold text-green-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>${countUpValues.rent.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-6 h-6 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
@@ -1185,12 +1176,9 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
-                      <DollarSign className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
-                        This Month's Expenses
-                      </p>
-                </div>
+                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                      This Month's Expenses
+                    </p>
                     <p className="font-bold text-red-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>${countUpValues.expenses.toLocaleString()}</p>
                 </div>
                   <DollarSign className="w-6 h-6 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
