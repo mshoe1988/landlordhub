@@ -71,7 +71,12 @@ export default function ReportsPage() {
     }
   }
   
-  const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(getThisMonthRange())
+  const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(null)
+
+  // Initialize date range on client side only to avoid hydration mismatch
+  useEffect(() => {
+    setDateRange(getThisMonthRange())
+  }, [])
 
   useEffect(() => {
     if (user) {
@@ -455,7 +460,7 @@ export default function ReportsPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="space-y-6" key={`reports-${Date.now()}`} style={{ background: '#F8FBFA' }}>
+        <div className="space-y-6" style={{ background: '#F8FBFA' }}>
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold" style={{ color: '#0A2540' }}>Financial Reports</h1>
@@ -620,7 +625,7 @@ export default function ReportsPage() {
               </div>
               
               <div className="h-80 md:h-96">
-                <ResponsiveContainer width="100%" height="100%" key={`pie-chart-${Date.now()}`}>
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={categoryData as any}
