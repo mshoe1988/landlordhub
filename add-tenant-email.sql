@@ -23,3 +23,4 @@ CREATE INDEX IF NOT EXISTS idx_properties_tenant_email ON properties(tenant_emai
 
 
 
+

@@ -8,7 +8,7 @@ import { getContacts, getTenantContacts, createContact, updateContact, deleteCon
 import { getProperties } from '@/lib/database'
 import { Contact, Property } from '@/lib/types'
 import { supabase } from '@/lib/supabase'
-import { Users, Building, Plus, Edit, Trash2, Phone, Mail, MapPin, Crown, Send } from 'lucide-react'
+import { Users, Building, Plus, Edit, Trash2, Phone, Mail, MapPin, Crown, Send, MessageSquare, FileText, Calendar, Search, Filter, X, ChevronDown, Wrench, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
 export default function ContactsPage() {
@@ -21,13 +21,19 @@ export default function ContactsPage() {
   const [showVendorForm, setShowVendorForm] = useState(false)
   const [editingVendor, setEditingVendor] = useState<Contact | null>(null)
   const [subscription, setSubscription] = useState<any>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterType, setFilterType] = useState<'all' | 'tenants' | 'vendors' | 'agents' | 'contractors'>('all')
+  const [sortBy, setSortBy] = useState<'name' | 'property' | 'last_contacted'>('name')
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
+  const [showContactDrawer, setShowContactDrawer] = useState(false)
   const [newVendor, setNewVendor] = useState({
     name: '',
     email: '',
     phone: '',
     company: '',
     service_type: '',
-    notes: ''
+    notes: '',
+    tags: [] as string[]
   })
 
   useEffect(() => {
@@ -123,7 +129,8 @@ export default function ContactsPage() {
         phone: '',
         company: '',
         service_type: '',
-        notes: ''
+        notes: '',
+        tags: []
       })
       setShowVendorForm(false)
       setActiveTab('vendors')
@@ -157,7 +164,8 @@ export default function ContactsPage() {
         phone: '',
         company: '',
         service_type: '',
-        notes: ''
+        notes: '',
+        tags: []
       })
       loadData()
     } catch (error) {
@@ -186,7 +194,8 @@ export default function ContactsPage() {
       phone: vendor.phone || '',
       company: vendor.company || '',
       service_type: vendor.service_type || '',
-      notes: vendor.notes || ''
+      notes: vendor.notes || '',
+      tags: []
     })
     setShowVendorForm(true)
   }
@@ -200,7 +209,8 @@ export default function ContactsPage() {
       phone: '',
       company: '',
       service_type: '',
-      notes: ''
+      notes: '',
+      tags: []
     })
   }
 
@@ -252,6 +262,100 @@ export default function ContactsPage() {
     'Cleaning',
     'Other'
   ]
+
+  const tagOptions = [
+    'Real Estate Agent',
+    'Plumber',
+    'Electrician',
+    'Priority Tenant',
+    'Late Payer',
+    'Contractor',
+    'HVAC',
+    'Preferred Vendor'
+  ]
+
+  const tagColors: { [key: string]: string } = {
+    'Real Estate Agent': '#6366F1',
+    'Plumber': '#0EA5E9',
+    'Electrician': '#F59E0B',
+    'Priority Tenant': '#10B981',
+    'Late Payer': '#EF4444',
+    'Contractor': '#8B5CF6',
+    'HVAC': '#06B6D4',
+    'Preferred Vendor': '#1A5F7A'
+  }
+
+  // Get initials for avatar
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  // Get role label for contact
+  const getRoleLabel = (contact: Contact) => {
+    if (contact.contact_type === 'tenant') return 'Tenant'
+    if (contact.service_type) return contact.service_type
+    return 'Vendor'
+  }
+
+  // Filter and search contacts
+  const getFilteredContacts = () => {
+    let contacts: Contact[] = []
+    
+    if (activeTab === 'tenants') {
+      contacts = tenantContacts
+    } else {
+      contacts = vendorContacts
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      contacts = contacts.filter(contact => 
+        contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.company?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    // Apply type filter
+    if (filterType !== 'all') {
+      if (filterType === 'agents') {
+        contacts = contacts.filter(c => c.service_type === 'Real Estate Agent')
+      } else if (filterType === 'contractors') {
+        contacts = contacts.filter(c => 
+          ['Plumber', 'Electrician', 'HVAC', 'Contractor', 'Carpenter', 'Painter', 'Roofing'].includes(c.service_type || '')
+        )
+      }
+    }
+
+    // Sort contacts
+    contacts.sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name)
+      } else if (sortBy === 'property' && a.property_id && b.property_id) {
+        const propA = properties.find(p => p.id === a.property_id)
+        const propB = properties.find(p => p.id === b.property_id)
+        return (propA?.address || '').localeCompare(propB?.address || '')
+      }
+      return 0
+    })
+
+    return contacts
+  }
+
+  const handleContactClick = (contact: Contact) => {
+    setSelectedContact(contact)
+    setShowContactDrawer(true)
+  }
+
+  const handleScheduleMaintenance = (contact: Contact) => {
+    // Navigate to maintenance page with vendor prefilled
+    window.location.href = `/maintenance/new?vendor=${encodeURIComponent(contact.id)}&vendorName=${encodeURIComponent(contact.name)}`
+  }
 
   if (loading) {
     return (
@@ -378,13 +482,41 @@ export default function ContactsPage() {
     )
   }
 
+  const filteredContacts = getFilteredContacts()
+
   return (
     <ProtectedRoute>
       <Layout>
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex items-center mb-6">
-            <Users className="w-8 h-8 text-blue-600 mr-3" />
-            <h1 className="text-3xl font-bold text-gray-900">Contacts</h1>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <div className="relative">
+                <Users className="w-8 h-8 mr-3" style={{ color: '#1A5F7A', filter: 'drop-shadow(0 2px 4px rgba(26,95,122,0.2))' }} />
+              </div>
+              <h1 className="text-3xl font-bold" style={{ color: '#1E293B' }}>Contacts</h1>
+            </div>
+          </div>
+
+          {/* Smart Summary Card */}
+          <div className="mb-6 rounded-xl p-4" style={{ backgroundColor: '#F8FBFB', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
+            <div className="flex items-center gap-6 text-sm">
+              <span className="font-semibold" style={{ color: '#1E293B' }}>
+                <Sparkles className="w-4 h-4 inline mr-1" style={{ color: '#1A5F7A' }} />
+                Contact Summary:
+              </span>
+              <span style={{ color: '#64748B' }}>
+                <span className="font-semibold" style={{ color: '#0F172A' }}>{tenantContacts.length}</span> Tenants
+              </span>
+              <span style={{ color: '#64748B' }}>
+                <span className="font-semibold" style={{ color: '#0F172A' }}>{vendorContacts.length}</span> Vendors
+              </span>
+              <span style={{ color: '#64748B' }}>
+                <span className="font-semibold" style={{ color: '#0F172A' }}>{vendorContacts.filter(v => v.service_type === 'Real Estate Agent').length}</span> Realtor{vendorContacts.filter(v => v.service_type === 'Real Estate Agent').length !== 1 ? 's' : ''}
+              </span>
+              <span style={{ color: '#64748B' }}>
+                <span className="font-semibold" style={{ color: '#0F172A' }}>0</span> Pending Tasks
+              </span>
+            </div>
           </div>
 
           {/* Tab Navigation */}
@@ -392,23 +524,31 @@ export default function ContactsPage() {
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8">
                 <button
-                  onClick={() => setActiveTab('tenants')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  onClick={() => {
+                    setActiveTab('tenants')
+                    setFilterType('all')
+                  }}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-all ${
                     activeTab === 'tenants'
                       ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
+                  style={{ transition: 'all 0.2s ease' }}
                 >
                   <Building className="w-4 h-4 inline mr-2" />
                   Tenants ({tenantContacts.length})
                 </button>
                 <button
-                  onClick={() => setActiveTab('vendors')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  onClick={() => {
+                    setActiveTab('vendors')
+                    setFilterType('all')
+                  }}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-all ${
                     activeTab === 'vendors'
                       ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
+                  style={{ transition: 'all 0.2s ease' }}
                 >
                   <Users className="w-4 h-4 inline mr-2" />
                   Vendors ({vendorContacts.length})
@@ -417,63 +557,158 @@ export default function ContactsPage() {
             </div>
           </div>
 
+          {/* Search and Filter Bar */}
+          <div className="mb-6 flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: '#94A3B8' }} />
+              <input
+                type="text"
+                placeholder="🔍 Search by name, email, or company"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{ color: '#1E293B' }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: '#94A3B8' }} />
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value as any)}
+                  className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                  style={{ color: '#1E293B' }}
+                >
+                  <option value="all">All</option>
+                  {activeTab === 'vendors' && (
+                    <>
+                      <option value="agents">Agents</option>
+                      <option value="contractors">Contractors</option>
+                    </>
+                  )}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: '#94A3B8' }} />
+              </div>
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                  style={{ color: '#1E293B' }}
+                >
+                  <option value="name">Sort by Name</option>
+                  <option value="property">Sort by Property</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: '#94A3B8' }} />
+              </div>
+            </div>
+          </div>
+
           {/* Tenants Tab */}
           {activeTab === 'tenants' && (
             <div className="bg-white rounded-lg shadow">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Tenant Contacts</h2>
-                <p className="text-sm text-gray-600 mt-1">
+                <h2 className="text-lg font-medium" style={{ color: '#1E293B' }}>Tenant Contacts</h2>
+                <p className="text-sm mt-1" style={{ color: '#64748B' }}>
                   Contact information pulled from your properties
                 </p>
               </div>
               <div className="p-6">
-                {tenantContacts.length === 0 ? (
+                {filteredContacts.length === 0 ? (
                   <div className="text-center py-8">
-                    <Building className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No tenant contacts</h3>
-                    <p className="text-gray-600">
-                      Add tenant information to your properties to see contacts here.
+                    <Building className="w-12 h-12 mx-auto mb-4" style={{ color: '#94A3B8' }} />
+                    <h3 className="text-lg font-medium mb-2" style={{ color: '#1E293B' }}>No tenant contacts</h3>
+                    <p style={{ color: '#64748B' }}>
+                      {searchQuery ? 'No contacts match your search.' : 'Add tenant information to your properties to see contacts here.'}
                     </p>
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {tenantContacts.map((contact) => {
+                    {filteredContacts.map((contact) => {
                       const property = properties.find(p => p.id === contact.property_id)
                       return (
-                        <div key={contact.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div 
+                          key={contact.id} 
+                          className="rounded-xl p-4 cursor-pointer transition-all hover:scale-[1.02]"
+                          style={{ 
+                            background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FBFC 100%)',
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                            transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.05)'
+                          }}
+                          onClick={() => handleContactClick(contact)}
+                        >
                           <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h3 className="font-medium text-gray-900">{contact.name}</h3>
-                              {property && (
-                                <p className="text-sm text-gray-600">{property.address}</p>
+                            <div className="flex items-center gap-3 flex-1">
+                              {/* Avatar */}
+                              <div 
+                                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+                                style={{ backgroundColor: '#1A5F7A' }}
+                              >
+                                {getInitials(contact.name)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold truncate" style={{ color: '#1E293B', fontSize: '16px' }}>
+                                  {contact.name}
+                                </h3>
+                                <span 
+                                  className="inline-block px-2 py-0.5 text-xs rounded-full mt-1"
+                                  style={{ backgroundColor: '#E0F2FE', color: '#1A5F7A' }}
+                                >
+                                  {getRoleLabel(contact)}
+                                </span>
+                              </div>
+                            </div>
+                            {/* Quick Actions */}
+                            <div className="flex gap-1 ml-2 flex-shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleEmailContact(contact.email!, contact.name, 'tenant', property?.address)
+                                }}
+                                className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
+                                title="Email Tenant"
+                              >
+                                <Mail className="w-4 h-4" style={{ color: '#64748B' }} />
+                              </button>
+                              {contact.phone && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    window.open(`tel:${contact.phone}`, '_blank')
+                                  }}
+                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
+                                  title="Call Tenant"
+                                >
+                                  <Phone className="w-4 h-4" style={{ color: '#64748B' }} />
+                                </button>
                               )}
                             </div>
                           </div>
                           
                           <div className="space-y-2">
+                            {property && (
+                              <div className="flex items-center text-sm" style={{ color: '#64748B' }}>
+                                <MapPin className="w-3 h-3 mr-2" />
+                                <span className="truncate">{property.address}</span>
+                              </div>
+                            )}
                             {contact.email && (
-                              <div className="flex items-center justify-between text-sm text-gray-600">
-                                <div className="flex items-center">
-                                  <Mail className="w-4 h-4 mr-2" />
-                                  <a href={`mailto:${contact.email}`} className="hover:text-blue-600">
-                                    {contact.email}
-                                  </a>
-                                </div>
-                                <button
-                                  onClick={() => handleEmailContact(contact.email!, contact.name, 'tenant', property?.address)}
-                                  className="flex items-center px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
-                                >
-                                  <Send className="w-3 h-3 mr-1" />
-                                  Email
-                                </button>
+                              <div className="flex items-center text-sm truncate" style={{ color: '#64748B' }}>
+                                <Mail className="w-3 h-3 mr-2 flex-shrink-0" />
+                                <span className="truncate">{contact.email}</span>
                               </div>
                             )}
                             {contact.phone && (
-                              <div className="flex items-center text-sm text-gray-600">
-                                <Phone className="w-4 h-4 mr-2" />
-                                <a href={`tel:${contact.phone}`} className="hover:text-blue-600">
-                                  {contact.phone}
-                                </a>
+                              <div className="flex items-center text-sm" style={{ color: '#64748B' }}>
+                                <Phone className="w-3 h-3 mr-2 flex-shrink-0" />
+                                <span>{contact.phone}</span>
                               </div>
                             )}
                           </div>
@@ -491,14 +726,28 @@ export default function ContactsPage() {
             <div className="bg-white rounded-lg shadow">
               <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900">Vendor Contacts</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <h2 className="text-lg font-medium" style={{ color: '#1E293B' }}>Vendor Contacts</h2>
+                  <p className="text-sm mt-1" style={{ color: '#64748B' }}>
                     Manage your service providers and contractors
                   </p>
                 </div>
                 <button
                   onClick={() => setShowVendorForm(true)}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 rounded-lg transition-all"
+                  style={{ 
+                    background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)',
+                    color: 'white',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+                    transform: 'scale(1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.02)'
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)'
+                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)'
+                  }}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Vendor
@@ -506,87 +755,317 @@ export default function ContactsPage() {
               </div>
               
               <div className="p-6">
-                {vendorContacts.length === 0 ? (
+                {filteredContacts.length === 0 ? (
                   <div className="text-center py-8">
-                    <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No vendor contacts</h3>
-                    <p className="text-gray-600 mb-4">
-                      Add your service providers to keep track of their contact information.
+                    <Users className="w-12 h-12 mx-auto mb-4" style={{ color: '#94A3B8' }} />
+                    <h3 className="text-lg font-medium mb-2" style={{ color: '#1E293B' }}>No vendor contacts</h3>
+                    <p className="mb-4" style={{ color: '#64748B' }}>
+                      {searchQuery ? 'No contacts match your search.' : 'Add your service providers to keep track of their contact information.'}
                     </p>
-                    <button
-                      onClick={() => setShowVendorForm(true)}
-                      className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Your First Vendor
-                    </button>
+                    {!searchQuery && (
+                      <button
+                        onClick={() => setShowVendorForm(true)}
+                        className="inline-flex items-center px-4 py-2 rounded-lg transition-all"
+                        style={{ 
+                          background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)',
+                          color: 'white',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.06)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.02)'
+                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)'
+                          e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)'
+                        }}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Your First Vendor
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {vendorContacts.map((contact) => (
-                      <div key={contact.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="font-medium text-gray-900">{contact.name}</h3>
-                            {contact.company && (
-                              <p className="text-sm text-gray-600">{contact.company}</p>
-                            )}
-                            {contact.service_type && (
-                              <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full mt-1">
-                                {contact.service_type}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => startEditVendor(contact)}
-                              className="p-1 text-gray-400 hover:text-blue-600"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteVendor(contact.id)}
-                              className="p-1 text-gray-400 hover:text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          {contact.email && (
-                            <div className="flex items-center justify-between text-sm text-gray-600">
-                              <div className="flex items-center">
-                                <Mail className="w-4 h-4 mr-2" />
-                                <a href={`mailto:${contact.email}`} className="hover:text-blue-600">
-                                  {contact.email}
-                                </a>
-                              </div>
-                              <button
-                                onClick={() => handleEmailContact(contact.email!, contact.name, 'vendor')}
-                                className="flex items-center px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                    {filteredContacts.map((contact) => {
+                      const contactTags = contact.service_type ? [contact.service_type] : []
+                      return (
+                        <div 
+                          key={contact.id} 
+                          className="rounded-xl p-4 cursor-pointer transition-all hover:scale-[1.02]"
+                          style={{ 
+                            background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FBFC 100%)',
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                            transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.05)'
+                          }}
+                          onClick={() => handleContactClick(contact)}
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3 flex-1">
+                              {/* Avatar */}
+                              <div 
+                                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+                                style={{ backgroundColor: '#1A5F7A' }}
                               >
-                                <Send className="w-3 h-3 mr-1" />
-                                Email
+                                {getInitials(contact.name)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold truncate" style={{ color: '#1E293B', fontSize: '16px' }}>
+                                  {contact.name}
+                                </h3>
+                                {contact.company && (
+                                  <p className="text-sm truncate mt-0.5" style={{ color: '#64748B' }}>
+                                    {contact.company}
+                                  </p>
+                                )}
+                                <span 
+                                  className="inline-block px-2 py-0.5 text-xs rounded-full mt-1"
+                                  style={{ 
+                                    backgroundColor: contact.service_type && tagColors[contact.service_type] 
+                                      ? `${tagColors[contact.service_type]}20`
+                                      : '#E0F2FE',
+                                    color: contact.service_type && tagColors[contact.service_type]
+                                      ? tagColors[contact.service_type]
+                                      : '#1A5F7A'
+                                  }}
+                                >
+                                  {getRoleLabel(contact)}
+                                </span>
+                              </div>
+                            </div>
+                            {/* Quick Actions */}
+                            <div className="flex gap-1 ml-2 flex-shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleEmailContact(contact.email!, contact.name, 'vendor')
+                                }}
+                                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                title="Email Vendor"
+                              >
+                                <Mail className="w-4 h-4" style={{ color: '#64748B' }} />
                               </button>
+                              {contact.phone && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    window.open(`tel:${contact.phone}`, '_blank')
+                                  }}
+                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  title="Call Vendor"
+                                >
+                                  <Phone className="w-4 h-4" style={{ color: '#64748B' }} />
+                                </button>
+                              )}
+                              {contact.notes && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleContactClick(contact)
+                                  }}
+                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  title="View Notes"
+                                >
+                                  <FileText className="w-4 h-4" style={{ color: '#64748B' }} />
+                                </button>
+                              )}
+                              {contact.contact_type === 'vendor' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleScheduleMaintenance(contact)
+                                  }}
+                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  title="Schedule Maintenance"
+                                >
+                                  <Wrench className="w-4 h-4" style={{ color: '#64748B' }} />
+                                </button>
+                              )}
                             </div>
-                          )}
-                          {contact.phone && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Phone className="w-4 h-4 mr-2" />
-                              <a href={`tel:${contact.phone}`} className="hover:text-blue-600">
-                                {contact.phone}
-                              </a>
-                            </div>
-                          )}
-                          {contact.notes && (
-                            <p className="text-sm text-gray-600 mt-2">{contact.notes}</p>
-                          )}
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {contact.email && (
+                              <div className="flex items-center text-sm truncate" style={{ color: '#64748B' }}>
+                                <Mail className="w-3 h-3 mr-2 flex-shrink-0" />
+                                <span className="truncate">{contact.email}</span>
+                              </div>
+                            )}
+                            {contact.phone && (
+                              <div className="flex items-center text-sm" style={{ color: '#64748B' }}>
+                                <Phone className="w-3 h-3 mr-2 flex-shrink-0" />
+                                <span>{contact.phone}</span>
+                              </div>
+                            )}
+                            {/* Tags */}
+                            {contactTags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {contactTags.map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-0.5 text-xs rounded-full font-medium"
+                                    style={{
+                                      backgroundColor: tagColors[tag] ? `${tagColors[tag]}20` : '#E0F2FE',
+                                      color: tagColors[tag] || '#1A5F7A'
+                                    }}
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Contact Detail Drawer */}
+          {showContactDrawer && selectedContact && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end"
+              onClick={() => {
+                setShowContactDrawer(false)
+                setSelectedContact(null)
+              }}
+            >
+              <div 
+                className="bg-white w-full max-w-md h-full overflow-y-auto shadow-xl"
+                style={{ animation: 'slideIn 0.3s ease-out' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                  <h2 className="text-xl font-semibold" style={{ color: '#1E293B' }}>Contact Details</h2>
+                  <button
+                    onClick={() => {
+                      setShowContactDrawer(false)
+                      setSelectedContact(null)
+                    }}
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" style={{ color: '#64748B' }} />
+                  </button>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0"
+                      style={{ backgroundColor: '#1A5F7A' }}
+                    >
+                      {getInitials(selectedContact.name)}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-1" style={{ color: '#1E293B' }}>
+                        {selectedContact.name}
+                      </h3>
+                      <span 
+                        className="inline-block px-3 py-1 text-xs rounded-full font-medium"
+                        style={{ 
+                          backgroundColor: selectedContact.service_type && tagColors[selectedContact.service_type] 
+                            ? `${tagColors[selectedContact.service_type]}20`
+                            : '#E0F2FE',
+                          color: selectedContact.service_type && tagColors[selectedContact.service_type]
+                            ? tagColors[selectedContact.service_type]
+                            : '#1A5F7A'
+                        }}
+                      >
+                        {getRoleLabel(selectedContact)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {selectedContact.company && (
+                      <div>
+                        <label className="text-xs font-medium mb-1 block" style={{ color: '#64748B' }}>Company</label>
+                        <p className="text-sm" style={{ color: '#1E293B' }}>{selectedContact.company}</p>
+                      </div>
+                    )}
+                    {selectedContact.email && (
+                      <div>
+                        <label className="text-xs font-medium mb-1 block" style={{ color: '#64748B' }}>Email</label>
+                        <a 
+                          href={`mailto:${selectedContact.email}`}
+                          className="text-sm flex items-center gap-2"
+                          style={{ color: '#1A5F7A' }}
+                        >
+                          <Mail className="w-4 h-4" />
+                          {selectedContact.email}
+                        </a>
+                      </div>
+                    )}
+                    {selectedContact.phone && (
+                      <div>
+                        <label className="text-xs font-medium mb-1 block" style={{ color: '#64748B' }}>Phone</label>
+                        <a 
+                          href={`tel:${selectedContact.phone}`}
+                          className="text-sm flex items-center gap-2"
+                          style={{ color: '#1A5F7A' }}
+                        >
+                          <Phone className="w-4 h-4" />
+                          {selectedContact.phone}
+                        </a>
+                      </div>
+                    )}
+                    {selectedContact.property_id && (
+                      <div>
+                        <label className="text-xs font-medium mb-1 block" style={{ color: '#64748B' }}>Related Property</label>
+                        <Link 
+                          href={`/properties/${selectedContact.property_id}/edit`}
+                          className="text-sm flex items-center gap-2"
+                          style={{ color: '#1A5F7A' }}
+                        >
+                          <MapPin className="w-4 h-4" />
+                          {properties.find(p => p.id === selectedContact.property_id)?.address || 'View Property'}
+                        </Link>
+                      </div>
+                    )}
+                    {selectedContact.notes && (
+                      <div>
+                        <label className="text-xs font-medium mb-1 block" style={{ color: '#64748B' }}>Notes</label>
+                        <p className="text-sm whitespace-pre-wrap" style={{ color: '#1E293B' }}>{selectedContact.notes}</p>
+                      </div>
+                    )}
+                    {selectedContact.contact_type === 'vendor' && (
+                      <div className="pt-4 border-t border-gray-200">
+                        <button
+                          onClick={() => {
+                            handleScheduleMaintenance(selectedContact)
+                            setShowContactDrawer(false)
+                          }}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all"
+                          style={{ 
+                            backgroundColor: '#1A5F7A',
+                            color: 'white',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.06)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#164D61'
+                            e.currentTarget.style.transform = 'scale(1.02)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1A5F7A'
+                            e.currentTarget.style.transform = 'scale(1)'
+                          }}
+                        >
+                          <Wrench className="w-4 h-4" />
+                          Create Work Order
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
