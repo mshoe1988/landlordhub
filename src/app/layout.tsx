@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
+import StructuredData from "@/components/StructuredData";
 import "./register-sw";
 
 const geistSans = Geist({
@@ -121,7 +122,7 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
             {/* Schema.org Structured Data */}
-            
+            <StructuredData />
             <AuthProvider>
               {children}
               <Toaster
