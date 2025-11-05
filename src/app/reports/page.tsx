@@ -402,24 +402,24 @@ export default function ReportsPage() {
     URL.revokeObjectURL(url)
   }
 
-  // Get consistent color for a category name
+  // Get consistent pastel color for a category name
   const getCategoryColor = (categoryName: string): string => {
-    // Predefined colors for common categories
+    // Predefined pastel colors for common categories
     const categoryColorMap: Record<string, string> = {
-      'Maintenance': '#3b82f6',      // Blue
-      'Repairs': '#ef4444',           // Red
-      'Utilities': '#10b981',        // Green
-      'Insurance': '#f59e0b',         // Yellow/Orange
-      'Property Tax': '#8b5cf6',     // Purple
-      'Taxes': '#8b5cf6',            // Purple (alternative name)
-      'HOA Fees': '#06b6d4',         // Cyan
-      'Lawn Care': '#84cc16',        // Lime
-      'Pest Control': '#f97316',    // Orange
-      'Legal Fees': '#ec4899',       // Pink
-      'Legal': '#ec4899',            // Pink (alternative name)
-      'Marketing': '#14b8a6',        // Teal
-      'Management Fees': '#6366f1',  // Indigo
-      'Other': '#64748b'             // Gray
+      'Maintenance': '#A5D8FF',      // Pastel Blue
+      'Repairs': '#FFB3BA',           // Pastel Red
+      'Utilities': '#BAFFC9',        // Pastel Green
+      'Insurance': '#FFDFBA',         // Pastel Orange
+      'Property Tax': '#E0BBE4',     // Pastel Purple
+      'Taxes': '#E0BBE4',            // Pastel Purple (alternative name)
+      'HOA Fees': '#B4E6FF',         // Pastel Cyan
+      'Lawn Care': '#D4F4B7',        // Pastel Lime
+      'Pest Control': '#FFCCB6',    // Pastel Peach
+      'Legal Fees': '#FFC1E3',       // Pastel Pink
+      'Legal': '#FFC1E3',            // Pastel Pink (alternative name)
+      'Marketing': '#B3E5D1',        // Pastel Teal
+      'Management Fees': '#C5C7F0',  // Pastel Indigo
+      'Other': '#D1D5DB'             // Pastel Gray
     }
     
     // If category has a predefined color, use it
@@ -427,8 +427,8 @@ export default function ReportsPage() {
       return categoryColorMap[categoryName]
     }
     
-    // For unknown categories, generate a consistent color using hash
-    const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#14b8a6', '#6366f1', '#64748b']
+    // For unknown categories, generate a consistent pastel color using hash
+    const colors = ['#A5D8FF', '#FFB3BA', '#BAFFC9', '#FFDFBA', '#E0BBE4', '#B4E6FF', '#D4F4B7', '#FFCCB6', '#FFC1E3', '#B3E5D1', '#C5C7F0', '#D1D5DB']
     let hash = 0
     for (let i = 0; i < categoryName.length; i++) {
       hash = categoryName.charCodeAt(i) + ((hash << 5) - hash)
@@ -641,19 +641,25 @@ export default function ReportsPage() {
                         <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name)} />
                       ))}
                     </Pie>
-                    {/* Center total */}
-                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '18px', fill: '#0A2540', fontWeight: 700 }}>
-                      ${totalCategoryAmount.toLocaleString()}
-                    </text>
+                    {/* Center total - dual line */}
+                    <g>
+                      <text x="50%" y="45%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '18px', fill: '#0A2540', fontWeight: 700 }}>
+                        ${totalCategoryAmount.toLocaleString()}
+                      </text>
+                      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '12px', fill: '#64748b', fontWeight: 400 }}>
+                        Total Expenses
+                      </text>
+                    </g>
                     <Tooltip 
                       formatter={(value: number, name: string, props: any) => {
+                        const categoryName = props.payload?.name || 'Category'
                         const percentage = props.payload?.percentage || 0
                         return [
-                          `$${value.toLocaleString()} (${percentage.toFixed(1)}%)`,
-                          props.payload?.name || 'Category'
+                          `${categoryName} — $${value.toLocaleString()} (${percentage.toFixed(1)}%)`,
+                          ''
                         ]
                       }}
-                      labelFormatter={(label) => `Category: ${label}`}
+                      labelFormatter={() => ''}
                     />
                     <Legend 
                       verticalAlign="bottom" 
@@ -712,64 +718,8 @@ export default function ReportsPage() {
                 )}
               </div>
               
-              <div className="h-80 md:h-96">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={monthlyNetIncomeTrend}>
-                    <defs>
-                      <linearGradient id="colorNetIncomePositive" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorNetIncomeNegative" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip 
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Net Income']}
-                      labelFormatter={(label) => `Month: ${label}`}
-                      contentStyle={{
-                        backgroundColor: '#fff',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px'
-                      }}
-                    />
-                    {/* Positive area */}
-                    <Area
-                      type="monotone"
-                      dataKey="netIncome"
-                      stroke="#10b981"
-                      fillOpacity={1}
-                      fill="url(#colorNetIncomePositive)"
-                      strokeWidth={2}
-                      strokeDasharray=""
-                      dot={(props: any) => {
-                        const { cx, cy, payload } = props
-                        const color = payload.netIncome < 0 ? '#ef4444' : '#10b981'
-                        return (
-                          <circle cx={cx} cy={cy} r={5} fill={color} stroke={color} strokeWidth={2} />
-                        )
-                      }}
-                    />
-                    {/* Zero line reference */}
-                    <Line
-                      type="linear"
-                      dataKey={() => 0}
-                      stroke="#9ca3af"
-                      strokeWidth={1}
-                      strokeDasharray="5 5"
-                      dot={false}
-                      legendType="none"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              
-              {/* Summary Stats */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              {/* Summary Stats - moved above chart */}
+              <div className="mb-4 pb-4 border-b border-gray-200">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   {(() => {
                     const totalNetIncome = monthlyNetIncomeTrend.reduce((sum, m) => sum + m.netIncome, 0)
@@ -800,6 +750,89 @@ export default function ReportsPage() {
                     )
                   })()}
                 </div>
+              </div>
+              
+              <div className="h-80 md:h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={monthlyNetIncomeTrend}>
+                    <defs>
+                      <linearGradient id="colorNetIncomeTeal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#1A5F7A" stopOpacity={0.15}/>
+                        <stop offset="95%" stopColor="#1A5F7A" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorNetIncomeNegative" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
+                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value: number, name: string, props: any) => {
+                        const currentIndex = monthlyNetIncomeTrend.findIndex((m: MonthlyNetIncomeData) => m.month === props.payload.month)
+                        const prevIndex = currentIndex - 1
+                        let comparisonText = ''
+                        if (prevIndex >= 0) {
+                          const prevValue = monthlyNetIncomeTrend[prevIndex].netIncome
+                          const prevMonth = monthlyNetIncomeTrend[prevIndex].month
+                          const delta = Number(value) - prevValue
+                          const pct = prevValue !== 0 ? Math.round((delta / Math.abs(prevValue)) * 100) : 0
+                          const isUp = delta >= 0
+                          comparisonText = ` ${isUp ? '↑' : '↓'} ${isUp ? '+' : ''}${Math.abs(pct)}% from ${prevMonth}`
+                        }
+                        return [
+                          `$${Number(value).toLocaleString()}${comparisonText}`,
+                          'Net Income'
+                        ]
+                      }}
+                      labelFormatter={(label) => `Month: ${label}`}
+                      contentStyle={{
+                        backgroundColor: '#fff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    {/* Area with teal gradient */}
+                    <Area
+                      type="monotone"
+                      dataKey="netIncome"
+                      stroke="#1A5F7A"
+                      fillOpacity={1}
+                      fill="url(#colorNetIncomeTeal)"
+                      strokeWidth={2.5}
+                      dot={(props: any) => {
+                        const { cx, cy, index } = props
+                        const isLatest = index === monthlyNetIncomeTrend.length - 1
+                        const color = props.payload.netIncome < 0 ? '#ef4444' : '#1A5F7A'
+                        
+                        if (isLatest) {
+                          // Glowing dot for latest point
+                          return (
+                            <g>
+                              <circle cx={cx} cy={cy} r={8} fill="rgba(26, 95, 122, 0.2)" />
+                              <circle cx={cx} cy={cy} r={6} fill={color} />
+                              <circle cx={cx} cy={cy} r={3} fill="#fff" />
+                            </g>
+                          )
+                        }
+                        return (
+                          <circle cx={cx} cy={cy} r={4} fill={color} stroke={color} strokeWidth={1} />
+                        )
+                      }}
+                    />
+                    {/* Zero line reference */}
+                    <Line
+                      type="linear"
+                      dataKey={() => 0}
+                      stroke="#9ca3af"
+                      strokeWidth={1}
+                      strokeDasharray="5 5"
+                      dot={false}
+                      legendType="none"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
