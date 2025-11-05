@@ -1053,19 +1053,19 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="space-y-6" style={{ 
-          gap: '24px',
+        <div className="space-y-4 md:space-y-6" style={{ 
+          gap: '16px',
           background: 'linear-gradient(to bottom, #EAF4F1, #E7F2EF)',
           minHeight: '100vh',
-          padding: '24px'
+          padding: '12px 16px'
         }}>
           {/* Top Section: Stats Cards and Rent Collection Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '24px' }}>
-            {/* Left Side: Stats Cards (2x2 grid) */}
-            <div className="grid grid-cols-2" style={{ gap: '24px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '12px' }}>
+            {/* Left Side: Stats Cards (2x2 grid on desktop, 1 column on mobile) */}
+            <div className="grid grid-cols-2 md:grid-cols-2" style={{ gap: '12px' }}>
               {/* Top Row */}
               <div 
-                className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
+                className="bg-white p-3 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[100px] md:min-h-[140px]"
                 style={{ 
                   background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                   borderRadius: '12px',
@@ -1084,21 +1084,21 @@ export default function DashboardPage() {
               onClick={() => router.push('/properties')}
             >
                 <div className="flex items-start md:items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Home className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
+                      <Home className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
                         Total Properties
                       </p>
                 </div>
-                    <p className="font-bold text-gray-800 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{countUpValues.properties}</p>
+                    <p className="font-bold text-gray-800 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>{countUpValues.properties}</p>
                 </div>
-                  <Home className="w-8 h-8 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-2" />
+                  <Home className="w-6 h-6 md:w-12 md:h-12 text-blue-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
               </div>
             </div>
             
             <div 
-                className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
+                className="bg-white p-3 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[100px] md:min-h-[140px]"
                 style={{ 
                   background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                   borderRadius: '12px',
@@ -1117,22 +1117,22 @@ export default function DashboardPage() {
                 onClick={() => router.push('/maintenance')}
               >
                 <div className="flex items-start md:items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Calendar className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
+                      <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
                         Upcoming Tasks
                       </p>
                     </div>
-                    <p className="font-bold text-orange-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>{countUpValues.tasks}</p>
+                    <p className="font-bold text-orange-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>{countUpValues.tasks}</p>
                   </div>
-                  <Calendar className="w-8 h-8 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-2" />
+                  <Calendar className="w-6 h-6 md:w-12 md:h-12 text-orange-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
                 </div>
               </div>
 
               {/* Bottom Row */}
               <div 
-                className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
+                className="bg-white p-3 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[100px] md:min-h-[140px]"
                 style={{ 
                   background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                   borderRadius: '12px',
@@ -1151,21 +1151,21 @@ export default function DashboardPage() {
               onClick={() => router.push('/reports')}
             >
                 <div className="flex items-start md:items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <DollarSign className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
+                      <DollarSign className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
                         Monthly Rent
                       </p>
                 </div>
-                    <p className="font-bold text-green-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${countUpValues.rent.toLocaleString()}</p>
+                    <p className="font-bold text-green-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>${countUpValues.rent.toLocaleString()}</p>
                 </div>
-                  <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-2" />
+                  <DollarSign className="w-6 h-6 md:w-12 md:h-12 text-green-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
               </div>
             </div>
             
             <div 
-                className="bg-white p-4 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[140px]"
+                className="bg-white p-3 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[100px] md:min-h-[140px]"
                 style={{ 
                   background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
                   borderRadius: '12px',
@@ -1184,16 +1184,16 @@ export default function DashboardPage() {
               onClick={() => router.push('/expenses')}
             >
                 <div className="flex items-start md:items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <DollarSign className="w-4 h-4" style={{ color: '#0A2540', opacity: 0.6 }} />
-                      <p className="text-gray-900 font-bold" style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 md:gap-2 mb-1">
+                      <DollarSign className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: '#0A2540', opacity: 0.6 }} />
+                      <p className="text-gray-900 font-bold truncate" style={{ fontSize: '14px', lineHeight: '1.3' }}>
                         This Month's Expenses
                       </p>
                 </div>
-                    <p className="font-bold text-red-600 mt-2" style={{ fontSize: '32px', lineHeight: '1.2' }}>${countUpValues.expenses.toLocaleString()}</p>
+                    <p className="font-bold text-red-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>${countUpValues.expenses.toLocaleString()}</p>
                 </div>
-                  <DollarSign className="w-8 h-8 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-2" />
+                  <DollarSign className="w-6 h-6 md:w-12 md:h-12 text-red-500 opacity-20 flex-shrink-0 ml-1 md:ml-2" />
                 </div>
               </div>
             </div>
@@ -1201,7 +1201,7 @@ export default function DashboardPage() {
             {/* Right Side: Rent Collection Status Chart */}
             {propertiesWithTenants.length > 0 && (
               <div 
-                className="bg-white p-6 transition-all duration-200"
+                className="bg-white p-4 md:p-6 transition-all duration-200"
                 style={{ 
                   borderRadius: '14px',
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)'
@@ -1233,30 +1233,30 @@ export default function DashboardPage() {
               background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)'
             }}
           >
-            <div className="p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
+            <div className="p-4 md:p-6 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-4 mb-3 md:mb-4">
                 <div className="flex-1">
-                  <h2 className="mb-1" style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cashflow Summary</h2>
-                  <p className="text-sm" style={{ color: '#667680', fontWeight: 400 }}>
+                  <h2 className="mb-1" style={{ color: '#0A2540', fontWeight: 600, fontSize: '1rem', lineHeight: '1.3' }}>Cashflow Summary</h2>
+                  <p className="text-xs md:text-sm" style={{ color: '#667680', fontWeight: 400 }}>
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
                 </div>
                 
                 {/* Legend moved to header */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#1C7C63', marginRight: '5px' }}></div>
-                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cashflow</span>
+                <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#1C7C63' }}></div>
+                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7, fontSize: '11px' }}>Cashflow</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent', marginRight: '5px' }}></div>
-                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cumulative</span>
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent' }}></div>
+                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7, fontSize: '11px' }}>Cumulative</span>
               </div>
             </div>
           </div>
 
               {/* Time Filter Pills */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 md:gap-2">
                 {['all-time', 'this-month', 'last-month', 'last-quarter', 'last-year'].map((range) => {
                   const isActive = cashflowDateRange === range
                   const labelMap: Record<string, string> = {
@@ -1276,7 +1276,7 @@ export default function DashboardPage() {
                           e.currentTarget.style.transform = 'scale(1)'
                         }, 150)
                       }}
-                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 relative"
+                      className="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 relative"
                       style={{
                         backgroundColor: isActive ? '#1C7C63' : 'transparent',
                         color: isActive ? '#FFFFFF' : '#0A2540',
@@ -1285,7 +1285,6 @@ export default function DashboardPage() {
                         transform: 'scale(1)',
                         transition: 'all 0.15s ease',
                         position: 'relative',
-                        paddingBottom: isActive ? '11px' : '8px',
                         boxShadow: isActive ? '0 0 12px rgba(28, 124, 99, 0.3)' : 'none'
                       }}
                       onMouseEnter={(e) => {
@@ -1311,7 +1310,7 @@ export default function DashboardPage() {
                 })}
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               {(() => {
                 const cashflowData = calculateCashflowData()
                 const hasData = cashflowData.length > 0 && cashflowData.some((entry: any) => entry.income > 0 || entry.expenses > 0)
@@ -1331,7 +1330,7 @@ export default function DashboardPage() {
                 }
                 
                 return (
-                  <div style={{ height: '560px', paddingBottom: '5px' }}>
+                  <div style={{ height: '400px', paddingBottom: '5px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
@@ -1365,16 +1364,16 @@ export default function DashboardPage() {
                     />
                     <XAxis 
                       dataKey="month" 
-                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 10 }}
                       angle={-45}
                       textAnchor="end"
-                      height={100}
+                      height={80}
                       style={{ color: 'rgba(10, 37, 64, 0.7)' }}
                     />
                     <YAxis 
-                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 10 }}
                       tickFormatter={(value) => `$${value.toLocaleString()}`}
-                      width={80}
+                      width={60}
                       domain={['auto', 'auto']}
                       allowDataOverflow={false}
                       tickCount={5}
@@ -1489,10 +1488,10 @@ export default function DashboardPage() {
                 const sign = isPositive ? '+' : ''
                 
                   return (
-                  <div className="mt-0 pt-2 border-t" style={{ borderColor: '#E5E9E7', marginTop: '24px', marginBottom: '24px' }}>
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div className="mt-0 pt-2 border-t" style={{ borderColor: '#E5E9E7', marginTop: '16px', marginBottom: '16px' }}>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
                       <div>
-                        <p className="text-sm mb-2" style={{ color: '#7A8A8A' }}>
+                        <p className="text-xs md:text-sm mb-1.5 md:mb-2" style={{ color: '#7A8A8A' }}>
                           Net Cashflow ({periodLabel})
                         </p>
                         <div className="flex items-center gap-2">
@@ -1500,7 +1499,7 @@ export default function DashboardPage() {
                             className="font-bold"
                             style={{ 
                               color: isPositive ? '#1C7C63' : '#EF4444', 
-                              fontSize: '18px',
+                              fontSize: '16px',
                               backgroundColor: isPositive ? 'rgba(28, 124, 99, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                               borderRadius: '6px',
                               padding: '2px 6px',
@@ -1515,7 +1514,7 @@ export default function DashboardPage() {
                       {summary.percentageChange !== null && summary.percentageChange > 0 && (
                         <div className="flex items-center gap-2">
                           <div 
-                            className="px-4 py-2 rounded-lg flex items-center gap-2"
+                            className="px-3 py-2 md:px-4 md:py-2 rounded-lg flex items-center gap-2"
                             style={{ 
                               background: 'linear-gradient(90deg, #E8FFF5 0%, #F7FFFA 100%)',
                               color: '#1C7C63',
@@ -1523,8 +1522,8 @@ export default function DashboardPage() {
                               fontWeight: 500
                             }}
                           >
-                            <span className="text-base">🎉</span>
-                            <span className="text-sm font-semibold">
+                            <span className="text-sm md:text-base">🎉</span>
+                            <span className="text-xs md:text-sm font-semibold">
                               {summary.percentageChange > 1000 ? (
                                 <>
                                   Great work — your cashflow is up {Math.abs(summary.percentageChange / 100).toFixed(1)}x from last month!
@@ -1551,7 +1550,7 @@ export default function DashboardPage() {
             {/* Expenses Comparison Insight Banner */}
             {getExpensesComparison() && (
               <div 
-                className="mt-4 p-4 rounded-lg"
+                className="mt-3 md:mt-4 p-3 md:p-4 rounded-lg"
                 style={{
                   background: 'linear-gradient(90deg, #E9FFF4, #F4FFFA)',
                   borderLeft: '4px solid #1C7C63',
@@ -1559,7 +1558,7 @@ export default function DashboardPage() {
                   fontWeight: 500
                 }}
               >
-                <p className="text-sm" style={{ color: '#1C7C63', fontWeight: 500 }}>
+                <p className="text-xs md:text-sm" style={{ color: '#1C7C63', fontWeight: 500, lineHeight: '1.4' }}>
                   💡 Your expenses {getExpensesComparison()!.change > 0 ? 'increased' : 'decreased'} {Math.abs(getExpensesComparison()!.change)}% this month compared to {getExpensesComparison()!.lastMonthName}. {getExpensesComparison()!.change > 0 ? 'Check Reports for a breakdown.' : 'Great cost management!'}
                 </p>
             </div>
@@ -1568,14 +1567,14 @@ export default function DashboardPage() {
             {/* Smart Insight Card */}
             {getRentCollectionPercentage() !== null && (
               <div 
-                className="mt-4 p-4 rounded-lg"
+                className="mt-3 md:mt-4 p-3 md:p-4 rounded-lg"
                 style={{
                   background: 'linear-gradient(90deg, #E9FFF4, #F4FFFA)',
                   borderLeft: '4px solid #1C7C63',
                   borderRadius: '8px'
                 }}
               >
-                <p className="text-sm" style={{ color: '#1C7C63', fontWeight: 500 }}>
+                <p className="text-xs md:text-sm" style={{ color: '#1C7C63', fontWeight: 500, lineHeight: '1.4' }}>
                   💡 You earned {getRentCollectionPercentage()}% of expected rent this month — {getRentCollectionPercentage()! >= 90 ? 'keep up the momentum!' : 'track progress in Reports.'}
                 </p>
               </div>
@@ -1593,28 +1592,28 @@ export default function DashboardPage() {
           {/* Financial Overview Section Label */}
           <div style={{ marginBottom: '8px' }}>
             <h2 style={{ 
-              fontSize: '1.1rem',
+              fontSize: '1rem',
               fontWeight: 600,
               color: '#0A2540',
-              marginBottom: '8px'
+              marginBottom: '4px'
             }}>
               Financial Overview
             </h2>
             <p style={{ 
-              fontSize: '0.875rem',
+              fontSize: '0.75rem',
               color: '#8DA6A0',
               fontWeight: 400,
-              marginTop: '4px'
+              marginTop: '2px'
             }}>
               Income, expenses, and forecast performance
             </p>
             </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '24px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '12px' }}>
             {/* Expenses by Category Pie Chart */}
             <div 
-              className="bg-white p-6 transition-all duration-200"
+              className="bg-white p-4 md:p-6 transition-all duration-200"
               style={{ 
                 borderRadius: '14px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
@@ -1624,21 +1623,21 @@ export default function DashboardPage() {
                 animation: 'fadeInUp 0.5s ease-out'
               }}
             >
-              <div className="flex justify-between items-center mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">📊</span>
-                  <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Expenses by Category</h2>
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4 pb-3 md:pb-4 border-b gap-2" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+                <div className="flex items-center gap-1.5 md:gap-2 mb-1">
+                  <span className="text-base md:text-lg">📊</span>
+                  <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1rem', lineHeight: '1.3' }}>Expenses by Category</h2>
                         </div>
-                <div className="text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>
+                <div className="text-xs md:text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>
                   Current: {getCurrentPieChartRangeLabel()}
                 </div>
               </div>
               
               {/* Date Range Filter Buttons */}
-              <div className="mb-4 flex flex-wrap gap-2">
+              <div className="mb-3 md:mb-4 flex flex-wrap gap-1.5 md:gap-2">
                         <button 
                   onClick={() => handlePieChartDateRange(null)}
-                  className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                  className="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200"
                   style={{
                     backgroundColor: !pieChartDateRange ? '#1C7C63' : 'transparent',
                     color: !pieChartDateRange ? '#FFFFFF' : '#0A2540',
@@ -1677,7 +1676,7 @@ export default function DashboardPage() {
                           e.currentTarget.style.transform = 'scale(1)'
                         }, 150)
                       }}
-                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 relative"
+                      className="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 relative"
                       style={{
                         backgroundColor: isActive ? '#1C7C63' : 'transparent',
                         color: isActive ? '#FFFFFF' : '#0A2540',
@@ -1686,7 +1685,6 @@ export default function DashboardPage() {
                         transform: 'scale(1)',
                         transition: 'all 0.15s ease',
                         position: 'relative',
-                        paddingBottom: isActive ? '11px' : '8px',
                         boxShadow: isActive ? '0 0 12px rgba(28, 124, 99, 0.3)' : 'none'
                       }}
                       onMouseEnter={(e) => {
@@ -1707,26 +1705,12 @@ export default function DashboardPage() {
                       }}
                     >
                       {range}
-                      {isActive && (
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            bottom: '0',
-                            left: '10%',
-                            right: '10%',
-                            height: '3px',
-                            background: 'linear-gradient(90deg, #1C7C63, #5DD39E)',
-                            borderRadius: '2px',
-                            boxShadow: '0 0 8px rgba(93, 211, 158, 0.5)'
-                          }}
-                        />
-                      )}
                     </button>
                   )
                 })}
           </div>
 
-              <div className="h-80" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.08))' }}>
+              <div className="h-64 md:h-80" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.08))' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <defs>
@@ -1826,7 +1810,7 @@ export default function DashboardPage() {
 
             {/* Cash Flow Forecast Chart */}
             <div 
-              className="bg-white p-6 transition-all duration-200"
+              className="bg-white p-4 md:p-6 transition-all duration-200"
               style={{ 
                 borderRadius: '14px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
@@ -1836,15 +1820,15 @@ export default function DashboardPage() {
                 animation: 'fadeInUp 0.5s ease-out 0.1s both'
               }}
             >
-              <div className="mb-4 pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">🧾</span>
-                  <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Cash Flow Forecast (Next 3 Months)</h2>
+              <div className="mb-3 md:mb-4 pb-3 md:pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
+                <div className="flex items-center gap-1.5 md:gap-2 mb-1">
+                  <span className="text-base md:text-lg">🧾</span>
+                  <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1rem', lineHeight: '1.3' }}>Cash Flow Forecast (Next 3 Months)</h2>
                 </div>
-                <p className="text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>Projected income, expenses, and net cash flow</p>
+                <p className="text-xs md:text-sm mt-1" style={{ color: '#8DA6A0', fontWeight: 400 }}>Projected income, expenses, and net cash flow</p>
               </div>
               
-              <div className="h-80 md:h-96">
+              <div className="h-64 md:h-80 lg:h-96">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={cashFlowForecast}>
                     <defs>
@@ -1940,24 +1924,24 @@ export default function DashboardPage() {
             }}
           >
             <div 
-              className="p-6 border-b" 
+              className="p-4 md:p-6 border-b" 
               style={{ 
                 borderColor: '#E5E9E7', 
                 borderBottomWidth: '1px',
                 backgroundColor: '#F8FBFA'
               }}
             >
-              <div className="flex items-center gap-1.5 mb-2.5" style={{ marginBottom: '10px' }}>
-                <span className="text-lg">🔧</span>
-                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Upcoming Maintenance</h2>
+              <div className="flex items-center gap-1.5 mb-2" style={{ marginBottom: '8px' }}>
+                <span className="text-base md:text-lg">🔧</span>
+                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1rem', lineHeight: '1.3' }}>Upcoming Maintenance</h2>
               </div>
-              <p style={{ fontSize: '0.85rem', color: '#8DA6A0', fontWeight: 400 }}>Track and manage repairs, upkeep, and maintenance tasks</p>
+              <p style={{ fontSize: '0.75rem', color: '#8DA6A0', fontWeight: 400 }}>Track and manage repairs, upkeep, and maintenance tasks</p>
             </div>
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               {maintenance.filter(m => m.status === 'pending').length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No upcoming maintenance tasks</p>
+                <p className="text-gray-500 text-center py-6 md:py-8 text-sm md:text-base">No upcoming maintenance tasks</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '12px' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '8px' }}>
                   {maintenance.filter(m => m.status === 'pending').map(task => {
                     const property = properties.find(p => p.id === task.property_id)
                     const taskIcon = task.task.toLowerCase().includes('plumb') || task.task.toLowerCase().includes('pipe') ? '🚰' : 
@@ -1986,7 +1970,7 @@ export default function DashboardPage() {
                     return (
                       <div 
                         key={task.id} 
-                        className="border rounded-lg p-4 flex flex-col cursor-pointer transition-all duration-200"
+                        className="border rounded-lg p-3 md:p-4 flex flex-col cursor-pointer transition-all duration-200"
                         style={{
                           borderRadius: '12px',
                           background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FCFB 100%)',
@@ -2010,9 +1994,9 @@ export default function DashboardPage() {
                         onClick={() => router.push('/maintenance')}
                       >
                         {/* Task Title */}
-                        <div className="flex items-start gap-2 mb-3">
-                          <span className="text-xl">{taskIcon}</span>
-                          <h3 className="font-semibold text-gray-800 flex-1" style={{ fontWeight: 600, fontSize: '16px' }}>{task.task}</h3>
+                        <div className="flex items-start gap-2 mb-2 md:mb-3">
+                          <span className="text-lg md:text-xl">{taskIcon}</span>
+                          <h3 className="font-semibold text-gray-800 flex-1" style={{ fontWeight: 600, fontSize: '14px', lineHeight: '1.3' }}>{task.task}</h3>
                         </div>
 
                         {/* Status Badge */}
@@ -2080,7 +2064,7 @@ export default function DashboardPage() {
                               setSelectedTask(task)
                               setShowCostModal(true)
                             }}
-                            className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                            className="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200"
                             style={{
                               background: 'linear-gradient(90deg, #1C7C63, #29A184)',
                               color: 'white',
