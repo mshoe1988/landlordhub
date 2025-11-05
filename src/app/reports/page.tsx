@@ -460,7 +460,7 @@ export default function ReportsPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="space-y-6" style={{ background: '#F8FBFA' }}>
+        <div className="space-y-4" style={{ background: '#F8FBFA' }}>
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold" style={{ color: '#0A2540' }}>Financial Reports</h1>
@@ -476,20 +476,20 @@ export default function ReportsPage() {
           />
 
           {/* Tax Summary Card */}
-          <div className="bg-white rounded-xl p-6 transition-all" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+          <div className="rounded-2xl p-6 transition-all mb-8" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Tax Summary</h2>
               <div className="relative">
                 <button
                   onClick={() => setShowExportMenu(v => !v)}
-                  className="px-4 py-2 rounded-full flex items-center gap-2 shadow-sm"
+                  className="px-4 py-2 rounded-full flex items-center gap-2 text-sm"
                   style={{ background: '#0F3D3E', color: 'white' }}
                 >
                   <Download className="w-4 h-4" />
                   Export
                 </button>
                 {showExportMenu && (
-                  <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg border" style={{ boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
+                  <div className="absolute right-0 mt-2 w-44 rounded-lg border z-50" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 10px 22px rgba(2,32,71,0.08)' }}>
                     <button onClick={handleExportPDF} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50">
                       <FileDown className="w-4 h-4 text-gray-600" /> PDF
                     </button>
@@ -523,7 +523,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Profit & Loss by Property */}
-          <div className="bg-white rounded-xl" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+          <div className="rounded-2xl mb-8" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Profit & Loss by Property</h2>
             </div>
@@ -538,7 +538,7 @@ export default function ReportsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI %</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody style={{ backgroundColor: '#FCFDFD' }} className="divide-y divide-gray-200">
                   {profitLossData.map((row, index) => (
                     <tr key={index} className="hover:bg-gray-50" style={{ backgroundColor: index === 0 && row.netIncome > 0 ? 'rgba(16,185,129,0.06)' : 'transparent' }}>
                       <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>{row.property}</td>
@@ -573,7 +573,7 @@ export default function ReportsPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
-            <div className="bg-white rounded-xl p-6" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+            <div className="rounded-2xl p-6" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Expenses by Category</h2>
                 <div className="text-sm text-gray-600">
@@ -690,7 +690,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="bg-white rounded-xl p-6" style={{ boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
+            <div className="rounded-2xl p-6" style={{ backgroundColor: '#FCFDFD', boxShadow: '0 8px 24px rgba(2, 32, 71, 0.06)' }}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Monthly Net Income Trend</h2>
                 {monthlyNetIncomeTrend.length >= 2 && (
