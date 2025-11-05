@@ -335,11 +335,12 @@ export default function ReportsPage() {
     const currentMonth = now.getMonth() // 0-11 (0 = January, 11 = December)
     
     // Initialize last 12 months including current month
-    for (let i = 11; i >= 0; i--) {
-      const targetMonth = currentMonth - i
-      const targetYear = currentYear + Math.floor(targetMonth / 12)
-      const adjustedMonth = ((targetMonth % 12) + 12) % 12 // Handle negative months
-      const monthKey = `${targetYear}-${String(adjustedMonth + 1).padStart(2, '0')}` // YYYY-MM (1-12)
+    // Go from 11 months ago to current month
+    for (let i = 0; i <= 11; i++) {
+      const date = new Date(currentYear, currentMonth - 11 + i, 1)
+      const year = date.getFullYear()
+      const month = date.getMonth() + 1 // Convert to 1-12
+      const monthKey = `${year}-${String(month).padStart(2, '0')}` // YYYY-MM (1-12)
       monthlyMap.set(monthKey, { income: 0, expenses: 0 })
     }
     
@@ -365,11 +366,17 @@ export default function ReportsPage() {
       }
     })
     
-    // Calculate net income for each month
-    const result = Array.from(monthlyMap.entries()).map(([month, data]) => ({
-      month: new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      netIncome: data.income - data.expenses
-    }))
+    // Calculate net income for each month and sort by month key
+    const result = Array.from(monthlyMap.entries())
+      .sort(([monthA], [monthB]) => monthA.localeCompare(monthB)) // Sort by YYYY-MM string
+      .map(([month, data]) => {
+        const [year, monthNum] = month.split('-')
+        const date = new Date(parseInt(year), parseInt(monthNum) - 1, 1)
+        return {
+          month: date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          netIncome: data.income - data.expenses
+        }
+      })
     
     return result
   }
