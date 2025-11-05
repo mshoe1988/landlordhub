@@ -331,11 +331,15 @@ export default function ReportsPage() {
   const calculateMonthlyNetIncomeTrend = (): MonthlyNetIncomeData[] => {
     const monthlyMap = new Map<string, { income: number; expenses: number }>()
     const now = new Date()
+    const currentYear = now.getFullYear()
+    const currentMonth = now.getMonth() // 0-11 (0 = January, 11 = December)
     
     // Initialize last 12 months including current month
     for (let i = 11; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
-      const monthKey = date.toISOString().slice(0, 7) // YYYY-MM
+      const targetMonth = currentMonth - i
+      const targetYear = currentYear + Math.floor(targetMonth / 12)
+      const adjustedMonth = ((targetMonth % 12) + 12) % 12 // Handle negative months
+      const monthKey = `${targetYear}-${String(adjustedMonth + 1).padStart(2, '0')}` // YYYY-MM (1-12)
       monthlyMap.set(monthKey, { income: 0, expenses: 0 })
     }
     
@@ -352,7 +356,9 @@ export default function ReportsPage() {
     // Add expenses by month
     expenses.forEach(expense => {
       const expenseDate = new Date(expense.date)
-      const monthKey = expenseDate.toISOString().slice(0, 7)
+      const expenseYear = expenseDate.getFullYear()
+      const expenseMonth = expenseDate.getMonth() + 1 // Convert to 1-12
+      const monthKey = `${expenseYear}-${String(expenseMonth).padStart(2, '0')}`
       const current = monthlyMap.get(monthKey)
       if (current) {
         current.expenses += expense.amount
