@@ -134,7 +134,7 @@ export default function Layout({ children }: LayoutProps) {
       <div 
         className="py-2 px-4 md:px-6 shadow-lg relative" 
         style={{ 
-          background: 'radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 70%), linear-gradient(180deg, #0C3C53 0%, #12677E 100%)', 
+          background: 'radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(180deg, #1E7D9A 0%, #0F5C70 100%)', 
           color: '#0A2540', 
           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)', 
           borderBottom: '1px solid rgba(0,0,0,0.05)' 
