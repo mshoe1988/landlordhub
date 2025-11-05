@@ -60,6 +60,8 @@ export default function ReportsPage() {
   const [pieChartDateRange, setPieChartDateRange] = useState<{ start: string; end: string } | null>(null)
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [compareMode, setCompareMode] = useState(false)
+  const [chartKey, setChartKey] = useState(0)
+  const [fadeIn, setFadeIn] = useState(true)
   
   // Initialize date range to this month by default
   const getThisMonthRange = () => {
@@ -218,16 +220,21 @@ export default function ReportsPage() {
   }
 
   const handlePieChartDateRange = (rangeName: string | null) => {
-    if (rangeName === null) {
-      setPieChartDateRange(null)
-      return
-    }
-    
-    const options = getDateRangeOptions()
-    const range = options[rangeName as keyof typeof options]
-    if (range) {
-      setPieChartDateRange(range)
-    }
+    // Animate chart update
+    setFadeIn(false)
+    setTimeout(() => {
+      if (rangeName === null) {
+        setPieChartDateRange(null)
+      } else {
+        const options = getDateRangeOptions()
+        const range = options[rangeName as keyof typeof options]
+        if (range) {
+          setPieChartDateRange(range)
+        }
+      }
+      setChartKey(prev => prev + 1)
+      setFadeIn(true)
+    }, 150)
   }
 
   const getCurrentPieChartRangeLabel = () => {
@@ -507,9 +514,9 @@ export default function ReportsPage() {
           </div>
 
           {/* Tax Summary Card */}
-          <div className="rounded-2xl p-6 transition-all mb-8" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
+          <div className="rounded-2xl p-6 transition-all mb-8 hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Tax Summary</h2>
+              <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Tax Summary</h2>
               <div className="relative export-menu-container">
                 <button
                   onClick={() => setShowExportMenu(v => !v)}
@@ -543,30 +550,30 @@ export default function ReportsPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="font-bold" style={{ color: '#0F3D3E', fontSize: '18px' }}>
+                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700, lineHeight: '1.3' }}>
                   ${taxSummary.totalIncome.toLocaleString()}
                 </div>
-                <div className="text-sm" style={{ color: '#64748b' }}>Total Income (YTD)</div>
+                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginTop: '4px' }}>Total Income (YTD)</div>
               </div>
               <div className="text-center">
-                <div className="font-bold" style={{ color: '#E8684A', fontSize: '18px' }}>
+                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700, lineHeight: '1.3' }}>
                   ${taxSummary.totalExpenses.toLocaleString()}
                 </div>
-                <div className="text-sm" style={{ color: '#64748b' }}>Deductible Expenses (YTD)</div>
+                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginTop: '4px' }}>Deductible Expenses (YTD)</div>
               </div>
               <div className="text-center">
-                <div className="font-bold" style={{ fontSize: '18px', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#EF4444', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
+                <div className="font-bold" style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#EF4444', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
                   ${taxSummary.netTaxableIncome.toLocaleString()}
                 </div>
-                <div className="text-sm" style={{ color: '#64748b' }}>Net Taxable Income</div>
+                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginTop: '4px' }}>Net Taxable Income</div>
               </div>
             </div>
           </div>
 
           {/* Profit & Loss by Property */}
-          <div className="mb-8" style={{ backgroundColor: '#FFFFFF', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
+          <div className="mb-8 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FFFFFF', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
             <div className="p-6 border-b">
-              <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Profit & Loss by Property</h2>
+              <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Profit & Loss by Property</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -608,8 +615,8 @@ export default function ReportsPage() {
                       <td className={`px-6 py-4 text-sm font-semibold ${row.netIncome >= 0 ? '' : ''}`} style={{ color: row.netIncome >= 0 ? '#10B981' : '#EF4444' }}>
                         ${row.netIncome.toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: row.roi >= 0 ? '#10B981' : '#EF4444' }}>
-                        {row.roi >= 0 ? '↑' : '↓'} {Math.abs(row.roi).toFixed(1)}%
+                      <td className="px-6 py-4 text-sm font-bold" style={{ color: row.roi >= 0 ? '#10B981' : '#EF4444', fontSize: '14px' }}>
+                        <span style={{ fontSize: '16px', fontWeight: 700 }}>{row.roi >= 0 ? '↑' : '↓'}</span> {Math.abs(row.roi).toFixed(1)}%
                       </td>
                     </tr>
                     )
@@ -635,9 +642,9 @@ export default function ReportsPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
-            <div className="p-6" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
+            <div className="p-6 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Expenses by Category</h2>
+                <h2 className="text-lg font-semibold" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Expenses by Category</h2>
                 <div className="text-sm text-gray-600">
                   Current: {getCurrentPieChartRangeLabel()}
                 </div>
@@ -686,9 +693,21 @@ export default function ReportsPage() {
                 })}
               </div>
               
-              <div className="h-80 md:h-96">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-80 md:h-96" style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 0.3s ease' }}>
+                <ResponsiveContainer width="100%" height="100%" key={`pie-chart-${chartKey}`}>
                   <PieChart>
+                    <defs>
+                      {categoryData.map((entry, index) => {
+                        const color = getCategoryColor(entry.name)
+                        const gradientId = `gradient-${index}`
+                        return (
+                          <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor={color} stopOpacity={1} />
+                            <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                          </linearGradient>
+                        )
+                      })}
+                    </defs>
                     <Pie
                       data={categoryData as any}
                       cx="50%"
@@ -698,17 +717,26 @@ export default function ReportsPage() {
                       innerRadius="55%"
                       fill="#8884d8"
                       dataKey="value"
+                      animationBegin={0}
+                      animationDuration={600}
                     >
                       {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name)} />
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={`url(#gradient-${index})`}
+                          style={{ 
+                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                            cursor: 'pointer'
+                          }}
+                        />
                       ))}
                     </Pie>
                     {/* Center total - dual line */}
                     <g>
-                      <text x="50%" y="45%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '18px', fill: '#0A2540', fontWeight: 700 }}>
-                        ${totalCategoryAmount.toLocaleString()}
-                      </text>
-                      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '12px', fill: '#64748b', fontWeight: 400 }}>
+                      <text x="50%" y="45%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '16px', fill: '#0F172A', fontWeight: 700, lineHeight: '1.2' }}>
+                      ${totalCategoryAmount.toLocaleString()}
+                    </text>
+                      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '13px', fill: '#64748B', fontWeight: 400, letterSpacing: '0.01em' }}>
                         Total Expenses
                       </text>
                     </g>
@@ -758,11 +786,12 @@ export default function ReportsPage() {
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="p-6" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Monthly Net Income Trend</h2>
+            <div className="p-6 transition-transform hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold mb-1" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>
+                  Monthly Net Income Trend
                 {monthlyNetIncomeTrend.length >= 2 && (
-                  <div className="text-sm text-gray-600">
+                    <span className="ml-2" style={{ fontSize: '14px', fontWeight: 500 }}>
                     {(() => {
                       const firstQuarter = monthlyNetIncomeTrend.slice(0, 3).reduce((sum, m) => sum + m.netIncome, 0) / 3
                       const lastQuarter = monthlyNetIncomeTrend.slice(-3).reduce((sum, m) => sum + m.netIncome, 0) / 3
@@ -771,13 +800,14 @@ export default function ReportsPage() {
                         : '0.0'
                       const isPositive = lastQuarter > firstQuarter
                       return (
-                        <span className={isPositive ? 'text-green-600' : 'text-red-600'}>
-                          {isPositive ? '↑' : '↓'} {Math.abs(parseFloat(percentChange))}% vs last quarter
+                          <span style={{ color: isPositive ? '#10B981' : '#EF4444' }}>
+                            {isPositive ? '+' : ''}{percentChange}% vs last quarter
                         </span>
                       )
                     })()}
-                  </div>
-                )}
+                    </span>
+                  )}
+                </h2>
               </div>
               
               {/* Summary Stats - moved above chart */}
@@ -791,20 +821,20 @@ export default function ReportsPage() {
                     return (
                       <>
                         <div>
-                          <p className="text-xs text-gray-600 mb-1">Total Net Income</p>
-                          <p className={`text-lg font-semibold ${totalNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          <p style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginBottom: '4px' }}>Total Net Income</p>
+                          <p className={`font-bold ${totalNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: totalNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
                             ${totalNetIncome.toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600 mb-1">Average Monthly</p>
-                          <p className={`text-lg font-semibold ${averageNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          <p style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginBottom: '4px' }}>Average Monthly</p>
+                          <p className={`font-bold ${averageNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: averageNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
                             ${averageNetIncome.toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600 mb-1">Negative Months</p>
-                          <p className={`text-lg font-semibold ${negativeMonths === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          <p style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginBottom: '4px' }}>Negative Months</p>
+                          <p className={`font-bold ${negativeMonths === 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: negativeMonths === 0 ? '#10B981' : '#EF4444' }}>
                             {negativeMonths}
                           </p>
                         </div>
@@ -814,14 +844,21 @@ export default function ReportsPage() {
                 </div>
               </div>
               
-              <div className="h-80 md:h-96">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-80 md:h-96" style={{ opacity: fadeIn ? 1 : 0, transition: 'opacity 0.3s ease' }}>
+                <ResponsiveContainer width="100%" height="100%" key={`area-chart-${chartKey}`}>
                   <AreaChart data={monthlyNetIncomeTrend}>
                     <defs>
                       <linearGradient id="colorNetIncomeTeal" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#1A5F7A" stopOpacity={0.15}/>
                         <stop offset="95%" stopColor="#1A5F7A" stopOpacity={0}/>
                       </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
                       <linearGradient id="colorNetIncomeNegative" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
@@ -863,6 +900,8 @@ export default function ReportsPage() {
                       fillOpacity={1}
                       fill="url(#colorNetIncomeTeal)"
                       strokeWidth={2.5}
+                      animationBegin={0}
+                      animationDuration={800}
                       dot={(props: any) => {
                         const { cx, cy, index } = props
                         const isLatest = index === monthlyNetIncomeTrend.length - 1
@@ -870,11 +909,11 @@ export default function ReportsPage() {
                         
                         if (isLatest) {
                           // Glowing dot for latest point
-                          return (
-                            <g>
-                              <circle cx={cx} cy={cy} r={8} fill="rgba(26, 95, 122, 0.2)" />
-                              <circle cx={cx} cy={cy} r={6} fill={color} />
-                              <circle cx={cx} cy={cy} r={3} fill="#fff" />
+                        return (
+                            <g filter="url(#glow)">
+                              <circle cx={cx} cy={cy} r={10} fill="rgba(26, 95, 122, 0.2)" />
+                              <circle cx={cx} cy={cy} r={7} fill={color} />
+                              <circle cx={cx} cy={cy} r={4} fill="#fff" />
                             </g>
                           )
                         }
@@ -896,7 +935,7 @@ export default function ReportsPage() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+                        </div>
           </div>
         </div>
       </Layout>
