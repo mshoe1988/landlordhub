@@ -236,10 +236,24 @@ export default function AccountPage() {
                         conversion_type: 'free_to_paid_intent'
                       })
                     }}
-                    className="inline-flex items-center px-4 py-2 rounded-lg transition-colors"
-                    style={{ backgroundColor: '#1A5F7A', color: 'white' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#164D61'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1A5F7A'}
+                    className="inline-flex items-center px-4 py-2 rounded-lg transition-all"
+                    style={{ 
+                      backgroundColor: '#1A5F7A', 
+                      color: 'white',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
+                      transform: 'scale(1)',
+                      transition: 'background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#164D61'
+                      e.currentTarget.style.transform = 'scale(1.02)'
+                      e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1A5F7A'
+                      e.currentTarget.style.transform = 'scale(1)'
+                      e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.06)'
+                    }}
                   >
                     Upgrade Plan
                     <ExternalLink className="w-4 h-4 ml-2" />
@@ -297,10 +311,28 @@ export default function AccountPage() {
                     <button
                       onClick={handleManageBilling}
                       disabled={portalLoading}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-                      style={{ backgroundColor: '#1A5F7A', color: 'white' }}
-                      onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = '#164D61')}
-                      onMouseLeave={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = '#1A5F7A')}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg transition-all disabled:opacity-50"
+                      style={{ 
+                        backgroundColor: '#1A5F7A', 
+                        color: 'white',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
+                        transform: 'scale(1)',
+                        transition: 'background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!e.currentTarget.disabled) {
+                          e.currentTarget.style.backgroundColor = '#164D61'
+                          e.currentTarget.style.transform = 'scale(1.02)'
+                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!e.currentTarget.disabled) {
+                          e.currentTarget.style.backgroundColor = '#1A5F7A'
+                          e.currentTarget.style.transform = 'scale(1)'
+                          e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.06)'
+                        }
+                      }}
                     >
                       {portalLoading ? (
                         <>
@@ -325,15 +357,26 @@ export default function AccountPage() {
                           conversion_type: 'plan_change_intent'
                         })
                       }}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg transition-colors border"
-                      style={{ borderColor: '#1A5F7A', color: '#1A5F7A', backgroundColor: 'white' }}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg transition-all border"
+                      style={{ 
+                        borderColor: '#1A5F7A', 
+                        color: '#1A5F7A', 
+                        backgroundColor: 'white',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
+                        transform: 'scale(1)',
+                        transition: 'background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease'
+                      }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = '#F8FBFB'
                         e.currentTarget.style.borderColor = '#164D61'
+                        e.currentTarget.style.transform = 'scale(1.02)'
+                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'white'
                         e.currentTarget.style.borderColor = '#1A5F7A'
+                        e.currentTarget.style.transform = 'scale(1)'
+                        e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.06)'
                       }}
                     >
                       Change Plan
