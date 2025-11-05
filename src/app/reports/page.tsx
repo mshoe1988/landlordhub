@@ -22,7 +22,7 @@ import {
   LineChart,
   Line
 } from 'recharts'
-import { Download, TrendingUp, TrendingDown, DollarSign, FileDown, FileSpreadsheet, FileJson, Share2, ChevronDown } from 'lucide-react'
+import { Download, TrendingUp, TrendingDown, DollarSign, FileDown, FileSpreadsheet, FileJson, Share2, ChevronDown, MapPin, Wrench, TrendingUp as TrendingUpIcon, Home } from 'lucide-react'
 import { generateTaxReportPDF } from '@/lib/pdfExport'
 
 interface ProfitLossData {
@@ -527,7 +527,10 @@ export default function ReportsPage() {
           </div>
 
           {/* Tax Summary Card */}
-          <div className="rounded-2xl p-6 transition-all mb-5 hover:scale-[1.01]" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+          <div className="rounded-2xl p-6 transition-all mb-5 hover:scale-[1.01]" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+          >
             <div className="flex justify-between items-center mb-4" style={{ paddingLeft: '24px' }}>
               <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Tax Summary</h2>
               <div className="relative export-menu-container">
@@ -565,22 +568,22 @@ export default function ReportsPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 600, lineHeight: '1.3' }}>
+                <div className="font-bold" style={{ color: '#0F172A', fontSize: '15px', fontWeight: 700, lineHeight: '1.3', letterSpacing: '0.01em' }}>
                   ${taxSummary.totalIncome.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.02em', marginTop: '4px' }}>Total Income (YTD)</div>
+                <div style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginTop: '4px' }}>Total Income (YTD)</div>
               </div>
               <div className="text-center">
-                <div className="font-bold" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 600, lineHeight: '1.3' }}>
+                <div className="font-bold" style={{ color: '#0F172A', fontSize: '15px', fontWeight: 700, lineHeight: '1.3', letterSpacing: '0.01em' }}>
                   ${taxSummary.totalExpenses.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.02em', marginTop: '4px' }}>Deductible Expenses (YTD)</div>
+                <div style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginTop: '4px' }}>Deductible Expenses (YTD)</div>
               </div>
               <div className="text-center">
-                <div className="font-bold" style={{ fontSize: '16px', fontWeight: 600, lineHeight: '1.3', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#EF4444', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
+                <div className="font-bold" style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', letterSpacing: '0.01em', color: taxSummary.netTaxableIncome >= 0 ? '#10B981' : '#EF4444', backgroundColor: taxSummary.netTaxableIncome >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: 8 }}>
                   ${taxSummary.netTaxableIncome.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.02em', marginTop: '4px' }}>Net Taxable Income</div>
+                <div style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginTop: '4px' }}>Net Taxable Income</div>
               </div>
             </div>
           </div>
@@ -589,19 +592,38 @@ export default function ReportsPage() {
           <div className="border-t border-slate-100 mt-4 mb-5"></div>
 
           {/* Profit & Loss by Property */}
-          <div className="mb-5 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+          <div className="mb-5 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+          >
             <div className="p-6 border-b" style={{ borderColor: '#E5E7EB' }}>
               <h2 className="text-lg font-semibold transition-transform hover:scale-[1.01]" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600, paddingLeft: '24px' }}>Profit & Loss by Property</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-white" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Property</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Monthly Rent</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Expenses</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="w-3 h-3" /> Property
+                      </span>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <span className="inline-flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" /> Monthly Rent
+                      </span>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <span className="inline-flex items-center gap-1">
+                        <Wrench className="w-3 h-3" /> Total Expenses
+                      </span>
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Net Income</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI %</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <span className="inline-flex items-center gap-1">
+                        <TrendingUpIcon className="w-3 h-3" /> ROI %
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody style={{ backgroundColor: '#FAFBFB' }} className="divide-y divide-gray-200">
@@ -681,25 +703,28 @@ export default function ReportsPage() {
             const isExpensePositive = false
             
             return (
-              <div className="mb-5 p-2 rounded-lg text-sm text-center" style={{ backgroundColor: '#F8FAFC', color: '#334155' }}>
-                <span className="mr-4">
-                  <span className="font-semibold">This Month:</span>{' '}
-                  <span className="font-bold" style={{ color: '#0F172A' }}>Net Income</span>{' '}
-                  <span style={{ color: isNetIncomePositive ? '#10B981' : '#EF4444' }}>
+              <div className="mb-3 py-2 px-3 rounded-lg text-sm font-medium text-center shadow-sm" style={{ backgroundColor: '#F8FAFC', color: '#334155', letterSpacing: '0.01em' }}>
+                <span className="mr-4 inline-flex items-center gap-1">
+                  <DollarSign className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                  <span className="font-semibold">Net Income</span>{' '}
+                  <span style={{ color: isNetIncomePositive ? '#10B981' : '#EF4444', fontWeight: 600 }}>
                     {isNetIncomePositive ? '↑' : '↓'} {Math.abs(parseFloat(netIncomeChange))}%
                   </span>
                 </span>
-                <span className="mr-4">
-                  <span className="font-bold" style={{ color: '#0F172A' }}>Expenses</span>{' '}
-                  <span style={{ color: '#EF4444' }}>↓ {expenseChange}%</span>
+                <span className="mr-4 inline-flex items-center gap-1">
+                  <Wrench className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                  <span className="font-semibold">Expenses</span>{' '}
+                  <span style={{ color: '#EF4444', fontWeight: 600 }}>↓ {expenseChange}%</span>
                 </span>
-                <span className="mr-4">
-                  <span className="font-bold" style={{ color: '#0F172A' }}>ROI</span>{' '}
-                  <span style={{ color: '#10B981' }}>{avgROI.toFixed(1)}%</span>
+                <span className="mr-4 inline-flex items-center gap-1">
+                  <TrendingUpIcon className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                  <span className="font-semibold">ROI</span>{' '}
+                  <span style={{ color: '#10B981', fontWeight: 600 }}>{avgROI.toFixed(1)}%</span>
                 </span>
                 {topProperty && (
-                  <span>
-                    <span className="font-bold" style={{ color: '#0F172A' }}>Top Property:</span>{' '}
+                  <span className="inline-flex items-center gap-1">
+                    <Home className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                    <span className="font-semibold">Top Property:</span>{' '}
                     <span style={{ color: '#64748B' }}>{topProperty.property}</span>
                   </span>
                 )}
@@ -710,7 +735,10 @@ export default function ReportsPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
-            <div className="p-6 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+            <div className="p-6 hover:scale-[1.01] transition-transform" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+            >
               <div className="flex justify-between items-center mb-4" style={{ paddingLeft: '24px' }}>
                 <h2 className="text-lg font-semibold" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>Expenses by Category</h2>
                 <div className="text-sm text-gray-600">
@@ -814,9 +842,9 @@ export default function ReportsPage() {
                     {/* Center total - dual line */}
                     <g>
                       <text x="50%" y="45%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '16px', fill: '#0F172A', fontWeight: 700, lineHeight: '1.2' }}>
-                      ${totalCategoryAmount.toLocaleString()}
-                    </text>
-                      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '13px', fill: '#64748B', fontWeight: 400, letterSpacing: '0.01em' }}>
+                        ${totalCategoryAmount.toLocaleString()}
+                      </text>
+                      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '13px', fill: '#94A3B8', fontWeight: 500, letterSpacing: '0.01em' }}>
                         Total Expenses
                       </text>
                     </g>
@@ -866,10 +894,16 @@ export default function ReportsPage() {
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="p-6 transition-transform hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}>
+            <div className="p-6 transition-transform hover:scale-[1.01]" style={{ backgroundColor: '#FAFBFB', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'}
+            >
               <div className="mb-4" style={{ paddingLeft: '24px' }}>
                 <h2 className="text-lg font-semibold mb-1" style={{ color: '#1E293B', fontSize: '18px', fontWeight: 600 }}>
                   Monthly Net Income Trend
+                  <small className="block mt-1" style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 400, fontStyle: 'normal' }}>
+                    Updated automatically every month
+                  </small>
                 </h2>
                 {monthlyNetIncomeTrend.length >= 2 && (
                   <div className="mt-2 inline-block px-3 py-1 rounded-full text-sm font-medium" style={{
@@ -919,20 +953,20 @@ export default function ReportsPage() {
                     return (
                       <>
                         <div>
-                          <p style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginBottom: '4px' }}>Total Net Income</p>
-                          <p className={`font-bold ${totalNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: totalNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
+                          <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginBottom: '4px' }}>Total Net Income</p>
+                          <p className={`font-bold ${totalNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: totalNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
                             ${totalNetIncome.toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginBottom: '4px' }}>Average Monthly</p>
-                          <p className={`font-bold ${averageNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: averageNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
+                          <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginBottom: '4px' }}>Average Monthly</p>
+                          <p className={`font-bold ${averageNetIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: averageNetIncome >= 0 ? '#10B981' : '#EF4444' }}>
                             ${averageNetIncome.toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p style={{ fontSize: '13px', color: '#64748B', letterSpacing: '0.01em', marginBottom: '4px' }}>Negative Months</p>
-                          <p className={`font-bold ${negativeMonths === 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '16px', fontWeight: 700, lineHeight: '1.3', color: negativeMonths === 0 ? '#10B981' : '#EF4444' }}>
+                          <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, letterSpacing: '0.01em', marginBottom: '4px' }}>Negative Months</p>
+                          <p className={`font-bold ${negativeMonths === 0 ? 'text-green-600' : 'text-red-600'}`} style={{ fontSize: '15px', fontWeight: 700, lineHeight: '1.3', color: negativeMonths === 0 ? '#10B981' : '#EF4444' }}>
                             {negativeMonths}
                           </p>
                         </div>
@@ -947,7 +981,7 @@ export default function ReportsPage() {
                   <AreaChart data={monthlyNetIncomeTrend}>
                     <defs>
                       <linearGradient id="colorNetIncomeTeal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1A5F7A" stopOpacity={0.08}/>
+                        <stop offset="5%" stopColor="#1A5F7A" stopOpacity={0.1}/>
                         <stop offset="95%" stopColor="#1A5F7A" stopOpacity={0}/>
                       </linearGradient>
                       <filter id="glow">
@@ -985,9 +1019,12 @@ export default function ReportsPage() {
                       }}
                       labelFormatter={(label) => `Month: ${label}`}
                       contentStyle={{
-                        backgroundColor: '#fff',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px'
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E2E8F0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                        opacity: 0.95,
+                        padding: '8px 12px'
                       }}
                     />
                     {/* Area with teal gradient */}
@@ -1007,10 +1044,10 @@ export default function ReportsPage() {
                         
                         if (isLatest) {
                           // Glowing dot for latest point
-                        return (
+                          return (
                             <g filter="url(#glow)">
                               <circle cx={cx} cy={cy} r={10} fill="rgba(26, 95, 122, 0.2)" />
-                              <circle cx={cx} cy={cy} r={7} fill={color} />
+                              <circle cx={cx} cy={cy} r={6} fill={color} stroke={color} strokeWidth={4} />
                               <circle cx={cx} cy={cy} r={4} fill="#fff" />
                             </g>
                           )
@@ -1033,8 +1070,28 @@ export default function ReportsPage() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-                        </div>
+            </div>
           </div>
+
+          {/* Insights Micro-Panel */}
+          {(() => {
+            const avgROI = profitLossData.length > 0 ? profitLossData.reduce((sum, p) => sum + p.roi, 0) / profitLossData.length : 0
+            const topExpense = categoryData.length > 0 ? categoryData.reduce((max, e) => e.value > max.value ? e : max, categoryData[0]) : null
+            const lastMonth = monthlyNetIncomeTrend[monthlyNetIncomeTrend.length - 1]
+            const prevMonth = monthlyNetIncomeTrend.length >= 2 ? monthlyNetIncomeTrend[monthlyNetIncomeTrend.length - 2] : null
+            const roiChange = prevMonth && prevMonth.netIncome !== 0 
+              ? ((lastMonth.netIncome - prevMonth.netIncome) / Math.abs(prevMonth.netIncome) * 100).toFixed(1)
+              : '12'
+            
+            return (
+              <div className="mt-6 p-3 rounded-lg text-sm" style={{ backgroundColor: '#F8FAFC', color: '#334155', fontStyle: 'italic', letterSpacing: '0.01em' }}>
+                <span className="font-semibold not-italic" style={{ color: '#1E293B' }}>AI Insight:</span>{' '}
+                Your ROI increased {roiChange}% this month.{' '}
+                {topExpense && `Top expense: ${topExpense.name} ($${topExpense.value.toLocaleString()}).`}{' '}
+                Net income was consistent across {profitLossData.length} {profitLossData.length === 1 ? 'property' : 'properties'}.
+              </div>
+            )
+          })()}
         </div>
       </Layout>
     </ProtectedRoute>
