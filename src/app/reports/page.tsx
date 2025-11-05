@@ -507,7 +507,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Tax Summary Card */}
-          <div className="rounded-2xl p-6 transition-all mb-8 shadow-sm hover:shadow-md" style={{ backgroundColor: '#FCFDFD', transition: 'box-shadow 0.2s ease' }}>
+          <div className="rounded-2xl p-6 transition-all mb-8" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Tax Summary</h2>
               <div className="relative export-menu-container">
@@ -564,7 +564,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Profit & Loss by Property */}
-          <div className="rounded-2xl mb-8 shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#FCFDFD' }}>
+          <div className="mb-8" style={{ backgroundColor: '#FFFFFF', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Profit & Loss by Property</h2>
             </div>
@@ -579,7 +579,7 @@ export default function ReportsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI %</th>
                   </tr>
                 </thead>
-                <tbody style={{ backgroundColor: '#FCFDFD' }} className="divide-y divide-gray-200">
+                <tbody style={{ backgroundColor: '#FFFFFF' }} className="divide-y divide-gray-200">
                   {profitLossData.map((row, index) => {
                     const property = properties.find(p => p.address === row.property)
                     const occupancyRate = property?.tenant_name ? 100 : 0 // Simple: has tenant = 100%
@@ -635,7 +635,7 @@ export default function ReportsPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expenses by Category Pie Chart */}
-            <div className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#FCFDFD' }}>
+            <div className="p-6" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Expenses by Category</h2>
                 <div className="text-sm text-gray-600">
@@ -758,7 +758,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Monthly Net Income Trend Chart */}
-            <div className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#FCFDFD' }}>
+            <div className="p-6" style={{ backgroundColor: '#FAFBFB', borderRadius: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s ease' }}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: '#0A2540' }}>Monthly Net Income Trend</h2>
                 {monthlyNetIncomeTrend.length >= 2 && (
