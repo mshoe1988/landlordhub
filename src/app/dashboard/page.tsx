@@ -55,7 +55,7 @@ interface MonthlyData {
   expenses: number
 }
 
-export default function DashboardPage() {
+function DashboardPage() {
   const { user } = useAuth()
   const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
@@ -2193,3 +2193,5 @@ export default function DashboardPage() {
     </ProtectedRoute>
   )
 }
+
+export default dynamic(() => Promise.resolve(DashboardPage), { ssr: false })
