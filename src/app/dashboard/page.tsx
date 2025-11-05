@@ -1,6 +1,7 @@
+
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { getProperties, getMaintenanceTasks, getExpenses, updateMaintenanceTask, createExpense, getCurrentMonthRentStatus, getRentPayments } from '@/lib/database'
@@ -130,6 +131,34 @@ export default function DashboardPage() {
       return () => clearInterval(timer)
     }
   }, [loading, properties.length, upcomingTasks, totalMonthlyRent, totalExpenses])
+
+  // Memoized chart data and labels (must be before any early returns)
+  const categoryData = useMemo(() => calculateCategoryData(), [expenses, pieChartDateRange])
+  const monthlyData = useMemo(() => calculateMonthlyData(), [expenses, properties, allRentPayments, lineChartDateRange])
+  const cashFlowForecast = useMemo(() => calculateCashFlowForecast(), [expenses, properties])
+  const cashflowDataMemo = useMemo(() => calculateCashflowData(), [expenses, allRentPayments, cashflowDateRange, properties])
+  const hasCashflowData = useMemo(
+    () => cashflowDataMemo.length > 0 && cashflowDataMemo.some((entry: any) => entry.income > 0 || entry.expenses > 0),
+    [cashflowDataMemo]
+  )
+  const cashflowSummary = useMemo(() => {
+    const data = cashflowDataMemo
+    if (data.length === 0) return null
+    const totalCashflow = data.reduce((sum: number, entry: any) => sum + entry.cashflow, 0)
+    const lastEntry = data[data.length - 1]
+    const secondLastEntry = data.length > 1 ? data[data.length - 2] : null
+    let percentageChange: number | null = null
+    if (secondLastEntry && secondLastEntry.cashflow !== 0) {
+      percentageChange = ((lastEntry.cashflow - secondLastEntry.cashflow) / Math.abs(secondLastEntry.cashflow)) * 100
+    }
+    return {
+      totalCashflow,
+      lastMonthCashflow: lastEntry.cashflow,
+      percentageChange,
+      isPositive: totalCashflow > 0
+    }
+  }, [cashflowDataMemo])
+  const cashflowPeriodLabel = useMemo(() => getCashflowPeriodLabel(), [cashflowDateRange])
 
   const loadDashboardData = async () => {
     try {
@@ -1064,10 +1093,7 @@ export default function DashboardPage() {
     }
   }
 
-  // Calculate chart data
-  const categoryData = calculateCategoryData()
-  const monthlyData = calculateMonthlyData()
-  const cashFlowForecast = calculateCashFlowForecast()
+  // moved above early return
   const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
 
   return (
@@ -1323,12 +1349,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="p-6">
-              {(() => {
-                const cashflowData = calculateCashflowData()
-                const hasData = cashflowData.length > 0 && cashflowData.some((entry: any) => entry.income > 0 || entry.expenses > 0)
-                
-                if (!hasData) {
-                  return (
+              {!hasCashflowData ? (
                     <div className="flex flex-col items-center justify-center py-16" style={{ height: '480px' }}>
                       <div className="text-center">
                         <DollarSign className="w-16 h-16 mx-auto mb-4" style={{ color: '#1C7C63', opacity: 0.3 }} />
@@ -1338,14 +1359,11 @@ export default function DashboardPage() {
                         </p>
                       </div>
                     </div>
-                  )
-                }
-                
-                return (
+                ) : (
                   <div style={{ height: '560px', paddingTop: '8px', paddingBottom: '12px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
-                        data={cashflowData as any}
+                        data={cashflowDataMemo as any}
                         margin={{ top: 30, right: 30, left: 20, bottom: 45 }}
                         key={cashflowDateRange}
                         style={{ transition: 'all 0.3s ease' }}
@@ -1454,7 +1472,7 @@ export default function DashboardPage() {
                       animationDuration={700}
                       animationEasing="ease-out"
                     >
-                      {(cashflowData as any).map((entry: any, index: number) => (
+                      {(cashflowDataMemo as any).map((entry: any, index: number) => (
                         <Cell 
                           key={`cell-${index}`} 
                           fill={entry.cashflow >= 0 ? 'url(#cashflowGradient)' : 'url(#expenseGradient)'}
@@ -1487,43 +1505,34 @@ export default function DashboardPage() {
                   </ComposedChart>
                 </ResponsiveContainer>
                   </div>
-                )
-              })()}
+                )}
               
               {/* Summary Stats */}
-              {(() => {
-                const summary = getCashflowSummary()
-                if (!summary) return null
-                
-                const periodLabel = getCashflowPeriodLabel()
-                const isPositive = summary.totalCashflow > 0
-                const sign = isPositive ? '+' : ''
-                
-                  return (
+              {cashflowSummary ? (
                   <div className="mt-0 border-t" style={{ borderColor: '#E5E9E7', marginTop: '8px', marginBottom: '12px', paddingTop: '8px' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
                         <p className="text-sm mb-2" style={{ color: '#7A8A8A' }}>
-                          Net Cashflow ({periodLabel})
+                          Net Cashflow ({cashflowPeriodLabel})
                         </p>
                         <div className="flex items-center gap-2">
                           <span 
                             className="font-bold"
                             style={{ 
-                              color: isPositive ? '#1C7C63' : '#EF4444', 
+                              color: cashflowSummary.totalCashflow > 0 ? '#1C7C63' : '#EF4444', 
                               fontSize: '18px',
-                              backgroundColor: isPositive ? 'rgba(28, 124, 99, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                              backgroundColor: cashflowSummary.totalCashflow > 0 ? 'rgba(28, 124, 99, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                               borderRadius: '6px',
                               padding: '2px 6px',
                               fontWeight: 600
                             }}
                           >
-                            {sign}${summary.totalCashflow.toLocaleString()}
+                            {(cashflowSummary.totalCashflow > 0 ? '+' : '')}${cashflowSummary.totalCashflow.toLocaleString()}
                           </span>
                         </div>
                       </div>
                       
-                      {summary.percentageChange !== null && summary.percentageChange > 0 && (
+                      {cashflowSummary.percentageChange !== null && cashflowSummary.percentageChange > 0 && (
                         <div className="flex items-center gap-2">
                           <div 
                             className="px-4 py-2 rounded-lg flex items-center gap-2"
@@ -1536,17 +1545,17 @@ export default function DashboardPage() {
                           >
                             <span className="text-base">🎉</span>
                             <span className="text-sm font-semibold">
-                              {summary.percentageChange > 1000 ? (
+                              {cashflowSummary.percentageChange > 1000 ? (
                                 <>
-                                  Great work — your cashflow is up {Math.abs(summary.percentageChange / 100).toFixed(1)}x from last month!
+                                  Great work — your cashflow is up {Math.abs(cashflowSummary.percentageChange / 100).toFixed(1)}x from last month!
                                 </>
-                              ) : summary.percentageChange > 100 ? (
+                              ) : cashflowSummary.percentageChange > 100 ? (
                                 <>
-                                  Cashflow up {Math.abs(summary.percentageChange).toFixed(0)}% since last month — keep it growing!
+                                  Cashflow up {Math.abs(cashflowSummary.percentageChange).toFixed(0)}% since last month — keep it growing!
                                 </>
                               ) : (
                                 <>
-                                  Cashflow up {Math.abs(summary.percentageChange).toFixed(0)}% from last month — great progress!
+                                  Cashflow up {Math.abs(cashflowSummary.percentageChange).toFixed(0)}% from last month — great progress!
                                 </>
                               )}
                             </span>
@@ -1555,8 +1564,7 @@ export default function DashboardPage() {
                         )}
                       </div>
                     </div>
-                  )
-              })()}
+                  ) : null}
               </div>
             
             {/* Expenses Comparison Insight Banner */}
