@@ -74,6 +74,8 @@ export default function DashboardPage() {
     rent: 0,
     expenses: 0
   })
+  const [showOverdueBanner, setShowOverdueBanner] = useState<boolean>(false)
+  const [overdueCount, setOverdueCount] = useState<number>(0)
 
   useEffect(() => {
     if (user) {
@@ -201,23 +203,41 @@ export default function DashboardPage() {
     return expenses.filter(e => e.property_id === propertyId).reduce((sum, e) => sum + e.amount, 0)
   }
 
-  // Check if task is overdue
+  // Check if task is overdue (date-only)
   const isOverdue = (task: MaintenanceTask) => {
     if (task.status === 'completed') return false
     const dueDate = new Date(task.due_date + 'T00:00:00')
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    return dueDate < today
+    dueDate.setHours(0, 0, 0, 0)
+    return dueDate.getTime() < today.getTime()
   }
 
-  // Check if task is due soon (<48 hours)
+  // Check if task is due soon (within next 2 days, date-only)
   const isDueSoon = (task: MaintenanceTask) => {
     if (task.status === 'completed') return false
     const dueDate = new Date(task.due_date + 'T00:00:00')
-    const now = new Date()
-    const hoursUntilDue = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60)
-    return hoursUntilDue > 0 && hoursUntilDue < 48
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    dueDate.setHours(0, 0, 0, 0)
+    const msPerDay = 1000 * 60 * 60 * 24
+    const daysUntilDue = Math.round((dueDate.getTime() - today.getTime()) / msPerDay)
+    return daysUntilDue > 0 && daysUntilDue <= 2
   }
+
+  // On mount: if any overdue tasks exist, show a once-per-day banner
+  useEffect(() => {
+    if (!loading) {
+      const todayKey = new Date().toISOString().slice(0, 10)
+      const storageKey = `overdue-banner-${todayKey}`
+      const alreadyShown = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : '1'
+      const overdueTasks = maintenance.filter(t => isOverdue(t)).length
+      setOverdueCount(overdueTasks)
+      if (!alreadyShown && overdueTasks > 0) {
+        setShowOverdueBanner(true)
+      }
+    }
+  }, [loading, maintenance])
 
   const handleMarkComplete = async (taskId: string, event: React.MouseEvent) => {
     event.stopPropagation() // Prevent the click from navigating to maintenance page
@@ -1956,13 +1976,52 @@ export default function DashboardPage() {
                 <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.1rem' }}>Upcoming Maintenance</h2>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#8DA6A0', fontWeight: 400 }}>Track and manage repairs, upkeep, and maintenance tasks</p>
+              {showOverdueBanner && overdueCount > 0 && (
+                <div 
+                  className="mt-4 p-3 rounded-md flex items-start justify-between"
+                  style={{
+                    background: 'linear-gradient(90deg, #FFEAEA, #FFD1C7)',
+                    borderLeft: '4px solid #E04848'
+                  }}
+                >
+                  <div style={{ color: '#7A1E1E' }}>
+                    <strong style={{ color: '#7A1E1E' }}>{overdueCount}</strong> maintenance {overdueCount === 1 ? 'task is' : 'tasks are'} overdue. Please review.
+                  </div>
+                  <button
+                    onClick={() => {
+                      const todayKey = new Date().toISOString().slice(0, 10)
+                      const storageKey = `overdue-banner-${todayKey}`
+                      if (typeof window !== 'undefined') {
+                        localStorage.setItem(storageKey, '1')
+                      }
+                      setShowOverdueBanner(false)
+                    }}
+                    className="ml-4 px-3 py-1 rounded-md text-sm"
+                    style={{ background: '#7A1E1E', color: '#FFFFFF', fontWeight: 600 }}
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
             </div>
             <div className="p-6">
               {maintenance.filter(m => m.status === 'pending').length === 0 ? (
                 <p className="text-gray-500 text-center py-8">No upcoming maintenance tasks</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '12px' }}>
-                  {maintenance.filter(m => m.status === 'pending').map(task => {
+                  {maintenance
+                    .filter(m => m.status === 'pending')
+                    .sort((a, b) => {
+                      // Priority: Overdue (2) > Due soon (1) > Pending (0)
+                      const priority = (t: MaintenanceTask) => (isOverdue(t) ? 2 : isDueSoon(t) ? 1 : 0)
+                      const prioDiff = priority(b) - priority(a)
+                      if (prioDiff !== 0) return prioDiff
+                      // Then by nearest due date (earliest first)
+                      const aDate = new Date(a.due_date + 'T00:00:00').getTime()
+                      const bDate = new Date(b.due_date + 'T00:00:00').getTime()
+                      return aDate - bDate
+                    })
+                    .map(task => {
                     const property = properties.find(p => p.id === task.property_id)
                     const taskIcon = task.task.toLowerCase().includes('plumb') || task.task.toLowerCase().includes('pipe') ? '🚰' : 
                                     task.task.toLowerCase().includes('hvac') || task.task.toLowerCase().includes('heat') || task.task.toLowerCase().includes('air') ? '❄️' :
@@ -2025,9 +2084,9 @@ export default function DashboardPage() {
                             <span 
                               className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full"
                               style={{ 
-                                background: 'linear-gradient(90deg, #FFEAEA 0%, #FFD1C7 100%)', 
-                                color: '#E04848', 
-                                fontWeight: 500 
+                                background: '#E04848',
+                                color: '#FFFFFF',
+                                fontWeight: 700 
                               }}
                             >
                               <AlertTriangle className="w-3 h-3" />
