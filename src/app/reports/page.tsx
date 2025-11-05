@@ -645,9 +645,47 @@ export default function ReportsPage() {
                     <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '18px', fill: '#0A2540', fontWeight: 700 }}>
                       ${totalCategoryAmount.toLocaleString()}
                     </text>
-                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
+                    <Tooltip 
+                      formatter={(value: number, name: string, props: any) => {
+                        const percentage = props.payload?.percentage || 0
+                        return [
+                          `$${value.toLocaleString()} (${percentage.toFixed(1)}%)`,
+                          props.payload?.name || 'Category'
+                        ]
+                      }}
+                      labelFormatter={(label) => `Category: ${label}`}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36}
+                      formatter={(value, entry: any) => {
+                        const data = categoryData.find((d: CategoryData) => d.name === value)
+                        return `${value} (${data?.percentage.toFixed(1) || 0}%)`
+                      }}
+                      iconType="circle"
+                    />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+              
+              {/* Category Legend List */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {categoryData.map((entry, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div 
+                        className="w-4 h-4 rounded-full" 
+                        style={{ backgroundColor: getCategoryColor(entry.name) }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">{entry.name}</div>
+                        <div className="text-xs text-gray-600">
+                          ${entry.value.toLocaleString()} ({entry.percentage.toFixed(1)}%)
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
