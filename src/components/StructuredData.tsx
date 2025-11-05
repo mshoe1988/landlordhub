@@ -1,14 +1,8 @@
-'use client'
-
-import { usePathname } from 'next/navigation'
+'use server'
 
 export default function StructuredData() {
-  const pathname = usePathname()
-  
-  // Get the base URL - works in both dev and production
-  const baseUrl = typeof window !== 'undefined' 
-    ? `${window.location.protocol}//${window.location.host}`
-    : 'https://landlordhub.com' // Fallback
+  // Use a stable base URL during SSR to avoid hydration mismatches
+  const baseUrl = 'https://landlordhubapp.com'
 
   // Organization Schema
   const organizationSchema = {
@@ -73,37 +67,8 @@ export default function StructuredData() {
     }
   }
 
-  // Breadcrumb Schema (if on a specific page)
-  const getBreadcrumbSchema = () => {
-    if (pathname === '/') return null
-    
-    const paths = pathname.split('/').filter(Boolean)
-    const breadcrumbs = [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": baseUrl
-      }
-    ]
-
-    let currentPath = ''
-    paths.forEach((path, index) => {
-      currentPath += `/${path}`
-      breadcrumbs.push({
-        "@type": "ListItem",
-        "position": index + 2,
-        "name": path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' '),
-        "item": `${baseUrl}${currentPath}`
-      })
-    })
-
-    return {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": breadcrumbs
-    }
-  }
+  // Breadcrumb Schema omitted in SSR to ensure deterministic markup
+  const breadcrumbSchema = null
 
   // Service Schema (for homepage)
   const serviceSchema = pathname === '/' ? {
@@ -159,26 +124,27 @@ export default function StructuredData() {
     }
   } : null
 
-  const breadcrumbSchema = getBreadcrumbSchema()
-
   return (
     <>
       {/* Organization Schema - Always present */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        suppressHydrationWarning
       />
       
       {/* SoftwareApplication Schema - Always present */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
+        suppressHydrationWarning
       />
       
       {/* WebSite Schema - Always present */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        suppressHydrationWarning
       />
       
       {/* Service Schema - Only on homepage */}
@@ -186,6 +152,7 @@ export default function StructuredData() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+          suppressHydrationWarning
         />
       )}
       
@@ -194,6 +161,7 @@ export default function StructuredData() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+          suppressHydrationWarning
         />
       )}
     </>
