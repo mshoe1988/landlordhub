@@ -1242,17 +1242,8 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 
-                {/* Legend moved to header */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#1C7C63', marginRight: '5px' }}></div>
-                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cashflow</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent', marginRight: '5px' }}></div>
-                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7 }}>Cumulative</span>
-              </div>
-            </div>
+                {/* Legend removed for cleaner design */}
+                <div />
           </div>
 
               {/* Time Filter Pills */}
@@ -1331,11 +1322,11 @@ export default function DashboardPage() {
                 }
                 
                 return (
-                  <div style={{ height: '560px', paddingBottom: '5px' }}>
+                  <div style={{ height: '560px', paddingTop: '8px', paddingBottom: '12px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+                        margin={{ top: 30, right: 30, left: 20, bottom: 45 }}
                         key={cashflowDateRange}
                         style={{ transition: 'all 0.3s ease' }}
                       >
@@ -1365,14 +1356,14 @@ export default function DashboardPage() {
                     />
                     <XAxis 
                       dataKey="month" 
-                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 15 }}
                       angle={-45}
                       textAnchor="end"
                       height={100}
                       style={{ color: 'rgba(10, 37, 64, 0.7)' }}
                     />
                     <YAxis 
-                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 12 }}
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 15 }}
                       tickFormatter={(value) => `$${value.toLocaleString()}`}
                       width={80}
                       domain={['auto', 'auto']}
@@ -1468,7 +1459,7 @@ export default function DashboardPage() {
                         formatter={(value: any) => `$${value.toLocaleString()}`}
                         style={{ 
                           fill: '#0A2540', 
-                          fontSize: '11px',
+                          fontSize: '14px',
                           fontWeight: '600'
                         }}
                       />
@@ -1489,7 +1480,7 @@ export default function DashboardPage() {
                 const sign = isPositive ? '+' : ''
                 
                   return (
-                  <div className="mt-0 pt-2 border-t" style={{ borderColor: '#E5E9E7', marginTop: '24px', marginBottom: '24px' }}>
+                  <div className="mt-0 border-t" style={{ borderColor: '#E5E9E7', marginTop: '8px', marginBottom: '12px', paddingTop: '8px' }}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
                         <p className="text-sm mb-2" style={{ color: '#7A8A8A' }}>
@@ -1863,9 +1854,22 @@ export default function DashboardPage() {
                         <stop offset="100%" stopColor="rgba(109, 200, 160, 0)" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E9E7" strokeOpacity={0.3} />
-                    <XAxis dataKey="month" />
-                    <YAxis />
+                    <CartesianGrid 
+                      strokeDasharray="3 3" 
+                      stroke="#E3E8E5" 
+                      strokeOpacity={0.1}
+                      vertical={true}
+                      horizontal={true}
+                    />
+                    <XAxis 
+                      dataKey="month"
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 15 }}
+                      style={{ color: 'rgba(10, 37, 64, 0.7)' }}
+                    />
+                    <YAxis 
+                      tick={{ fill: 'rgba(10, 37, 64, 0.7)', fontSize: 15 }}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
                     <Tooltip 
                       formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name]}
                       labelFormatter={(label) => `Month: ${label}`}
