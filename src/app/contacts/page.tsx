@@ -6,10 +6,11 @@ import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getContacts, getTenantContacts, createContact, updateContact, deleteContact } from '@/lib/database'
 import { getProperties } from '@/lib/database'
-import { Contact, Property } from '@/lib/types'
+import { Contact, Property, MaintenanceTask } from '@/lib/types'
 import { supabase } from '@/lib/supabase'
-import { Users, Building, Plus, Edit, Trash2, Phone, Mail, MapPin, Crown, Send, MessageSquare, FileText, Calendar, Search, Filter, X, ChevronDown, Wrench, Sparkles } from 'lucide-react'
+import { Users, Building, Plus, Edit, Trash2, Phone, Mail, MapPin, Crown, Send, MessageSquare, FileText, Calendar, Search, Filter, X, ChevronDown, Wrench, Sparkles, UserPlus } from 'lucide-react'
 import Link from 'next/link'
+import { getMaintenanceTasks } from '@/lib/database'
 
 export default function ContactsPage() {
   const { user } = useAuth()
@@ -17,6 +18,7 @@ export default function ContactsPage() {
   const [tenantContacts, setTenantContacts] = useState<Contact[]>([])
   const [vendorContacts, setVendorContacts] = useState<Contact[]>([])
   const [properties, setProperties] = useState<Property[]>([])
+  const [maintenanceTasks, setMaintenanceTasks] = useState<MaintenanceTask[]>([])
   const [loading, setLoading] = useState(true)
   const [showVendorForm, setShowVendorForm] = useState(false)
   const [editingVendor, setEditingVendor] = useState<Contact | null>(null)
@@ -98,6 +100,10 @@ export default function ContactsPage() {
       // Load vendor contacts
       const vendorData = await getContacts(user.id, 'vendor')
       setVendorContacts(vendorData)
+
+      // Load maintenance tasks for last activity tracking
+      const maintenanceData = await getMaintenanceTasks(user.id)
+      setMaintenanceTasks(maintenanceData)
     } catch (error) {
       console.error('Error loading contacts:', error)
     } finally {
@@ -275,14 +281,28 @@ export default function ContactsPage() {
   ]
 
   const tagColors: { [key: string]: string } = {
-    'Real Estate Agent': '#6366F1',
+    'Real Estate Agent': '#8B5CF6', // Purple
     'Plumber': '#0EA5E9',
     'Electrician': '#F59E0B',
-    'Priority Tenant': '#10B981',
+    'Priority Tenant': '#F59E0B', // Gold
     'Late Payer': '#EF4444',
-    'Contractor': '#8B5CF6',
+    'Contractor': '#64748B', // Gray
     'HVAC': '#06B6D4',
     'Preferred Vendor': '#1A5F7A'
+  }
+
+  // Get role-based tag color
+  const getRoleTagColor = (contact: Contact) => {
+    if (contact.contact_type === 'tenant') {
+      return { bg: '#E0F2FE', color: '#0D9488' } // Teal
+    }
+    if (contact.service_type === 'Real Estate Agent') {
+      return { bg: '#F3E8FF', color: '#8B5CF6' } // Purple
+    }
+    if (['Plumber', 'Electrician', 'HVAC', 'Contractor', 'Carpenter', 'Painter', 'Roofing'].includes(contact.service_type || '')) {
+      return { bg: '#F1F5F9', color: '#64748B' } // Gray
+    }
+    return { bg: '#EEF2FF', color: '#6366F1' } // Indigo for vendors
   }
 
   // Get initials for avatar
@@ -355,6 +375,26 @@ export default function ContactsPage() {
   const handleScheduleMaintenance = (contact: Contact) => {
     // Navigate to maintenance page with vendor prefilled
     window.location.href = `/maintenance/new?vendor=${encodeURIComponent(contact.id)}&vendorName=${encodeURIComponent(contact.name)}`
+  }
+
+  // Get last maintenance job for a vendor
+  const getLastMaintenanceJob = (contact: Contact) => {
+    if (contact.contact_type !== 'vendor') return null
+    // Find maintenance tasks that might be related to this vendor
+    // Note: This is a simplified check - in production, you'd want a vendor_id field on maintenance tasks
+    const relatedTasks = maintenanceTasks
+      .filter(task => task.notes?.toLowerCase().includes(contact.name.toLowerCase()) || 
+                     task.task.toLowerCase().includes(contact.name.toLowerCase()))
+      .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    
+    return relatedTasks.length > 0 ? relatedTasks[0] : null
+  }
+
+  // Get last contacted date (simplified - would need to track in database)
+  const getLastContacted = (contact: Contact) => {
+    // This would ideally come from a contact_log or activity table
+    // For now, we'll use updated_at as a proxy
+    return contact.updated_at
   }
 
   if (loading) {
@@ -615,12 +655,40 @@ export default function ContactsPage() {
               </div>
               <div className="p-6">
                 {filteredContacts.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Building className="w-12 h-12 mx-auto mb-4" style={{ color: '#94A3B8' }} />
-                    <h3 className="text-lg font-medium mb-2" style={{ color: '#1E293B' }}>No tenant contacts</h3>
-                    <p style={{ color: '#64748B' }}>
-                      {searchQuery ? 'No contacts match your search.' : 'Add tenant information to your properties to see contacts here.'}
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style={{ backgroundColor: '#F0F9FA' }}>
+                      <Building className="w-10 h-10" style={{ color: '#1A5F7A' }} />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E293B' }}>
+                      {searchQuery ? 'No contacts match your search' : "You haven't added any tenants yet"}
+                    </h3>
+                    <p className="mb-6 max-w-md mx-auto" style={{ color: '#64748B' }}>
+                      {searchQuery 
+                        ? 'Try adjusting your search terms or filters.' 
+                        : 'Add tenant information to your properties to start tracking communication easily.'}
                     </p>
+                    {!searchQuery && (
+                      <Link
+                        href="/properties"
+                        className="inline-flex items-center px-4 py-2 rounded-lg transition-all"
+                        style={{ 
+                          background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)',
+                          color: 'white',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.06)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.02)'
+                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)'
+                          e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)'
+                        }}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Tenant to Property
+                      </Link>
+                    )}
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -629,18 +697,21 @@ export default function ContactsPage() {
                       return (
                         <div 
                           key={contact.id} 
-                          className="rounded-xl p-4 cursor-pointer transition-all hover:scale-[1.02]"
+                          className="rounded-xl p-4 cursor-pointer transition-all"
                           style={{ 
                             background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FBFC 100%)',
                             borderRadius: '12px',
                             boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-                            transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+                            transition: 'all 0.15s ease',
+                            transform: 'translateY(0)'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'
+                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)'
+                            e.currentTarget.style.transform = 'translateY(-2px)'
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.05)'
+                            e.currentTarget.style.transform = 'translateY(0)'
                           }}
                           onClick={() => handleContactClick(contact)}
                         >
@@ -659,7 +730,7 @@ export default function ContactsPage() {
                                 </h3>
                                 <span 
                                   className="inline-block px-2 py-0.5 text-xs rounded-full mt-1"
-                                  style={{ backgroundColor: '#E0F2FE', color: '#1A5F7A' }}
+                                  style={getRoleTagColor(contact)}
                                 >
                                   {getRoleLabel(contact)}
                                 </span>
@@ -674,8 +745,16 @@ export default function ContactsPage() {
                                 }}
                                 className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
                                 title="Email Tenant"
+                                onMouseEnter={(e) => {
+                                  const icon = e.currentTarget.querySelector('svg')
+                                  if (icon) icon.style.color = '#1E7D9A'
+                                }}
+                                onMouseLeave={(e) => {
+                                  const icon = e.currentTarget.querySelector('svg')
+                                  if (icon) icon.style.color = '#64748B'
+                                }}
                               >
-                                <Mail className="w-4 h-4" style={{ color: '#64748B' }} />
+                                <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
                               </button>
                               {contact.phone && (
                                 <button
@@ -685,8 +764,16 @@ export default function ContactsPage() {
                                   }}
                                   className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
                                   title="Call Tenant"
+                                  onMouseEnter={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#1E7D9A'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#64748B'
+                                  }}
                                 >
-                                  <Phone className="w-4 h-4" style={{ color: '#64748B' }} />
+                                  <Phone className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                             </div>
@@ -756,11 +843,17 @@ export default function ContactsPage() {
               
               <div className="p-6">
                 {filteredContacts.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="w-12 h-12 mx-auto mb-4" style={{ color: '#94A3B8' }} />
-                    <h3 className="text-lg font-medium mb-2" style={{ color: '#1E293B' }}>No vendor contacts</h3>
-                    <p className="mb-4" style={{ color: '#64748B' }}>
-                      {searchQuery ? 'No contacts match your search.' : 'Add your service providers to keep track of their contact information.'}
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style={{ backgroundColor: '#F0F9FA' }}>
+                      <Users className="w-10 h-10" style={{ color: '#1A5F7A' }} />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E293B' }}>
+                      {searchQuery ? 'No contacts match your search' : "You haven't added any vendors yet"}
+                    </h3>
+                    <p className="mb-6 max-w-md mx-auto" style={{ color: '#64748B' }}>
+                      {searchQuery 
+                        ? 'Try adjusting your search terms or filters.' 
+                        : 'Add your service providers to keep track of their contact information and streamline maintenance requests.'}
                     </p>
                     {!searchQuery && (
                       <button
@@ -792,18 +885,21 @@ export default function ContactsPage() {
                       return (
                         <div 
                           key={contact.id} 
-                          className="rounded-xl p-4 cursor-pointer transition-all hover:scale-[1.02]"
+                          className="rounded-xl p-4 cursor-pointer transition-all"
                           style={{ 
                             background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FBFC 100%)',
                             borderRadius: '12px',
                             boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-                            transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+                            transition: 'all 0.15s ease',
+                            transform: 'translateY(0)'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'
+                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)'
+                            e.currentTarget.style.transform = 'translateY(-2px)'
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.05)'
+                            e.currentTarget.style.transform = 'translateY(0)'
                           }}
                           onClick={() => handleContactClick(contact)}
                         >
@@ -827,14 +923,7 @@ export default function ContactsPage() {
                                 )}
                                 <span 
                                   className="inline-block px-2 py-0.5 text-xs rounded-full mt-1"
-                                  style={{ 
-                                    backgroundColor: contact.service_type && tagColors[contact.service_type] 
-                                      ? `${tagColors[contact.service_type]}20`
-                                      : '#E0F2FE',
-                                    color: contact.service_type && tagColors[contact.service_type]
-                                      ? tagColors[contact.service_type]
-                                      : '#1A5F7A'
-                                  }}
+                                  style={getRoleTagColor(contact)}
                                 >
                                   {getRoleLabel(contact)}
                                 </span>
@@ -849,8 +938,16 @@ export default function ContactsPage() {
                                 }}
                                 className="p-1.5 rounded hover:bg-gray-100 transition-colors"
                                 title="Email Vendor"
+                                onMouseEnter={(e) => {
+                                  const icon = e.currentTarget.querySelector('svg')
+                                  if (icon) icon.style.color = '#1E7D9A'
+                                }}
+                                onMouseLeave={(e) => {
+                                  const icon = e.currentTarget.querySelector('svg')
+                                  if (icon) icon.style.color = '#64748B'
+                                }}
                               >
-                                <Mail className="w-4 h-4" style={{ color: '#64748B' }} />
+                                <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
                               </button>
                               {contact.phone && (
                                 <button
@@ -860,8 +957,16 @@ export default function ContactsPage() {
                                   }}
                                   className="p-1.5 rounded hover:bg-gray-100 transition-colors"
                                   title="Call Vendor"
+                                  onMouseEnter={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#1E7D9A'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#64748B'
+                                  }}
                                 >
-                                  <Phone className="w-4 h-4" style={{ color: '#64748B' }} />
+                                  <Phone className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                               {contact.notes && (
@@ -872,8 +977,16 @@ export default function ContactsPage() {
                                   }}
                                   className="p-1.5 rounded hover:bg-gray-100 transition-colors"
                                   title="View Notes"
+                                  onMouseEnter={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#1E7D9A'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#64748B'
+                                  }}
                                 >
-                                  <FileText className="w-4 h-4" style={{ color: '#64748B' }} />
+                                  <FileText className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                               {contact.contact_type === 'vendor' && (
@@ -884,8 +997,16 @@ export default function ContactsPage() {
                                   }}
                                   className="p-1.5 rounded hover:bg-gray-100 transition-colors"
                                   title="Schedule Maintenance"
+                                  onMouseEnter={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#1E7D9A'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#64748B'
+                                  }}
                                 >
-                                  <Wrench className="w-4 h-4" style={{ color: '#64748B' }} />
+                                  <Wrench className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                             </div>
@@ -971,14 +1092,7 @@ export default function ContactsPage() {
                       </h3>
                       <span 
                         className="inline-block px-3 py-1 text-xs rounded-full font-medium"
-                        style={{ 
-                          backgroundColor: selectedContact.service_type && tagColors[selectedContact.service_type] 
-                            ? `${tagColors[selectedContact.service_type]}20`
-                            : '#E0F2FE',
-                          color: selectedContact.service_type && tagColors[selectedContact.service_type]
-                            ? tagColors[selectedContact.service_type]
-                            : '#1A5F7A'
-                        }}
+                        style={getRoleTagColor(selectedContact)}
                       >
                         {getRoleLabel(selectedContact)}
                       </span>
@@ -1037,6 +1151,37 @@ export default function ContactsPage() {
                         <p className="text-sm whitespace-pre-wrap" style={{ color: '#1E293B' }}>{selectedContact.notes}</p>
                       </div>
                     )}
+                    {/* Last Contacted */}
+                    <div className="pt-4 border-t border-gray-200">
+                      <label className="text-xs font-medium mb-1 block" style={{ color: '#64748B' }}>Last Contacted</label>
+                      <p className="text-sm flex items-center gap-2" style={{ color: '#1E293B' }}>
+                        <Calendar className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                        {new Date(getLastContacted(selectedContact)).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric', 
+                          year: 'numeric' 
+                        })}
+                      </p>
+                    </div>
+                    {/* Last Maintenance Job (for vendors) */}
+                    {selectedContact.contact_type === 'vendor' && getLastMaintenanceJob(selectedContact) && (
+                      <div className="pt-4 border-t border-gray-200">
+                        <label className="text-xs font-medium mb-1 block" style={{ color: '#64748B' }}>Last Maintenance Job</label>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Wrench className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                          <p className="text-sm font-medium" style={{ color: '#1E293B' }}>
+                            {getLastMaintenanceJob(selectedContact)?.task}
+                          </p>
+                        </div>
+                        <p className="text-xs ml-6" style={{ color: '#64748B' }}>
+                          {new Date(getLastMaintenanceJob(selectedContact)!.updated_at).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })}
+                        </p>
+                      </div>
+                    )}
                     {selectedContact.contact_type === 'vendor' && (
                       <div className="pt-4 border-t border-gray-200">
                         <button
@@ -1069,6 +1214,34 @@ export default function ContactsPage() {
               </div>
             </div>
           )}
+
+          {/* Floating Quick Add Button */}
+          <button
+            onClick={() => {
+              if (activeTab === 'tenants') {
+                window.location.href = '/properties'
+              } else {
+                setShowVendorForm(true)
+              }
+            }}
+            className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all"
+            style={{ 
+              background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)',
+              color: 'white',
+              boxShadow: '0 4px 12px rgba(26, 95, 122, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.1)'
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(26, 95, 122, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 95, 122, 0.3)'
+            }}
+            title={activeTab === 'tenants' ? 'Add Tenant' : 'Add Vendor'}
+          >
+            <Plus className="w-6 h-6" />
+          </button>
 
           {/* Vendor Form Modal */}
           {showVendorForm && (
