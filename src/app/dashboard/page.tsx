@@ -964,8 +964,8 @@ export default function DashboardPage() {
       'Repairs': '#E8684A',          // Soft coral
       'Utilities': '#10b981',         // Green
       'Insurance': '#F6BD16',         // Muted gold
-      'Property Tax': '#5B8FF9',     // Deep blue
-      'Taxes': '#5B8FF9',            // Deep blue (alternative name)
+      'Property Tax': '#8b5cf6',     // Purple
+      'Taxes': '#8b5cf6',            // Purple (alternative name)
       'HOA Fees': '#06b6d4',         // Cyan
       'Lawn Care': '#6DC8A0',         // Soft mint green
       'Pest Control': '#f97316',     // Orange
@@ -997,7 +997,7 @@ export default function DashboardPage() {
       '#E8684A': { from: '#E45B56', to: '#F19C98' }, // Red
       '#10b981': { from: '#1C7C63', to: '#A7D6C9' }, // Teal
       '#F6BD16': { from: '#F7A43F', to: '#FCD07D' }, // Orange
-      '#5B8FF9': { from: '#5E72E4', to: '#A7B8F7' }, // Blue
+      '#8b5cf6': { from: '#7C3AED', to: '#C4B5FD' }, // Purple
       '#06b6d4': { from: '#1C7C63', to: '#A7D6C9' }, // Cyan -> Teal
       '#6DC8A0': { from: '#1C7C63', to: '#A7D6C9' }, // Mint -> Teal
       '#f97316': { from: '#F7A43F', to: '#FCD07D' }, // Orange
