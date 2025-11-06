@@ -18,7 +18,8 @@ import {
   AlertCircle,
   Clock,
   AlertTriangle,
-  Paperclip
+  Paperclip,
+  TrendingUp
 } from 'lucide-react'
 import { 
   PieChart, 
@@ -74,10 +75,17 @@ export default function DashboardPage() {
     rent: 0,
     expenses: 0
   })
+  const [hasAnimated, setHasAnimated] = useState(false)
 
   useEffect(() => {
     if (user) {
       loadDashboardData()
+      
+      // Check if animations have already been shown in this session
+      const animatedBefore = sessionStorage.getItem('dashboard-animated')
+      if (animatedBefore) {
+        setHasAnimated(true)
+      }
     }
   }, [user])
 
@@ -93,39 +101,56 @@ export default function DashboardPage() {
   const totalExpenses = thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0)
   const upcomingTasks = maintenance.filter(m => m.status === 'pending').length
 
-  // Count-up animation for KPI cards
+  // Count-up animation for KPI cards - only run once per session
   useEffect(() => {
-    if (!loading && properties.length >= 0) {
-      const duration = 1500 // 1.5 seconds
-      const steps = 60
-      const interval = duration / steps
+    if (!loading) {
+      const animatedBefore = sessionStorage.getItem('dashboard-animated')
       
-      let currentStep = 0
-      const timer = setInterval(() => {
-        currentStep++
-        const progress = Math.min(currentStep / steps, 1)
-        // Ease-out function
-        const easeOut = 1 - Math.pow(1 - progress, 3)
+      if (!animatedBefore) {
+        // First time - run animation
+        const duration = 1000 // 1 second - faster, simultaneous
+        const steps = 60
+        const interval = duration / steps
         
-        setCountUpValues({
-          properties: Math.round(properties.length * easeOut),
-          tasks: Math.round(upcomingTasks * easeOut),
-          rent: Math.round(totalMonthlyRent * easeOut),
-          expenses: Math.round(totalExpenses * easeOut)
-        })
-        
-        if (currentStep >= steps) {
-          clearInterval(timer)
+        let currentStep = 0
+        const timer = setInterval(() => {
+          currentStep++
+          const progress = Math.min(currentStep / steps, 1)
+          // Ease-out function
+          const easeOut = 1 - Math.pow(1 - progress, 3)
+          
           setCountUpValues({
-            properties: properties.length,
-            tasks: upcomingTasks,
-            rent: totalMonthlyRent,
-            expenses: totalExpenses
+            properties: Math.round(properties.length * easeOut),
+            tasks: Math.round(upcomingTasks * easeOut),
+            rent: Math.round(totalMonthlyRent * easeOut),
+            expenses: Math.round(totalExpenses * easeOut)
           })
-        }
-      }, interval)
-      
-      return () => clearInterval(timer)
+          
+          if (currentStep >= steps) {
+            clearInterval(timer)
+            setCountUpValues({
+              properties: properties.length,
+              tasks: upcomingTasks,
+              rent: totalMonthlyRent,
+              expenses: totalExpenses
+            })
+            // Mark as animated after animation completes
+            sessionStorage.setItem('dashboard-animated', 'true')
+            setHasAnimated(true)
+          }
+        }, interval)
+        
+        return () => clearInterval(timer)
+      } else {
+        // Already animated - set values immediately
+        setCountUpValues({
+          properties: properties.length,
+          tasks: upcomingTasks,
+          rent: totalMonthlyRent,
+          expenses: totalExpenses
+        })
+        setHasAnimated(true)
+      }
     }
   }, [loading, properties.length, upcomingTasks, totalMonthlyRent, totalExpenses])
 
@@ -1044,6 +1069,50 @@ export default function DashboardPage() {
     }
   }
 
+  // Calculate Portfolio Performance metrics
+  const calculatePortfolioPerformance = () => {
+    // Average rent per unit
+    const avgRentPerUnit = properties.length > 0 ? totalMonthlyRent / properties.length : 0
+    
+    // Occupancy rate (properties with tenants / total properties)
+    const occupiedCount = properties.filter(p => p.tenant_name).length
+    const occupancyRate = properties.length > 0 ? (occupiedCount / properties.length) * 100 : 0
+    
+    // ROI per property - calculate average ROI across all properties
+    // ROI = (Net Income / Monthly Rent) * 100 for each property, then average
+    const propertyROIs = properties.map(property => {
+      // Calculate expenses for this property for current month
+      const propertyExpenses = thisMonthExpenses
+        .filter(expense => expense.property_id === property.id)
+        .reduce((sum, expense) => sum + expense.amount, 0)
+      
+      // Get actual rent collected for this property (if paid)
+      const currentMonthPayment = allRentPayments.find(
+        p => p.property_id === property.id && 
+        p.month === currentDate.getMonth() + 1 && 
+        p.year === currentDate.getFullYear() &&
+        p.status === 'paid'
+      )
+      const actualRent = currentMonthPayment?.amount || property.monthly_rent
+      
+      const netIncome = actualRent - propertyExpenses
+      const roi = property.monthly_rent > 0 ? (netIncome / property.monthly_rent) * 100 : 0
+      return roi
+    })
+    
+    const avgROI = propertyROIs.length > 0 
+      ? propertyROIs.reduce((sum, roi) => sum + roi, 0) / propertyROIs.length 
+      : 0
+    
+    return {
+      avgRentPerUnit,
+      occupancyRate,
+      avgROI
+    }
+  }
+
+  const portfolioPerformance = calculatePortfolioPerformance()
+
   // Calculate chart data
   const categoryData = calculateCategoryData()
   const monthlyData = calculateMonthlyData()
@@ -1059,6 +1128,107 @@ export default function DashboardPage() {
           minHeight: '100vh',
           padding: '12px 16px'
         }}>
+          {/* Portfolio Performance Summary */}
+          <div 
+            className="bg-white p-4 md:p-6 transition-all duration-200"
+            style={{ 
+              borderRadius: '14px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+              background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)',
+              border: '1px solid rgba(227, 232, 229, 0.5)'
+            }}
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <div>
+                <h2 style={{ color: '#0A2540', fontWeight: 600, fontSize: '1.25rem', lineHeight: '1.3', marginBottom: '4px' }}>
+                  Portfolio Performance
+                </h2>
+                <p className="text-xs md:text-sm" style={{ color: '#667680', fontWeight: 400 }}>
+                  Key metrics to track your portfolio's growth and scalability
+                </p>
+              </div>
+              <button
+                onClick={() => router.push('/reports')}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 self-start md:self-auto"
+                style={{
+                  background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(28, 124, 99, 0.2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(28, 124, 99, 0.3)'
+                  e.currentTarget.style.transform = 'translateY(-1px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(28, 124, 99, 0.2)'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                <span>View detailed reports</span>
+                <span>→</span>
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              {/* Average Rent Per Unit */}
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="w-4 h-4" style={{ color: '#1C7C63' }} />
+                  <span className="text-xs md:text-sm font-medium" style={{ color: '#667680' }}>
+                    Average Rent Per Unit
+                  </span>
+                </div>
+                <p className="font-bold" style={{ color: '#0A2540', fontSize: '1.75rem', lineHeight: '1.2' }}>
+                  ${Math.round(portfolioPerformance.avgRentPerUnit).toLocaleString()}
+                </p>
+                <p className="text-xs mt-1" style={{ color: '#8DA6A0' }}>
+                  {properties.length} {properties.length === 1 ? 'property' : 'properties'}
+                </p>
+              </div>
+              
+              {/* Occupancy Rate */}
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-2">
+                  <Home className="w-4 h-4" style={{ color: '#1C7C63' }} />
+                  <span className="text-xs md:text-sm font-medium" style={{ color: '#667680' }}>
+                    Occupancy Rate
+                  </span>
+                </div>
+                <p className="font-bold" style={{ color: '#0A2540', fontSize: '1.75rem', lineHeight: '1.2' }}>
+                  {Math.round(portfolioPerformance.occupancyRate)}%
+                </p>
+                <p className="text-xs mt-1" style={{ color: '#8DA6A0' }}>
+                  {properties.filter(p => p.tenant_name).length} of {properties.length} {properties.length === 1 ? 'unit' : 'units'} occupied
+                </p>
+              </div>
+              
+              {/* ROI Per Property */}
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="w-4 h-4" style={{ color: '#1C7C63' }} />
+                  <span className="text-xs md:text-sm font-medium" style={{ color: '#667680' }}>
+                    ROI Per Property
+                  </span>
+                </div>
+                <p 
+                  className="font-bold" 
+                  style={{ 
+                    color: portfolioPerformance.avgROI >= 0 ? '#1C7C63' : '#EF4444', 
+                    fontSize: '1.75rem', 
+                    lineHeight: '1.2' 
+                  }}
+                >
+                  {portfolioPerformance.avgROI >= 0 ? '+' : ''}{portfolioPerformance.avgROI.toFixed(1)}%
+                </p>
+                <p className="text-xs mt-1" style={{ color: '#8DA6A0' }}>
+                  Average return across portfolio
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Top Section: Stats Cards and Rent Collection Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '12px' }}>
             {/* Left Side: Stats Cards (2x2 grid on desktop, 1 column on mobile) */}
@@ -1198,6 +1368,7 @@ export default function DashboardPage() {
                 <RentCollectionStatusChart 
                   properties={properties}
                   rentPayments={allRentPayments}
+                  hasAnimated={hasAnimated}
                 />
                 </div>
             )}
@@ -1412,17 +1583,19 @@ export default function DashboardPage() {
                       dataKey="cumulativeCashflow"
                       fill="url(#lineGradient)"
                       stroke="none"
-                      isAnimationActive={true}
-                      animationDuration={700}
+                      isAnimationActive={!hasAnimated}
+                      animationDuration={800}
                       animationEasing="ease-out"
+                      animationBegin={0}
                     />
                     <Bar 
                       dataKey="cashflow" 
                       name="Cashflow (Income - Expenses)"
                       radius={[6, 6, 0, 0]}
-                      isAnimationActive={true}
-                      animationDuration={700}
+                      isAnimationActive={!hasAnimated}
+                      animationDuration={800}
                       animationEasing="ease-out"
+                      animationBegin={0}
                     >
                       {(cashflowData as any).map((entry: any, index: number) => (
                         <Cell 
@@ -1599,10 +1772,7 @@ export default function DashboardPage() {
               style={{ 
                 borderRadius: '14px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-                background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)',
-                opacity: 1,
-                transform: 'translateY(0)',
-                animation: 'fadeInUp 0.5s ease-out'
+                background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)'
               }}
             >
               <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4 pb-3 md:pb-4 border-b gap-2" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
@@ -1716,8 +1886,9 @@ export default function DashboardPage() {
                       innerRadius="20%"
                       fill="#8884d8"
                       dataKey="value"
+                      isAnimationActive={!hasAnimated}
                       animationBegin={0}
-                      animationDuration={750}
+                      animationDuration={800}
                       animationEasing="ease-out"
                     >
                       {categoryData.map((entry, index) => {
@@ -1801,10 +1972,7 @@ export default function DashboardPage() {
               style={{ 
                 borderRadius: '14px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-                background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)',
-                opacity: 1,
-                transform: 'translateY(0)',
-                animation: 'fadeInUp 0.5s ease-out 0.1s both'
+                background: 'linear-gradient(180deg, #F9FCFB 0%, #F3FAF7 100%)'
               }}
             >
               <div className="mb-3 md:mb-4 pb-3 md:pb-4 border-b" style={{ borderColor: '#E5E9E7', borderBottomWidth: '1px' }}>
@@ -1852,6 +2020,10 @@ export default function DashboardPage() {
                       name="Projected Income"
                       dot={{ fill: '#1C7C63', r: 5, strokeWidth: 2, stroke: '#FFFFFF' }}
                       activeDot={{ r: 6 }}
+                      isAnimationActive={!hasAnimated}
+                      animationDuration={800}
+                      animationEasing="ease-out"
+                      animationBegin={0}
                     />
                     <Area 
                       type="monotone" 
@@ -1863,6 +2035,10 @@ export default function DashboardPage() {
                       name="Projected Expenses"
                       dot={{ fill: '#E8684A', r: 5, strokeWidth: 2, stroke: '#FFFFFF' }}
                       activeDot={{ r: 6 }}
+                      isAnimationActive={!hasAnimated}
+                      animationDuration={800}
+                      animationEasing="ease-out"
+                      animationBegin={0}
                     />
                     <Area 
                       type="monotone" 
@@ -1871,6 +2047,10 @@ export default function DashboardPage() {
                       strokeWidth={2.5}
                       fillOpacity={0.6}
                       fill="url(#colorNet)"
+                      isAnimationActive={!hasAnimated}
+                      animationDuration={800}
+                      animationEasing="ease-out"
+                      animationBegin={0}
                       dot={(props: any) => {
                         const { payload } = props
                         const isNegative = payload.netCashFlow < 0
