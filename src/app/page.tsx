@@ -78,14 +78,75 @@ export default function Home() {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "LandlordHub",
+            "url": "https://landlordhubapp.com",
+            "image": "https://landlordhubapp.com/landlord-hub-logo.png",
             "applicationCategory": "BusinessApplication",
+            "applicationSubCategory": "Property Management Software",
             "operatingSystem": "Web",
+            "softwareVersion": "1.x",
+            "description": "All-in-one property management software for small landlords with 1–20 units. Track rent, expenses, maintenance, vendor contacts, and tax-ready reports—save 10+ hours a month.",
+            "keywords": [
+              "property management software",
+              "landlord software",
+              "rent tracking",
+              "rental accounting",
+              "maintenance tracking",
+              "small landlord tools",
+              "property management app"
+            ],
+            "featureList": [
+              "Rent collection status and reminders",
+              "Expense tracking with tax-ready reports",
+              "Maintenance task management",
+              "Vendor & tenant contact manager",
+              "Portfolio analytics and ROI",
+              "Secure document storage"
+            ],
             "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD",
-              "priceValidUntil": "2026-12-31",
-              "availability": "https://schema.org/InStock"
+              "@type": "OfferCatalog",
+              "name": "Pricing Plans",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "name": "Free",
+                  "price": "0",
+                  "priceCurrency": "USD",
+                  "category": "free",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "1 property, basic income & expense tracking, maintenance tasks, secure documents",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Basic",
+                  "price": "19",
+                  "priceCurrency": "USD",
+                  "category": "subscription",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "Manage 2–5 properties, advanced reporting, CSV exports, automated email reminders",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Growth",
+                  "price": "29",
+                  "priceCurrency": "USD",
+                  "category": "subscription",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "Manage 6–10 properties, enhanced analytics, simplified tax reporting, priority support",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Pro",
+                  "price": "39",
+                  "priceCurrency": "USD",
+                  "category": "subscription",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "Unlimited properties, advanced analytics, full tax reporting, interactive tenant & vendor management",
+                  "availability": "https://schema.org/InStock"
+                }
+              ]
             },
             "aggregateRating": {
               "@type": "AggregateRating",
@@ -94,19 +155,16 @@ export default function Home() {
               "bestRating": "5",
               "worstRating": "1"
             },
-            "description": "Property management software for small landlords with 1-20 units. Track rent, expenses, maintenance, and generate reports all in one dashboard.",
-            "url": "https://landlordhubapp.com",
-            "screenshot": "https://landlordhubapp.com/landlord-hub-logo.png",
-            "featureList": [
-              "Property Management",
-              "Rent Tracking",
-              "Expense Tracking",
-              "Maintenance Tracking",
-              "Tax Reports",
-              "Real-Time Analytics"
-            ],
-            "softwareVersion": "1.0",
-            "releaseNotes": "Property management software designed for small landlords"
+            "brand": {
+              "@type": "Brand",
+              "name": "LandlordHub",
+              "url": "https://landlordhubapp.com"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "LandlordHub",
+              "url": "https://landlordhubapp.com"
+            }
           })
         }}
       />
@@ -129,7 +187,7 @@ export default function Home() {
         {/* Header/Hero Section with Gradient Background */}
         <div 
           className="pt-20 pb-16 lg:pt-32 lg:pb-24 relative"
-          style={{
+              style={{ 
             background: 'linear-gradient(to bottom, rgba(20, 184, 166, 0.08) 0%, rgba(231, 242, 239, 0.95) 50%, rgba(255, 255, 255, 1) 100%)'
           }}
         >
@@ -148,7 +206,7 @@ export default function Home() {
                 <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#1C7C63' }}>
                   Trusted by 1,000+ landlords
                 </p>
-              </div>
+          </div>
               
               {/* Tagline */}
               <p className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#1C7C63' }}>
@@ -157,13 +215,13 @@ export default function Home() {
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#0A2540', fontWeight: 700 }}>
                 All-in-One Property Management Software for Landlords with 1–20 Units
-              </h1>
+          </h1>
               <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed" style={{ color: '#0A2540', opacity: 0.9 }}>
                 Manage rent, expenses, and maintenance in minutes — not hours. LandlordHub helps landlords with 1–20 units stay organized, profitable, and stress-free.
-              </p>
+          </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link
-                  href="/signup"
+            <Link
+              href="/signup"
                   className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
                   style={{ 
                     background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
@@ -178,11 +236,11 @@ export default function Home() {
                     e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
                     e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
                   }}
-                >
-                  Get Started Free
-                </Link>
-                <Link
-                  href="/pricing"
+            >
+              Get Started Free
+            </Link>
+            <Link
+              href="/pricing"
                   className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
                   style={{ 
                     background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
@@ -199,7 +257,7 @@ export default function Home() {
                   }}
                 >
                   See Plans
-                </Link>
+            </Link>
               </div>
             </div>
 
@@ -413,7 +471,7 @@ export default function Home() {
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
                       <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                    </svg>
+              </svg>
                   ))}
                 </div>
               </div>
@@ -464,14 +522,14 @@ export default function Home() {
                   <p className="text-xs text-gray-500">Austin, TX</p>
                 </div>
               </div>
-            </div>
-            
+          </div>
+          
             {/* Testimonial 3 */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="mb-4">
                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63', opacity: 0.3 }}>
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
-                </svg>
+              </svg>
               </div>
               <p className="text-gray-700 mb-4 italic">
                 "As someone managing 8 units, this tool keeps everything organized. The maintenance tracking is a game-changer."

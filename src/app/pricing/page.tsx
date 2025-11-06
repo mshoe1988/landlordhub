@@ -160,6 +160,67 @@ export default function PricingPage() {
 
   return (
     <Layout>
+      {/* Schema Markup for SEO - Pricing Offers */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "LandlordHub Pricing",
+            "url": "https://landlordhubapp.com/pricing",
+            "applicationCategory": "BusinessApplication",
+            "applicationSubCategory": "Property Management Software",
+            "offers": {
+              "@type": "OfferCatalog",
+              "name": "Pricing Plans",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "name": "Free",
+                  "price": "0",
+                  "priceCurrency": "USD",
+                  "category": "free",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "1 property, basic income & expense tracking, maintenance tasks, secure documents",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Basic",
+                  "price": "19",
+                  "priceCurrency": "USD",
+                  "category": "subscription",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "Manage 2–5 properties, advanced reporting, CSV exports, automated email reminders",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Growth",
+                  "price": "29",
+                  "priceCurrency": "USD",
+                  "category": "subscription",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "Manage 6–10 properties, enhanced analytics, simplified tax reporting, priority support",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Pro",
+                  "price": "39",
+                  "priceCurrency": "USD",
+                  "category": "subscription",
+                  "url": "https://landlordhubapp.com/pricing",
+                  "description": "Unlimited properties, advanced analytics, full tax reporting, interactive tenant & vendor management",
+                  "availability": "https://schema.org/InStock"
+                }
+              ]
+            }
+          })
+        }}
+      />
+      
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
