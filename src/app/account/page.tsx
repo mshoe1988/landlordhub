@@ -134,17 +134,22 @@ export default function AccountPage() {
     })
   }
 
-  const getDisplayedBillingDate = (isoString?: string, status?: string) => {
-    if (!isoString) return ''
+  const getNextBillingDate = (isoString?: string, status?: string): Date | null => {
+    if (!isoString) return null
     const periodEnd = new Date(isoString)
     const now = new Date()
     // If for any reason the stored period end is today or in the past,
     // show a sensible next billing date one month from now (display only).
     if (status === 'active' && periodEnd.getTime() <= now.getTime()) {
-      const inThirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-      return formatDate(inThirtyDays.toISOString())
+      return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
     }
-    return formatDate(isoString)
+    return periodEnd
+  }
+
+  const getDisplayedBillingDate = (isoString?: string, status?: string) => {
+    const date = getNextBillingDate(isoString, status)
+    if (!date) return ''
+    return formatDate(date.toISOString())
   }
 
   if (loading) {
@@ -440,11 +445,14 @@ export default function AccountPage() {
                 <div className="text-2xl font-bold mb-1" style={{ color: '#0F172A', fontSize: '16px', fontWeight: 700 }}>
                   {planInfo.price === 0 ? 'Free' : `$${planInfo.price}`}/month
                 </div>
-                {subscription?.current_period_end && (
-                  <div className="text-xs" style={{ color: '#94A3B8' }}>
-                    📅 Next: {new Date(subscription.current_period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </div>
-                )}
+                {subscription?.current_period_end && (() => {
+                  const nextBillingDate = getNextBillingDate(subscription.current_period_end, subscription?.status)
+                  return nextBillingDate ? (
+                    <div className="text-xs" style={{ color: '#94A3B8' }}>
+                      📅 Next: {nextBillingDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </div>
+                  ) : null
+                })()}
               </div>
             </div>
           </div>
