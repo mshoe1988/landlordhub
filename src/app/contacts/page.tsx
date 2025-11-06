@@ -697,7 +697,7 @@ export default function ContactsPage() {
                       return (
                         <div 
                           key={contact.id} 
-                          className="rounded-xl p-4 cursor-pointer transition-all"
+                          className="rounded-xl p-3 md:p-4 cursor-pointer transition-all"
                           style={{ 
                             background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FBFC 100%)',
                             borderRadius: '12px',
@@ -715,17 +715,17 @@ export default function ContactsPage() {
                           }}
                           onClick={() => handleContactClick(contact)}
                         >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3 flex-1">
+                          <div className="flex items-start justify-between mb-3 gap-2">
+                            <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
                               {/* Avatar */}
                               <div 
-                                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+                                className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm flex-shrink-0"
                                 style={{ backgroundColor: '#1A5F7A' }}
                               >
                                 {getInitials(contact.name)}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold truncate" style={{ color: '#1E293B', fontSize: '16px' }}>
+                                <h3 className="font-semibold truncate text-sm md:text-base" style={{ color: '#1E293B' }}>
                                   {contact.name}
                                 </h3>
                                 <span 
@@ -737,14 +737,14 @@ export default function ContactsPage() {
                               </div>
                             </div>
                             {/* Quick Actions */}
-                            <div className="flex gap-1.5 ml-2 flex-shrink-0">
+                            <div className="flex gap-1 md:gap-1.5 ml-1 md:ml-2 flex-shrink-0">
                               {contact.email && (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     handleEmailContact(contact.email!, contact.name, 'tenant', property?.address)
                                   }}
-                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
+                                  className="p-1 md:p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
                                   title="Email Tenant"
                                   onMouseEnter={(e) => {
                                     const icon = e.currentTarget.querySelector('svg')
@@ -755,7 +755,7 @@ export default function ContactsPage() {
                                     if (icon) icon.style.color = '#64748B'
                                   }}
                                 >
-                                  <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                  <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                               {contact.phone && (
@@ -764,7 +764,7 @@ export default function ContactsPage() {
                                     e.stopPropagation()
                                     window.open(`tel:${contact.phone}`, '_blank')
                                   }}
-                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
+                                  className="p-1 md:p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
                                   title="Call Tenant"
                                   onMouseEnter={(e) => {
                                     const icon = e.currentTarget.querySelector('svg')
@@ -775,7 +775,7 @@ export default function ContactsPage() {
                                     if (icon) icon.style.color = '#64748B'
                                   }}
                                 >
-                                  <Phone className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                  <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                             </div>
@@ -887,7 +887,7 @@ export default function ContactsPage() {
                       return (
                         <div 
                           key={contact.id} 
-                          className="rounded-xl p-4 cursor-pointer transition-all"
+                          className="rounded-xl p-3 md:p-4 cursor-pointer transition-all"
                           style={{ 
                             background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FBFC 100%)',
                             borderRadius: '12px',
@@ -905,21 +905,21 @@ export default function ContactsPage() {
                           }}
                           onClick={() => handleContactClick(contact)}
                         >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3 flex-1">
+                          <div className="flex items-start justify-between mb-3 gap-2">
+                            <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
                               {/* Avatar */}
                               <div 
-                                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+                                className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm flex-shrink-0"
                                 style={{ backgroundColor: '#1A5F7A' }}
                               >
                                 {getInitials(contact.name)}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold truncate" style={{ color: '#1E293B', fontSize: '16px' }}>
+                                <h3 className="font-semibold truncate text-sm md:text-base" style={{ color: '#1E293B' }}>
                                   {contact.name}
                                 </h3>
                                 {contact.company && (
-                                  <p className="text-sm truncate mt-0.5" style={{ color: '#64748B' }}>
+                                  <p className="text-xs md:text-sm truncate mt-0.5" style={{ color: '#64748B' }}>
                                     {contact.company}
                                   </p>
                                 )}
@@ -932,14 +932,14 @@ export default function ContactsPage() {
                               </div>
                             </div>
                             {/* Quick Actions */}
-                            <div className="flex gap-1.5 ml-2 flex-shrink-0">
+                            <div className="flex gap-1 md:gap-1.5 ml-1 md:ml-2 flex-shrink-0">
                               {contact.email && (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     handleEmailContact(contact.email!, contact.name, 'vendor')
                                   }}
-                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  className="p-1 md:p-1.5 rounded hover:bg-gray-100 transition-colors"
                                   title="Email Vendor"
                                   onMouseEnter={(e) => {
                                     const icon = e.currentTarget.querySelector('svg')
@@ -950,7 +950,7 @@ export default function ContactsPage() {
                                     if (icon) icon.style.color = '#64748B'
                                   }}
                                 >
-                                  <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                  <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                               {contact.phone && (
@@ -959,7 +959,7 @@ export default function ContactsPage() {
                                     e.stopPropagation()
                                     window.open(`tel:${contact.phone}`, '_blank')
                                   }}
-                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  className="p-1 md:p-1.5 rounded hover:bg-gray-100 transition-colors"
                                   title="Call Vendor"
                                   onMouseEnter={(e) => {
                                     const icon = e.currentTarget.querySelector('svg')
@@ -970,7 +970,7 @@ export default function ContactsPage() {
                                     if (icon) icon.style.color = '#64748B'
                                   }}
                                 >
-                                  <Phone className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                  <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                               {contact.notes && (
@@ -979,7 +979,7 @@ export default function ContactsPage() {
                                     e.stopPropagation()
                                     handleContactClick(contact)
                                   }}
-                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  className="p-1 md:p-1.5 rounded hover:bg-gray-100 transition-colors"
                                   title="View Notes"
                                   onMouseEnter={(e) => {
                                     const icon = e.currentTarget.querySelector('svg')
@@ -990,7 +990,7 @@ export default function ContactsPage() {
                                     if (icon) icon.style.color = '#64748B'
                                   }}
                                 >
-                                  <FileText className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                  <FileText className="w-3.5 h-3.5 md:w-4 md:h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                               {contact.contact_type === 'vendor' && (
@@ -999,7 +999,7 @@ export default function ContactsPage() {
                                     e.stopPropagation()
                                     handleScheduleMaintenance(contact)
                                   }}
-                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  className="p-1 md:p-1.5 rounded hover:bg-gray-100 transition-colors"
                                   title="Schedule Maintenance"
                                   onMouseEnter={(e) => {
                                     const icon = e.currentTarget.querySelector('svg')
@@ -1010,7 +1010,7 @@ export default function ContactsPage() {
                                     if (icon) icon.style.color = '#64748B'
                                   }}
                                 >
-                                  <Wrench className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                  <Wrench className="w-3.5 h-3.5 md:w-4 md:h-4 transition-colors" style={{ color: '#64748B' }} />
                                 </button>
                               )}
                             </div>
