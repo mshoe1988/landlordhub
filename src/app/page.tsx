@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
@@ -14,8 +14,6 @@ export const dynamic = 'force-dynamic'
 export default function Home() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
   useEffect(() => {
     if (!loading) {
@@ -24,37 +22,6 @@ export default function Home() {
       }
     }
   }, [user, loading, router])
-
-  // Scroll animation observer - runs after DOM is ready
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => new Set(prev).add(entry.target.id))
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-
-    // Use setTimeout to ensure refs are set after render
-    const timeoutId = setTimeout(() => {
-      const refs = Object.values(sectionRefs.current).filter(Boolean) as HTMLDivElement[]
-      refs.forEach((ref) => {
-        if (ref) observer.observe(ref)
-      })
-    }, 100)
-
-    return () => {
-      clearTimeout(timeoutId)
-      const refs = Object.values(sectionRefs.current).filter(Boolean) as HTMLDivElement[]
-      refs.forEach((ref) => {
-        if (ref) observer.unobserve(ref)
-      })
-      observer.disconnect()
-    }
-  }, [])
 
   if (loading) {
     return (
@@ -342,8 +309,7 @@ export default function Home() {
         {/* Features Section */}
         <div 
           id="features"
-          ref={(el) => { sectionRefs.current['features'] = el }}
-          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('features') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className="mt-20 mb-20"
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
@@ -440,8 +406,7 @@ export default function Home() {
         {/* Testimonials Section */}
         <div 
           id="testimonials"
-          ref={(el) => { sectionRefs.current['testimonials'] = el }}
-          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('testimonials') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className="mt-20 mb-20"
         >
           <div className="text-center mb-12">
             <div className="mb-4">
@@ -565,8 +530,7 @@ export default function Home() {
         {/* Comparison Section */}
         <div 
           id="comparison"
-          ref={(el) => { sectionRefs.current['comparison'] = el }}
-          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('comparison') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className="mt-20 mb-20"
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
@@ -672,8 +636,7 @@ export default function Home() {
         {/* Pricing CTA Section */}
         <div 
           id="pricing"
-          ref={(el) => { sectionRefs.current['pricing'] = el }}
-          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('pricing') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className="mt-20 mb-20"
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
