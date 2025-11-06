@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import { Check, X, Star } from 'lucide-react'
 import { PRICING_PLANS, STRIPE_PRICE_IDS } from '@/lib/stripe'
@@ -145,16 +144,14 @@ export default function PricingPage() {
     ...plan,
   }))
 
-  // Show loading while checking subscription
-  if (hasSubscription === null) {
+  // Show loading while checking subscription (only if user is logged in)
+  if (user && hasSubscription === null) {
     return (
-      <ProtectedRoute>
-        <Layout>
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          </div>
-        </Layout>
-      </ProtectedRoute>
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+      </Layout>
     )
   }
 
@@ -162,8 +159,7 @@ export default function PricingPage() {
   // Allow all users to access pricing page for plan changes
 
   return (
-    <ProtectedRoute>
-      <Layout>
+    <Layout>
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -282,6 +278,5 @@ export default function PricingPage() {
           </div>
         </div>
       </Layout>
-    </ProtectedRoute>
   )
 }
