@@ -44,6 +44,8 @@ export default function Layout({ children }: LayoutProps) {
   const quickActionsRef = useRef<HTMLDivElement>(null)
 
   const handleSignOut = async () => {
+    // Clear dashboard animation flag so animations play again on next sign-in
+    sessionStorage.removeItem('dashboard-animated')
     await signOut()
     router.push('/login')
   }

@@ -8,6 +8,7 @@ import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
 interface RentCollectionStatusChartProps {
   properties: Property[]
   rentPayments: RentPayment[]
+  hasAnimated?: boolean
 }
 
 interface CollectionStatusData {
@@ -18,7 +19,7 @@ interface CollectionStatusData {
   color: string
 }
 
-export default function RentCollectionStatusChart({ properties, rentPayments }: RentCollectionStatusChartProps) {
+export default function RentCollectionStatusChart({ properties, rentPayments, hasAnimated = false }: RentCollectionStatusChartProps) {
   const [selectedSegment, setSelectedSegment] = useState<'Paid' | 'Unpaid' | 'Overdue' | null>(null)
   const [chartType, setChartType] = useState<'bar' | 'donut'>('donut')
   
@@ -261,6 +262,10 @@ export default function RentCollectionStatusChart({ properties, rentPayments }: 
               dataKey="count"
               onClick={(data: any, index: number) => handlePieClick(data, index)}
               cursor="pointer"
+              isAnimationActive={!hasAnimated}
+              animationDuration={800}
+              animationEasing="ease-out"
+              animationBegin={0}
             >
               {statusData.map((entry, index) => {
                 return (
