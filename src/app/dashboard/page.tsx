@@ -1062,7 +1062,7 @@ export default function DashboardPage() {
           {/* Top Section: Stats Cards and Rent Collection Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '12px' }}>
             {/* Left Side: Stats Cards (2x2 grid on desktop, 1 column on mobile) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '12px' }}>
+            <div className="grid grid-cols-2" style={{ gap: '12px' }}>
               {/* Top Row */}
               <div 
                 className="bg-white p-3 md:p-6 cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[100px] md:min-h-[140px]"
@@ -1085,7 +1085,7 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                    <p className="text-gray-900 font-bold mb-1" style={{ fontSize: '14px', lineHeight: '1.3', wordWrap: 'break-word' }}>
                       Total Properties
                     </p>
                     <p className="font-bold text-gray-800 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>{countUpValues.properties}</p>
@@ -1115,7 +1115,7 @@ export default function DashboardPage() {
               >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                    <p className="text-gray-900 font-bold mb-1" style={{ fontSize: '14px', lineHeight: '1.3', wordWrap: 'break-word' }}>
                       Upcoming Tasks
                     </p>
                     <p className="font-bold text-orange-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>{countUpValues.tasks}</p>
@@ -1146,7 +1146,7 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                    <p className="text-gray-900 font-bold mb-1" style={{ fontSize: '14px', lineHeight: '1.3', wordWrap: 'break-word' }}>
                       Monthly Rent
                     </p>
                     <p className="font-bold text-green-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>${countUpValues.rent.toLocaleString()}</p>
@@ -1176,7 +1176,7 @@ export default function DashboardPage() {
             >
                 <div className="flex items-start md:items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 font-bold truncate mb-1" style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                    <p className="text-gray-900 font-bold mb-1" style={{ fontSize: '14px', lineHeight: '1.3', wordWrap: 'break-word' }}>
                       This Month's Expenses
                     </p>
                     <p className="font-bold text-red-600 mt-1 md:mt-2" style={{ fontSize: '24px', lineHeight: '1.2' }}>${countUpValues.expenses.toLocaleString()}</p>
@@ -1229,19 +1229,7 @@ export default function DashboardPage() {
                     Income vs Expenses ({getCashflowPeriodLabel()})
                   </p>
                 </div>
-                
-                {/* Legend moved to header */}
-                <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
-                  <div className="flex items-center gap-1.5 md:gap-2">
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#1C7C63' }}></div>
-                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7, fontSize: '11px' }}>Cashflow</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 md:gap-2">
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', border: '2px solid #1C7C63', backgroundColor: 'transparent' }}></div>
-                    <span className="text-xs" style={{ color: '#0A2540', opacity: 0.7, fontSize: '11px' }}>Cumulative</span>
               </div>
-            </div>
-          </div>
 
               {/* Time Filter Pills */}
               <div className="flex flex-wrap gap-1.5 md:gap-2">
@@ -1322,7 +1310,7 @@ export default function DashboardPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart 
                         data={cashflowData as any}
-                        margin={{ top: 20, right: 10, left: 10, bottom: 30 }}
+                        margin={{ top: 20, right: 20, left: 5, bottom: 30 }}
                         key={cashflowDateRange}
                         style={{ transition: 'all 0.3s ease' }}
                       >
@@ -1768,16 +1756,17 @@ export default function DashboardPage() {
                     />
                     <Legend 
                       verticalAlign="bottom" 
-                      height={80}
+                      height={100}
                       wrapperStyle={{ 
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
                         flexWrap: 'wrap',
-                        gap: '6px',
+                        gap: '4px',
                         paddingTop: '16px',
-                        paddingLeft: '8px',
-                        paddingRight: '8px'
+                        paddingLeft: '4px',
+                        paddingRight: '4px',
+                        maxWidth: '100%'
                       }}
                       iconType="circle"
                       formatter={(value, entry) => {
@@ -1788,11 +1777,12 @@ export default function DashboardPage() {
                             style={{
                               background: '#F9FCFB',
                               borderRadius: '12px',
-                              padding: '3px 8px',
-                              fontSize: '0.75rem',
+                              padding: '2px 6px',
+                              fontSize: '0.7rem',
                               color: '#0A2540',
                               fontWeight: 500,
-                              whiteSpace: 'nowrap'
+                              whiteSpace: 'nowrap',
+                              display: 'inline-block'
                             }}
                           >
                             {value}: {percentage}%
