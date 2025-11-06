@@ -409,14 +409,17 @@ export default function RentPaymentStatus({
 
       {/* Prorated Payment Modal */}
       {showProratedModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Record Prorated Rent</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              For {monthNames[currentMonth - 1]} {currentYear} • Monthly Rent: ${property.monthly_rent.toLocaleString()}
-            </p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full mx-4 flex flex-col max-h-[90vh]">
+            <div className="p-6 flex-shrink-0 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">Record Prorated Rent</h3>
+              <p className="text-sm text-gray-600">
+                For {monthNames[currentMonth - 1]} {currentYear} • Monthly Rent: ${property.monthly_rent.toLocaleString()}
+              </p>
+            </div>
             
-            <div className="space-y-4">
+            <div className="overflow-y-auto flex-1 p-6">
+              <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Move-In Date (optional)
@@ -503,8 +506,9 @@ export default function RentPaymentStatus({
                 </div>
               </div>
             </div>
+            </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="p-6 flex-shrink-0 border-t border-gray-200 flex gap-3">
               <button
                 onClick={handleProratedPayment}
                 disabled={processingProrated || (!proratedMoveInDate && !proratedMoveOutDate && !proratedDays)}
