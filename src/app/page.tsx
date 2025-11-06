@@ -216,7 +216,7 @@ export default function Home() {
         {/* Features Section */}
         <div 
           id="features"
-          ref={(el) => (sectionRefs.current['features'] = el)}
+          ref={(el) => { sectionRefs.current['features'] = el }}
           className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('features') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <div className="text-center mb-12">
@@ -274,7 +274,7 @@ export default function Home() {
         {/* Testimonials Section */}
         <div 
           id="testimonials"
-          ref={(el) => (sectionRefs.current['testimonials'] = el)}
+          ref={(el) => { sectionRefs.current['testimonials'] = el }}
           className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('testimonials') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <div className="text-center mb-12">
@@ -333,7 +333,7 @@ export default function Home() {
         {/* Comparison Section */}
         <div 
           id="comparison"
-          ref={(el) => (sectionRefs.current['comparison'] = el)}
+          ref={(el) => { sectionRefs.current['comparison'] = el }}
           className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('comparison') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <div className="text-center mb-12">
@@ -425,7 +425,7 @@ export default function Home() {
         {/* Pricing CTA Section */}
         <div 
           id="pricing"
-          ref={(el) => (sectionRefs.current['pricing'] = el)}
+          ref={(el) => { sectionRefs.current['pricing'] = el }}
           className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('pricing') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <div className="text-center mb-12">
