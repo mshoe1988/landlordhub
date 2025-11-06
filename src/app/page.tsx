@@ -169,6 +169,75 @@ export default function Home() {
         }}
       />
       
+      {/* FAQPage Schema Markup for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Who is LandlordHub designed for?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "LandlordHub is designed for small landlords and independent real estate investors who manage between 1 and 20 rental units. It helps simplify rent collection, expense tracking, maintenance, and tax reporting—all from one powerful dashboard."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is there a free plan available?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. LandlordHub offers a free plan for landlords managing a single property. You can track income and expenses, manage maintenance tasks, and store important documents securely—all at no cost."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do I need a credit card to get started?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No credit card is required to create a LandlordHub account. You can start free and upgrade anytime as your portfolio grows."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How much time can LandlordHub save me?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "LandlordHub users report saving an average of 10+ hours per month by automating rent tracking, maintenance reminders, and expense organization for tax season."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does LandlordHub work for large property management companies?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "LandlordHub is built specifically for small landlords and independent investors with up to 20 properties. For large-scale portfolios, a dedicated enterprise system may be more suitable."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I export reports for taxes and accounting?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. LandlordHub automatically generates tax-ready reports and allows CSV exports for bookkeeping or accountant use. This feature is available in the Basic plan and above."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is my data secure?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Absolutely. LandlordHub uses SSL encryption and secure payment systems to protect your information. Your property and financial data are stored safely in the cloud."
+                }
+              }
+            ]
+          })
+        }}
+      />
+      
       {/* Sign In Link - Top right */}
       <div className="absolute top-6 right-6 z-10">
         <Link
@@ -786,6 +855,101 @@ export default function Home() {
             title="LandlordHub - Property Management Software"
             description="Streamline your property management with our comprehensive suite of tools. Track income, manage expenses, schedule maintenance, and generate detailed reports—all in one place."
           />
+        </div>
+
+        {/* FAQ Section */}
+        <div id="faq" className="mt-20 mb-20">
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              details summary::-webkit-details-marker {
+                display: none;
+              }
+              details summary::marker {
+                display: none;
+              }
+              details[open] summary .faq-icon::before {
+                content: '−';
+              }
+              details:not([open]) summary .faq-icon::before {
+                content: '＋';
+              }
+            `
+          }} />
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg" style={{ color: '#0A2540', opacity: 0.8 }}>
+              Answers about plans, features, and getting started with LandlordHub
+            </p>
+          </div>
+          <div className="max-w-3xl mx-auto space-y-4">
+            {/* FAQ Item 1 */}
+            <details className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 cursor-pointer transition-all hover:shadow-md">
+              <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center" style={{ color: '#0A2540' }}>
+                <span>Who is LandlordHub designed for?</span>
+                <span className="faq-icon text-2xl" style={{ color: '#1C7C63' }}></span>
+              </summary>
+              <div className="mt-4 text-gray-700 leading-relaxed">
+                LandlordHub is built for small landlords and independent investors managing <strong>1–20 units</strong>. It centralizes rent tracking, expenses, maintenance, and tax reporting in one dashboard.
+              </div>
+            </details>
+
+            {/* FAQ Item 2 */}
+            <details className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 cursor-pointer transition-all hover:shadow-md">
+              <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center" style={{ color: '#0A2540' }}>
+                <span>Is there a free plan? Do I need a credit card?</span>
+                <span className="faq-icon text-2xl" style={{ color: '#1C7C63' }}></span>
+              </summary>
+              <div className="mt-4 text-gray-700 leading-relaxed">
+                Yes—our <strong>Free</strong> plan supports one property with income/expense tracking, maintenance tasks, and secure documents. <strong>No credit card required</strong>. Upgrade anytime as you grow.
+              </div>
+            </details>
+
+            {/* FAQ Item 3 */}
+            <details className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 cursor-pointer transition-all hover:shadow-md">
+              <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center" style={{ color: '#0A2540' }}>
+                <span>How much time can LandlordHub save?</span>
+                <span className="faq-icon text-2xl" style={{ color: '#1C7C63' }}></span>
+              </summary>
+              <div className="mt-4 text-gray-700 leading-relaxed">
+                Users report saving <strong>10+ hours per month</strong> by automating reminders, organizing expenses for taxes, and viewing real-time cash flow/ROI.
+              </div>
+            </details>
+
+            {/* FAQ Item 4 */}
+            <details className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 cursor-pointer transition-all hover:shadow-md">
+              <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center" style={{ color: '#0A2540' }}>
+                <span>Can I export reports for taxes and accounting?</span>
+                <span className="faq-icon text-2xl" style={{ color: '#1C7C63' }}></span>
+              </summary>
+              <div className="mt-4 text-gray-700 leading-relaxed">
+                Yes. LandlordHub automatically generates tax-ready reports and allows CSV exports for bookkeeping or accountant use. This feature is available in the Basic plan and above.
+              </div>
+            </details>
+
+            {/* FAQ Item 5 */}
+            <details className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 cursor-pointer transition-all hover:shadow-md">
+              <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center" style={{ color: '#0A2540' }}>
+                <span>Does LandlordHub work for large property management companies?</span>
+                <span className="faq-icon text-2xl" style={{ color: '#1C7C63' }}></span>
+              </summary>
+              <div className="mt-4 text-gray-700 leading-relaxed">
+                LandlordHub is built specifically for small landlords and independent investors with up to 20 properties. For large-scale portfolios, a dedicated enterprise system may be more suitable.
+              </div>
+            </details>
+
+            {/* FAQ Item 6 */}
+            <details className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 cursor-pointer transition-all hover:shadow-md">
+              <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center" style={{ color: '#0A2540' }}>
+                <span>Is my data secure?</span>
+                <span className="faq-icon text-2xl" style={{ color: '#1C7C63' }}></span>
+              </summary>
+              <div className="mt-4 text-gray-700 leading-relaxed">
+                Absolutely. LandlordHub uses SSL encryption and secure payment systems to protect your information. Your property and financial data are stored safely in the cloud.
+              </div>
+            </details>
+          </div>
         </div>
       </main>
 
