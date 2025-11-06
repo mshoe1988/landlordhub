@@ -828,7 +828,7 @@ export default function ExpensesPage() {
                   opacity: 1,
                   transform: 'translateY(0)',
                   padding: '1rem',
-                  paddingBottom: '1.5rem'
+                  paddingBottom: '1rem'
                 }}
                 key={`bar-${activeFilter}-${dateRange?.start}-${dateRange?.end}`}
               >
@@ -838,7 +838,7 @@ export default function ExpensesPage() {
                     <ResponsiveContainer width="100%" height={400}>
                       <BarChart 
                         data={getMonthlyExpenseData()}
-                        margin={{ top: 20, right: 15, left: 5, bottom: 80 }}
+                        margin={{ top: 20, right: 15, left: 5, bottom: 50 }}
                         barCategoryGap="20%"
                       >
                         <defs>
@@ -853,10 +853,10 @@ export default function ExpensesPage() {
                           stroke="#667680"
                           angle={-45}
                           textAnchor="end"
-                          height={100}
+                          height={60}
                           tick={{ fontSize: 12 }}
                           interval={0}
-                          tickMargin={8}
+                          tickMargin={5}
                         />
                         <YAxis 
                           stroke="#667680"
