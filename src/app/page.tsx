@@ -317,7 +317,7 @@ export default function Home() {
           <div className="hero-mock">
             {/* Real Dashboard Screenshot with 6px blur */}
             <img 
-              src="/hero-dashboard.jpg" 
+              src="/IMG_0614.jpg" 
               alt="LandlordHub dashboard preview showing property management features"
               className="absolute inset-0 w-full h-full object-cover"
             />
