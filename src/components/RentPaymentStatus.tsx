@@ -409,8 +409,8 @@ export default function RentPaymentStatus({
 
       {/* Prorated Payment Modal */}
       {showProratedModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full mx-4 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start md:items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-md w-full mx-4 my-4 md:my-0 flex flex-col shadow-xl" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
             <div className="p-6 flex-shrink-0 border-b border-gray-200">
               <h3 className="text-lg font-bold text-gray-800 mb-2">Record Prorated Rent</h3>
               <p className="text-sm text-gray-600">
@@ -418,7 +418,7 @@ export default function RentPaymentStatus({
               </p>
             </div>
             
-            <div className="overflow-y-auto flex-1 p-6">
+            <div className="overflow-y-auto p-6 flex-1 min-h-0">
               <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -508,11 +508,11 @@ export default function RentPaymentStatus({
             </div>
             </div>
 
-            <div className="p-6 flex-shrink-0 border-t border-gray-200 flex gap-3">
+            <div className="p-6 flex-shrink-0 border-t border-gray-200 bg-white flex gap-3">
               <button
                 onClick={handleProratedPayment}
                 disabled={processingProrated || (!proratedMoveInDate && !proratedMoveOutDate && !proratedDays)}
-                className="flex-1 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
               >
                 {processingProrated ? (
                   <>
