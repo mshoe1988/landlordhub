@@ -101,10 +101,11 @@ body {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
 }
 
-.hero-mock > div {
+.hero-mock img {
   width: 100%;
   height: 100%;
-  filter: blur(7px) saturate(1.05) brightness(1.03);
+  object-fit: cover;
+  filter: blur(6px) saturate(1.05) brightness(1.03);
   transform: scale(1.02);
 }
 

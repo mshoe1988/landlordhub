@@ -315,42 +315,12 @@ export default function Home() {
           </div>
 
           <div className="hero-mock">
-            {/* Blurred Dashboard Preview - Simulating real UI */}
-            <div className="absolute inset-0 p-4">
-              {/* Simulated dashboard elements */}
-              <div className="grid grid-cols-3 gap-3 mb-3">
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <div className="h-2 bg-teal-200 rounded mb-2"></div>
-                  <div className="h-4 bg-teal-300 rounded w-3/4"></div>
-                </div>
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <div className="h-2 bg-blue-200 rounded mb-2"></div>
-                  <div className="h-4 bg-blue-300 rounded w-2/3"></div>
-                </div>
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <div className="h-2 bg-green-200 rounded mb-2"></div>
-                  <div className="h-4 bg-green-300 rounded w-4/5"></div>
-                </div>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="h-3 bg-gray-200 rounded mb-3 w-1/2"></div>
-                <div className="flex gap-2 mb-2">
-                  <div className="h-16 bg-teal-100 rounded-lg flex-1"></div>
-                  <div className="h-16 bg-red-100 rounded-lg w-1/3"></div>
-                </div>
-                <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <div className="h-2 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-6 bg-green-200 rounded w-2/3"></div>
-                </div>
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <div className="h-2 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-6 bg-red-200 rounded w-2/3"></div>
-                </div>
-              </div>
-            </div>
+            {/* Real Dashboard Screenshot with 6px blur */}
+            <img 
+              src="/hero-dashboard.jpg" 
+              alt="LandlordHub dashboard preview showing property management features"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
         </section>
 
