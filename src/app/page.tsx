@@ -284,13 +284,13 @@ export default function Home() {
           <div className="hero-mock">
             {/* 3D Layering Effect - Base layer (faint, offset) */}
             <img 
-              src="/IMG_0614.jpg" 
+              src="/IMG_0614.png" 
               alt="LandlordHub dashboard preview"
               className="mock-base"
             />
             {/* Main layer (crisp, on top) */}
             <img 
-              src="/IMG_0614.jpg" 
+              src="/IMG_0614.png" 
               alt="LandlordHub dashboard preview showing property management features"
               className="mock-float"
             />
