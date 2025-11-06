@@ -193,13 +193,33 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   const subscriptionId = (invoice as any).subscription as string
   
-  if (subscriptionId) {
-    await supabase
-      .from('subscriptions')
-      .update({
-        status: 'active',
-      })
-      .eq('stripe_subscription_id', subscriptionId)
+  if (subscriptionId && stripe) {
+    try {
+      // Fetch the subscription to get current_period_end
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
+      
+      // Update subscription status and billing date
+      await supabase
+        .from('subscriptions')
+        .update({
+          status: 'active',
+          current_period_end: currentPeriodEnd.toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('stripe_subscription_id', subscriptionId)
+      
+      console.log('Payment succeeded - subscription updated:', subscriptionId)
+    } catch (error) {
+      console.error('Error updating subscription on payment success:', error)
+      // Fallback: just update status if subscription fetch fails
+      await supabase
+        .from('subscriptions')
+        .update({
+          status: 'active',
+        })
+        .eq('stripe_subscription_id', subscriptionId)
+    }
   }
 }
 
