@@ -471,7 +471,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link
-                  href="/signup"
+                  href="/pricing"
                   className="block w-full text-center text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
                   style={{ 
                     background: key === 'free' 
