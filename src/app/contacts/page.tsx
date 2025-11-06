@@ -539,7 +539,7 @@ export default function ContactsPage() {
 
           {/* Smart Summary Card */}
           <div className="mb-6 rounded-xl p-4" style={{ backgroundColor: '#F8FBFB', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
-            <div className="flex items-center gap-6 text-sm">
+            <div className="flex flex-wrap items-center gap-3 md:gap-6 text-sm">
               <span className="font-semibold" style={{ color: '#1E293B' }}>
                 <Sparkles className="w-4 h-4 inline mr-1" style={{ color: '#1A5F7A' }} />
                 Contact Summary:
@@ -603,7 +603,7 @@ export default function ContactsPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: '#94A3B8' }} />
               <input
                 type="text"
-                placeholder="🔍 Search by name, email, or company"
+                placeholder="Search by name, email, or company"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -653,7 +653,7 @@ export default function ContactsPage() {
                   Contact information pulled from your properties
                 </p>
               </div>
-              <div className="p-6">
+              <div className="p-4 md:p-6">
                 {filteredContacts.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style={{ backgroundColor: '#F0F9FA' }}>
@@ -737,25 +737,27 @@ export default function ContactsPage() {
                               </div>
                             </div>
                             {/* Quick Actions */}
-                            <div className="flex gap-1 ml-2 flex-shrink-0">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleEmailContact(contact.email!, contact.name, 'tenant', property?.address)
-                                }}
-                                className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
-                                title="Email Tenant"
-                                onMouseEnter={(e) => {
-                                  const icon = e.currentTarget.querySelector('svg')
-                                  if (icon) icon.style.color = '#1E7D9A'
-                                }}
-                                onMouseLeave={(e) => {
-                                  const icon = e.currentTarget.querySelector('svg')
-                                  if (icon) icon.style.color = '#64748B'
-                                }}
-                              >
-                                <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
-                              </button>
+                            <div className="flex gap-1.5 ml-2 flex-shrink-0">
+                              {contact.email && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEmailContact(contact.email!, contact.name, 'tenant', property?.address)
+                                  }}
+                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
+                                  title="Email Tenant"
+                                  onMouseEnter={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#1E7D9A'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#64748B'
+                                  }}
+                                >
+                                  <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                </button>
+                              )}
                               {contact.phone && (
                                 <button
                                   onClick={(e) => {
@@ -811,7 +813,7 @@ export default function ContactsPage() {
           {/* Vendors Tab */}
           {activeTab === 'vendors' && (
             <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <div className="px-4 md:px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
                 <div>
                   <h2 className="text-lg font-medium" style={{ color: '#1E293B' }}>Vendor Contacts</h2>
                   <p className="text-sm mt-1" style={{ color: '#64748B' }}>
@@ -820,7 +822,7 @@ export default function ContactsPage() {
                 </div>
                 <button
                   onClick={() => setShowVendorForm(true)}
-                  className="inline-flex items-center px-4 py-2 rounded-lg transition-all"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg transition-all w-full md:w-auto"
                   style={{ 
                     background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)',
                     color: 'white',
@@ -841,7 +843,7 @@ export default function ContactsPage() {
                 </button>
               </div>
               
-              <div className="p-6">
+              <div className="p-4 md:p-6">
                 {filteredContacts.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style={{ backgroundColor: '#F0F9FA' }}>
@@ -930,25 +932,27 @@ export default function ContactsPage() {
                               </div>
                             </div>
                             {/* Quick Actions */}
-                            <div className="flex gap-1 ml-2 flex-shrink-0">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleEmailContact(contact.email!, contact.name, 'vendor')
-                                }}
-                                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                                title="Email Vendor"
-                                onMouseEnter={(e) => {
-                                  const icon = e.currentTarget.querySelector('svg')
-                                  if (icon) icon.style.color = '#1E7D9A'
-                                }}
-                                onMouseLeave={(e) => {
-                                  const icon = e.currentTarget.querySelector('svg')
-                                  if (icon) icon.style.color = '#64748B'
-                                }}
-                              >
-                                <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
-                              </button>
+                            <div className="flex gap-1.5 ml-2 flex-shrink-0">
+                              {contact.email && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEmailContact(contact.email!, contact.name, 'vendor')
+                                  }}
+                                  className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                                  title="Email Vendor"
+                                  onMouseEnter={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#1E7D9A'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    const icon = e.currentTarget.querySelector('svg')
+                                    if (icon) icon.style.color = '#64748B'
+                                  }}
+                                >
+                                  <Mail className="w-4 h-4 transition-colors" style={{ color: '#64748B' }} />
+                                </button>
+                              )}
                               {contact.phone && (
                                 <button
                                   onClick={(e) => {
@@ -1215,7 +1219,7 @@ export default function ContactsPage() {
             </div>
           )}
 
-          {/* Floating Quick Add Button */}
+          {/* Floating Quick Add Button - Hidden on mobile when vendors tab is active (Add Vendor button is visible in header) */}
           <button
             onClick={() => {
               if (activeTab === 'tenants') {
@@ -1224,7 +1228,9 @@ export default function ContactsPage() {
                 setShowVendorForm(true)
               }
             }}
-            className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all"
+            className={`fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${
+              activeTab === 'vendors' ? 'hidden md:flex' : ''
+            }`}
             style={{ 
               background: 'linear-gradient(90deg, #1A5F7A 0%, #1E7D9A 100%)',
               color: 'white',
