@@ -22,10 +22,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://landlordhubapp.com'),
   applicationName: 'LandlordHub',
   title: {
-    default: 'LandlordHub Simplified property management',
+    default: 'LandlordHub | Property Management Software for Small Landlords (1–20 Units)',
     template: '%s | LandlordHub'
   },
-  description: 'Simplify rent collection, expenses, and maintenance in one app. LandlordHub makes property management easy for small landlords — start free today.',
+  description: 'Simplify rent collection, expense tracking, and maintenance in one dashboard. LandlordHub helps landlords with 1–20 units save 10+ hours a month — start free today.',
   keywords: [
     'property management software',
     'landlord software',

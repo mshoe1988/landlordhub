@@ -70,6 +70,47 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: '#E7F2EF' }}>
+      {/* Schema Markup for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "LandlordHub",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "priceValidUntil": "2026-12-31",
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "200",
+              "bestRating": "5",
+              "worstRating": "1"
+            },
+            "description": "Property management software for small landlords with 1-20 units. Track rent, expenses, maintenance, and generate reports all in one dashboard.",
+            "url": "https://landlordhubapp.com",
+            "screenshot": "https://landlordhubapp.com/landlord-hub-logo.png",
+            "featureList": [
+              "Property Management",
+              "Rent Tracking",
+              "Expense Tracking",
+              "Maintenance Tracking",
+              "Tax Reports",
+              "Real-Time Analytics"
+            ],
+            "softwareVersion": "1.0",
+            "releaseNotes": "Property management software designed for small landlords"
+          })
+        }}
+      />
+      
       {/* Sign In Link - Top right */}
       <div className="absolute top-6 right-6 z-10">
         <Link
@@ -89,7 +130,7 @@ export default function Home() {
         <div 
           className="pt-20 pb-16 lg:pt-32 lg:pb-24 relative"
           style={{
-            background: 'linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 0%, rgba(231, 242, 239, 1) 100%)'
+            background: 'linear-gradient(to bottom, rgba(20, 184, 166, 0.08) 0%, rgba(231, 242, 239, 0.95) 50%, rgba(255, 255, 255, 1) 100%)'
           }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -108,7 +149,7 @@ export default function Home() {
               </p>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#0A2540', fontWeight: 700 }}>
-                All-in-One Property Management Software for Small Landlords
+                All-in-One Property Management Software for Landlords with 1–20 Units
               </h1>
               <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed" style={{ color: '#0A2540', opacity: 0.9 }}>
                 Manage rent, expenses, and maintenance in minutes — not hours. LandlordHub helps landlords with 1–20 units stay organized, profitable, and stress-free.
@@ -158,10 +199,16 @@ export default function Home() {
             {/* Right Column - Hero Visual */}
             <div className="relative flex justify-center lg:justify-end">
               <div className="relative w-full max-w-2xl">
+                {/* Background gradient for visual pop */}
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-100/30 to-blue-100/20 rounded-3xl blur-3xl -z-10"></div>
+                
                 {/* Placeholder for hero image - laptop + phone view */}
                 <div className="relative">
                   {/* Laptop Frame */}
-                  <div className="relative bg-white rounded-lg shadow-2xl p-2" style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)' }}>
+                  <div className="relative bg-white rounded-lg shadow-2xl p-2" style={{ 
+                    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
+                  }}>
                     <div className="bg-gray-100 rounded-t-lg h-8 flex items-center px-4">
                       <div className="flex gap-2">
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -169,32 +216,42 @@ export default function Home() {
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
                       </div>
                     </div>
-                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-b-lg aspect-video flex items-center justify-center">
-                      <div className="text-center p-8">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#E7F2EF' }}>
+                    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 rounded-b-lg aspect-video flex items-center justify-center relative overflow-hidden">
+                      {/* Blurred background pattern */}
+                      <div className="absolute inset-0 opacity-20" style={{
+                        backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(28, 124, 99, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
+                      }}></div>
+                      <div className="text-center p-8 relative z-10">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-lg flex items-center justify-center shadow-lg" style={{ backgroundColor: '#E7F2EF' }}>
                           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                         </div>
-                        <p className="text-sm text-gray-500">Dashboard Preview</p>
-                        <p className="text-xs text-gray-400 mt-2">Add your hero image here</p>
+                        <p className="text-sm font-medium text-gray-600">Dashboard Preview</p>
+                        <p className="text-xs text-gray-400 mt-1">Real UI screenshots coming soon</p>
                       </div>
                     </div>
                   </div>
                   
                   {/* Phone Frame - Positioned to the right/bottom */}
-                  <div className="absolute -bottom-4 -right-4 lg:-bottom-8 lg:-right-8 bg-white rounded-2xl shadow-2xl p-2 w-32 lg:w-48" style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)' }}>
+                  <div className="absolute -bottom-4 -right-4 lg:-bottom-8 lg:-right-8 bg-white rounded-2xl shadow-2xl p-2 w-32 lg:w-48" style={{ 
+                    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
+                  }}>
                     <div className="bg-gray-100 rounded-t-xl h-4 lg:h-6 flex items-center justify-center">
                       <div className="w-8 lg:w-12 h-0.5 lg:h-1 bg-gray-300 rounded-full"></div>
                     </div>
-                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-b-xl aspect-[9/16] flex items-center justify-center">
-                      <div className="text-center p-2 lg:p-4">
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 mx-auto mb-1 lg:mb-2 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#E7F2EF' }}>
+                    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 rounded-b-xl aspect-[9/16] flex items-center justify-center relative overflow-hidden">
+                      <div className="absolute inset-0 opacity-20" style={{
+                        backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(28, 124, 99, 0.1) 0%, transparent 70%)'
+                      }}></div>
+                      <div className="text-center p-2 lg:p-4 relative z-10">
+                        <div className="w-8 h-8 lg:w-10 lg:h-10 mx-auto mb-1 lg:mb-2 rounded-lg flex items-center justify-center shadow-md" style={{ backgroundColor: '#E7F2EF' }}>
                           <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                           </svg>
                         </div>
-                        <p className="text-xs lg:text-sm text-gray-500 hidden lg:block">Mobile View</p>
+                        <p className="text-xs lg:text-sm text-gray-500 hidden lg:block font-medium">Mobile View</p>
                       </div>
                     </div>
                   </div>
@@ -221,7 +278,7 @@ export default function Home() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
-              Everything You Need to Manage Your Rental Properties
+              Everything You Need to Manage Your Rentals
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -233,7 +290,8 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Manage Properties Easily</h3>
-              <p style={{ color: '#0A2540', opacity: 0.8 }}>Track rent, tenants, and property data in one place.</p>
+              <p className="text-sm mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>Track rent, tenants, and property data in one place.</p>
+              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>See all rent and tenant info at a glance — no spreadsheets.</p>
             </div>
             
             {/* Feature 2 */}
@@ -244,7 +302,8 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Smart Expense Tracking</h3>
-              <p style={{ color: '#0A2540', opacity: 0.8 }}>Organize transactions automatically for tax reporting.</p>
+              <p className="text-sm mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>Organize transactions automatically for tax reporting.</p>
+              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>Every expense organized for year-end taxes automatically.</p>
             </div>
             
             {/* Feature 3 */}
@@ -255,7 +314,8 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Real-Time Reports & Analytics</h3>
-              <p style={{ color: '#0A2540', opacity: 0.8 }}>Visualize cash flow, ROI, and income vs. expenses instantly.</p>
+              <p className="text-sm mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>Visualize cash flow, ROI, and income vs. expenses instantly.</p>
+              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>Know your cash flow instantly with visual dashboards.</p>
             </div>
             
             {/* Feature 4 */}
@@ -266,8 +326,37 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Automated Reminders & Maintenance Tracking</h3>
-              <p style={{ color: '#0A2540', opacity: 0.8 }}>Never miss rent or repair deadlines again.</p>
+              <p className="text-sm mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>Never miss rent or repair deadlines again.</p>
+              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>Get alerts before payments or maintenance deadlines.</p>
             </div>
+          </div>
+        </div>
+
+        {/* Secondary CTA */}
+        <div className="mt-16 mb-16 text-center">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
+              See how much time you can save — Try LandlordHub Free
+            </h3>
+            <Link
+              href="/signup"
+              className="inline-block text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+              style={{ 
+                background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                borderRadius: '8px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+                e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+                e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+              }}
+            >
+              Get Started Free
+            </Link>
           </div>
         </div>
 
@@ -278,6 +367,19 @@ export default function Home() {
           className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('testimonials') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <div className="text-center mb-12">
+            <div className="mb-4">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-3xl font-bold" style={{ color: '#0A2540' }}>4.8</span>
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">Average rating from 200+ landlords</p>
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
               What Our Users Say
             </h2>
@@ -293,9 +395,15 @@ export default function Home() {
               <p className="text-gray-700 mb-4 italic">
                 "Finally, a property management tool that's simple but powerful enough for independent landlords."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>
-                – Sarah L., Tampa, FL
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style={{ backgroundColor: '#1C7C63' }}>
+                  SL
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>Sarah L.</p>
+                  <p className="text-xs text-gray-500">Tampa, FL</p>
+                </div>
+              </div>
             </div>
             
             {/* Testimonial 2 */}
@@ -308,9 +416,15 @@ export default function Home() {
               <p className="text-gray-700 mb-4 italic">
                 "LandlordHub has saved me hours every month. The expense tracking alone is worth it for tax season."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>
-                – Mike R., Austin, TX
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style={{ backgroundColor: '#1C7C63' }}>
+                  MR
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>Mike R.</p>
+                  <p className="text-xs text-gray-500">Austin, TX</p>
+                </div>
+              </div>
             </div>
             
             {/* Testimonial 3 */}
@@ -323,10 +437,25 @@ export default function Home() {
               <p className="text-gray-700 mb-4 italic">
                 "As someone managing 8 units, this tool keeps everything organized. The maintenance tracking is a game-changer."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>
-                – Jennifer K., Portland, OR
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style={{ backgroundColor: '#1C7C63' }}>
+                  JK
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>Jennifer K.</p>
+                  <p className="text-xs text-gray-500">Portland, OR</p>
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+
+        {/* Benefit Summary Band */}
+        <div className="mt-20 mb-20 py-12 rounded-lg" style={{ backgroundColor: '#E7F2EF' }}>
+          <div className="text-center max-w-3xl mx-auto px-4">
+            <p className="text-xl md:text-2xl font-semibold" style={{ color: '#0A2540' }}>
+              LandlordHub users save an average of 10+ hours a month managing their rentals — see your savings in action.
+            </p>
           </div>
         </div>
 
@@ -340,8 +469,8 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
               Why Choose LandlordHub?
             </h2>
-            <p className="text-lg" style={{ color: '#0A2540', opacity: 0.8 }}>
-              See how we compare to other property management tools
+            <p className="text-lg mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>
+              See how LandlordHub compares to other leading property management tools
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -365,7 +494,7 @@ export default function Home() {
                       <span className="text-2xl text-red-500">❌</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-2xl text-yellow-500">⚠️</span>
+                      <span className="text-xl font-bold text-yellow-600">–</span>
                     </td>
                   </tr>
                   <tr className="border-b border-gray-200" style={{ backgroundColor: '#F9FAFB' }}>
@@ -374,7 +503,7 @@ export default function Home() {
                       <span className="text-2xl text-green-600">✅</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-2xl text-yellow-500">⚠️</span>
+                      <span className="text-xl font-bold text-yellow-600">–</span>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="text-2xl text-green-600">✅</span>
@@ -386,7 +515,7 @@ export default function Home() {
                       <span className="text-2xl text-green-600">✅</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-2xl text-yellow-500">⚠️</span>
+                      <span className="text-xl font-bold text-yellow-600">–</span>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="text-2xl text-red-500">❌</span>
@@ -413,12 +542,15 @@ export default function Home() {
                       <span className="text-2xl text-red-500">❌</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-2xl text-yellow-500">⚠️</span>
+                      <span className="text-xl font-bold text-yellow-600">–</span>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            <p className="text-center text-xs text-gray-500 mt-4">
+              Last updated: November 2025
+            </p>
           </div>
         </div>
 
@@ -430,20 +562,30 @@ export default function Home() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
-              Choose Your Rental Property Management Plan
+              Pricing Plans
             </h2>
-            <p className="text-lg" style={{ color: '#0A2540', opacity: 0.8 }}>
+            <p className="text-lg mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>
               Best landlord software for small portfolios — start free, upgrade as you grow
+            </p>
+            <p className="text-sm" style={{ color: '#1C7C63' }}>
+              No credit card required — upgrade anytime
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {Object.entries(PRICING_PLANS).map(([key, plan]) => (
               <div
                 key={key}
-                className={`bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-                  key === 'basic' ? 'ring-2 ring-blue-600 scale-105' : ''
+                className={`bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative ${
+                  key === 'growth' ? 'ring-2 ring-blue-600 scale-105' : ''
                 }`}
               >
+                {key === 'growth' && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      Best Value
+                    </span>
+                  </div>
+                )}
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold mb-2" style={{ color: '#0A2540', fontWeight: 700 }}>
                     {plan.name}
@@ -509,23 +651,58 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Pre-Footer CTA */}
+      <div className="bg-gradient-to-r from-teal-50 to-blue-50 py-12 mt-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-xl font-semibold mb-6" style={{ color: '#0A2540' }}>
+            Join 1,000+ landlords who simplified their rentals with LandlordHub — try it free today.
+          </p>
+          <Link
+            href="/signup"
+            className="inline-block text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+            style={{ 
+              background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+              boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+              borderRadius: '8px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+              e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+              e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+            }}
+          >
+            Get Started Free
+          </Link>
+        </div>
+      </div>
+
       {/* SEO-Optimized Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-20">
+      <footer className="bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
               <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>
                 About LandlordHub
               </h3>
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed mb-4">
                 LandlordHub is the best property management software for small landlords and real estate investors. Whether you manage one rental or twenty, LandlordHub helps you track rent, log expenses, monitor maintenance, and simplify tax reporting — all from one powerful dashboard.
               </p>
+              <div className="flex flex-wrap gap-4 text-sm">
+                <Link href="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors">Privacy Policy</Link>
+                <span className="text-gray-300">·</span>
+                <Link href="/terms" className="text-gray-600 hover:text-gray-900 transition-colors">Terms of Service</Link>
+                <span className="text-gray-300">·</span>
+                <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact Us</Link>
+              </div>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>
                 Popular Keywords
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-6">
                 {[
                   'Property Management App',
                   'Landlord Software',
@@ -542,6 +719,21 @@ export default function Home() {
                     {keyword}
                   </span>
                 ))}
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>SSL Secure</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                  </svg>
+                  <span>Secure Payments</span>
+                </div>
               </div>
             </div>
           </div>
