@@ -134,22 +134,15 @@ export default function AccountPage() {
     })
   }
 
-  const getNextBillingDate = (isoString?: string, status?: string): Date | null => {
+  const getNextBillingDate = (isoString?: string): Date | null => {
     if (!isoString) return null
-    const periodEnd = new Date(isoString)
-    const now = new Date()
-    // If for any reason the stored period end is today or in the past,
-    // show a sensible next billing date one month from now (display only).
-    if (status === 'active' && periodEnd.getTime() <= now.getTime()) {
-      return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-    }
-    return periodEnd
+    return new Date(isoString)
   }
 
-  const getDisplayedBillingDate = (isoString?: string, status?: string) => {
-    const date = getNextBillingDate(isoString, status)
+  const getDisplayedBillingDate = (isoString?: string) => {
+    const date = getNextBillingDate(isoString)
     if (!date) return ''
-    return formatDate(date.toISOString())
+    return formatDate(isoString!)
   }
 
   if (loading) {
@@ -306,7 +299,7 @@ export default function AccountPage() {
                       <h3 className="font-medium" style={{ color: '#1E293B' }}>Next Billing Date</h3>
                     </div>
                     <p className="text-sm" style={{ color: '#64748B' }}>
-                      {getDisplayedBillingDate(subscription.current_period_end, subscription?.status)}
+                      {getDisplayedBillingDate(subscription.current_period_end)}
                     </p>
                   </div>
                 )}
@@ -446,7 +439,7 @@ export default function AccountPage() {
                   {planInfo.price === 0 ? 'Free' : `$${planInfo.price}`}/month
                 </div>
                 {subscription?.current_period_end && (() => {
-                  const nextBillingDate = getNextBillingDate(subscription.current_period_end, subscription?.status)
+                  const nextBillingDate = getNextBillingDate(subscription.current_period_end)
                   return nextBillingDate ? (
                     <div className="text-xs" style={{ color: '#94A3B8' }}>
                       📅 Next: {nextBillingDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
