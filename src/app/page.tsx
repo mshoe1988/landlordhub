@@ -254,170 +254,105 @@ export default function Home() {
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" role="main">
         {/* Header/Hero Section with Gradient Background */}
-        <div 
-          className="pt-20 pb-16 lg:pt-32 lg:pb-24 relative"
-              style={{ 
+        <section 
+          className="hero"
+          style={{ 
             background: 'linear-gradient(to bottom, rgba(20, 184, 166, 0.08) 0%, rgba(231, 242, 239, 0.95) 50%, rgba(255, 255, 255, 1) 100%)'
           }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Text Content */}
-            <div className="text-center lg:text-left">
-              {/* Rating Badge */}
-              <div className="mb-4">
-                <p className="text-sm font-semibold" style={{ color: '#1C7C63' }}>
-                  Rated 4.8 ★ by 200+ Landlords
-                </p>
-              </div>
-              
-              {/* Trust Indicator */}
-              <div className="mb-4">
-                <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#1C7C63' }}>
-                  Trusted by 1,000+ landlords
-                </p>
-          </div>
-              
-              {/* Tagline */}
-              <p className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#1C7C63' }}>
-                Simplify Life. Maximize Rentals. Save 10+ Hours a Month.
-              </p>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#0A2540', fontWeight: 700 }}>
-                All-in-One Property Management Software for Landlords with 1–20 Units
-          </h1>
-              <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed" style={{ color: '#0A2540', opacity: 0.9 }}>
-                Manage rent, expenses, and maintenance in minutes — not hours. LandlordHub helps landlords with 1–20 units stay organized, profitable, and stress-free.
-          </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Link
-              href="/signup"
-                  className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
-                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
-                    borderRadius: '8px'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
-                    e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
-                    e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
-                  }}
-            >
-              Get Started Free
-            </Link>
-            <Link
-              href="/pricing"
-                  className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
-                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
-                    borderRadius: '8px'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
-                    e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
-                    e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
-                  }}
-                >
-                  See Plans
-            </Link>
-              </div>
+          <div className="text-center lg:text-left">
+            <h1>All-in-One Property Management Software for Landlords with 1–20 Units</h1>
+            
+            <p className="subhead">
+              Manage rent, expenses, and maintenance in minutes—not hours. LandlordHub helps landlords with 1–20 units stay organized, profitable, and stress-free.
+            </p>
+
+            <div className="trust-row">
+              <span className="trust-pill">⭐ Rated 4.8 by 200+ landlords</span>
+              <span className="trust-pill">✓ Trusted by 1,000+ landlords</span>
             </div>
 
-            {/* Right Column - Hero Visual */}
-            <div className="relative flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-2xl">
-                {/* Background gradient for visual pop */}
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-100/30 to-blue-100/20 rounded-3xl blur-3xl -z-10"></div>
-                
-                {/* Tablet/Device Frame with Glow Effect */}
-                <div className="relative">
-                  {/* Glow effect around the device */}
-                  <div className="absolute -inset-4 bg-gradient-to-r from-teal-400/20 via-blue-400/20 to-teal-400/20 rounded-2xl blur-2xl opacity-75"></div>
-                  
-                  {/* Tablet Frame */}
-                  <div className="relative bg-white rounded-xl shadow-2xl p-3" style={{ 
-                    boxShadow: '0 30px 80px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05), 0 0 40px rgba(28, 124, 99, 0.15)',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
-                  }}>
-                    <div className="bg-gray-100 rounded-t-lg h-6 flex items-center justify-center">
-                      <div className="w-16 h-1 bg-gray-300 rounded-full"></div>
-                    </div>
-                    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 rounded-b-lg aspect-[4/3] relative overflow-hidden" style={{ filter: 'blur(2px)' }}>
-                      {/* Blurred Dashboard Preview - Simulating real UI */}
-                      <div className="absolute inset-0 p-4">
-                        {/* Simulated dashboard elements */}
-                        <div className="grid grid-cols-3 gap-3 mb-3">
-                          <div className="bg-white rounded-lg p-3 shadow-sm">
-                            <div className="h-2 bg-teal-200 rounded mb-2"></div>
-                            <div className="h-4 bg-teal-300 rounded w-3/4"></div>
-                          </div>
-                          <div className="bg-white rounded-lg p-3 shadow-sm">
-                            <div className="h-2 bg-blue-200 rounded mb-2"></div>
-                            <div className="h-4 bg-blue-300 rounded w-2/3"></div>
-                          </div>
-                          <div className="bg-white rounded-lg p-3 shadow-sm">
-                            <div className="h-2 bg-green-200 rounded mb-2"></div>
-                            <div className="h-4 bg-green-300 rounded w-4/5"></div>
-                          </div>
-                        </div>
-                        <div className="bg-white rounded-lg p-4 shadow-sm">
-                          <div className="h-3 bg-gray-200 rounded mb-3 w-1/2"></div>
-                          <div className="flex gap-2 mb-2">
-                            <div className="h-16 bg-teal-100 rounded-lg flex-1"></div>
-                            <div className="h-16 bg-red-100 rounded-lg w-1/3"></div>
-                          </div>
-                          <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-                        </div>
-                        <div className="mt-3 grid grid-cols-2 gap-3">
-                          <div className="bg-white rounded-lg p-3 shadow-sm">
-                            <div className="h-2 bg-gray-200 rounded mb-2"></div>
-                            <div className="h-6 bg-green-200 rounded w-2/3"></div>
-                          </div>
-                          <div className="bg-white rounded-lg p-3 shadow-sm">
-                            <div className="h-2 bg-gray-200 rounded mb-2"></div>
-                            <div className="h-6 bg-red-200 rounded w-2/3"></div>
-                          </div>
-                        </div>
-                      </div>
-                      {/* Overlay to enhance blur effect */}
-                      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
-                    </div>
-                  </div>
-                  
-                  {/* Phone Frame - Positioned to the right/bottom */}
-                  <div className="absolute -bottom-4 -right-4 lg:-bottom-8 lg:-right-8 bg-white rounded-2xl shadow-2xl p-2 w-32 lg:w-48" style={{ 
-                    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05), 0 0 30px rgba(28, 124, 99, 0.1)',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
-                  }}>
-                    <div className="bg-gray-100 rounded-t-xl h-4 lg:h-6 flex items-center justify-center">
-                      <div className="w-8 lg:w-12 h-0.5 lg:h-1 bg-gray-300 rounded-full"></div>
-                    </div>
-                    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 rounded-b-xl aspect-[9/16] flex items-center justify-center relative overflow-hidden">
-                      <div className="absolute inset-0 opacity-20" style={{
-                        backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(28, 124, 99, 0.1) 0%, transparent 70%)'
-                      }}></div>
-                      <div className="text-center p-2 lg:p-4 relative z-10">
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 mx-auto mb-1 lg:mb-2 rounded-lg flex items-center justify-center shadow-md" style={{ backgroundColor: '#E7F2EF' }}>
-                          <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                          </svg>
-                        </div>
-                        <p className="text-xs lg:text-sm text-gray-500 hidden lg:block font-medium">Mobile View</p>
-                      </div>
-                    </div>
-                  </div>
+            <div className="cta-row">
+              <Link
+                href="/signup"
+                className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+                style={{ 
+                  background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                  boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                  borderRadius: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+                  e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+                  e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                }}
+              >
+                Get Started Free
+              </Link>
+              <Link
+                href="/pricing"
+                className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+                style={{ 
+                  background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                  boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                  borderRadius: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+                  e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+                  e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                }}
+              >
+                See Plans
+              </Link>
+            </div>
+          </div>
+
+          <div className="hero-mock">
+            {/* Blurred Dashboard Preview - Simulating real UI */}
+            <div className="absolute inset-0 p-4">
+              {/* Simulated dashboard elements */}
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <div className="h-2 bg-teal-200 rounded mb-2"></div>
+                  <div className="h-4 bg-teal-300 rounded w-3/4"></div>
+                </div>
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <div className="h-2 bg-blue-200 rounded mb-2"></div>
+                  <div className="h-4 bg-blue-300 rounded w-2/3"></div>
+                </div>
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <div className="h-2 bg-green-200 rounded mb-2"></div>
+                  <div className="h-4 bg-green-300 rounded w-4/5"></div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <div className="h-3 bg-gray-200 rounded mb-3 w-1/2"></div>
+                <div className="flex gap-2 mb-2">
+                  <div className="h-16 bg-teal-100 rounded-lg flex-1"></div>
+                  <div className="h-16 bg-red-100 rounded-lg w-1/3"></div>
+                </div>
+                <div className="h-2 bg-gray-200 rounded w-3/4"></div>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <div className="h-2 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-6 bg-green-200 rounded w-2/3"></div>
+                </div>
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <div className="h-2 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-6 bg-red-200 rounded w-2/3"></div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Trust Bar */}
         <div className="bg-white/80 backdrop-blur-sm py-4 border-y border-gray-200">
