@@ -821,49 +821,56 @@ export default function ExpensesPage() {
 
               {/* Bar Chart - Monthly Trend */}
               <div 
-                className="bg-white rounded-lg shadow p-6 transition-all duration-300"
+                className="bg-white rounded-lg shadow transition-all duration-300"
                 style={{ 
                   borderRadius: '12px',
                   boxShadow: '0 3px 10px rgba(0,0,0,0.05)',
                   opacity: 1,
-                  transform: 'translateY(0)'
+                  transform: 'translateY(0)',
+                  padding: '1rem',
+                  paddingBottom: '1.5rem'
                 }}
                 key={`bar-${activeFilter}-${dateRange?.start}-${dateRange?.end}`}
               >
                 <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>Monthly Expense Trend</h3>
                 {getMonthlyExpenseData().length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart 
-                      data={getMonthlyExpenseData()}
-                      margin={{ top: 20, right: 10, left: 20, bottom: 60 }}
-                    >
-                      <defs>
-                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="rgba(28,124,99,0.8)" stopOpacity={0.8} />
-                          <stop offset="100%" stopColor="rgba(28,124,99,0.2)" stopOpacity={0.2} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E7ECEA" />
-                      <XAxis 
-                        dataKey="month" 
-                        stroke="#667680"
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
-                        tick={{ fontSize: 11 }}
-                        interval={0}
-                      />
-                      <YAxis 
-                        stroke="#667680"
-                        width={50}
-                        tick={{ fontSize: 11 }}
-                        tickFormatter={(value) => {
-                          if (Math.abs(value) >= 1000) {
-                            return `$${(value / 1000).toFixed(1)}k`
-                          }
-                          return `$${value}`
-                        }}
-                      />
+                  <div style={{ width: '100%', overflow: 'visible', paddingLeft: '0', paddingRight: '0' }}>
+                    <ResponsiveContainer width="100%" height={400}>
+                      <BarChart 
+                        data={getMonthlyExpenseData()}
+                        margin={{ top: 20, right: 15, left: 5, bottom: 80 }}
+                        barCategoryGap="20%"
+                      >
+                        <defs>
+                          <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="rgba(28,124,99,0.8)" stopOpacity={0.8} />
+                            <stop offset="100%" stopColor="rgba(28,124,99,0.2)" stopOpacity={0.2} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#E7ECEA" />
+                        <XAxis 
+                          dataKey="month" 
+                          stroke="#667680"
+                          angle={-45}
+                          textAnchor="end"
+                          height={100}
+                          tick={{ fontSize: 12 }}
+                          interval={0}
+                          tickMargin={8}
+                        />
+                        <YAxis 
+                          stroke="#667680"
+                          width={50}
+                          tick={{ fontSize: 11 }}
+                          tickMargin={5}
+                          tickFormatter={(value) => {
+                            if (Math.abs(value) >= 1000) {
+                              return `$${(value / 1000).toFixed(1)}k`
+                            }
+                            return `$${value}`
+                          }}
+                          domain={['auto', 'auto']}
+                        />
                       <Tooltip 
                         formatter={(value: any) => `$${value.toFixed(2)}`}
                         labelFormatter={(label) => label}
