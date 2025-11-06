@@ -746,7 +746,6 @@ export default function ExpensesPage() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={(entry: any) => `${entry.name} ${((entry.percent || 0) * 100).toFixed(0)}%`}
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
@@ -775,6 +774,44 @@ export default function ExpensesPage() {
                         ))}
                       </Pie>
                       <Tooltip formatter={(value: any) => `$${value.toFixed(2)}`} />
+                      <Legend 
+                        verticalAlign="bottom" 
+                        height={80}
+                        wrapperStyle={{ 
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: '8px',
+                          paddingTop: '16px',
+                          paddingLeft: '4px',
+                          paddingRight: '4px',
+                          maxWidth: '100%',
+                          fontSize: '12px'
+                        }}
+                        iconType="circle"
+                        formatter={(value, entry) => {
+                          const total = getCategoryData().reduce((sum, item) => sum + item.value, 0)
+                          const item = getCategoryData().find((item) => item.name === value)
+                          const percentage = total > 0 && item ? ((item.value / total) * 100).toFixed(0) : '0'
+                          return (
+                            <span 
+                              style={{
+                                background: '#F9FCFB',
+                                borderRadius: '8px',
+                                padding: '4px 8px',
+                                fontSize: '11px',
+                                color: '#0A2540',
+                                fontWeight: 500,
+                                whiteSpace: 'nowrap',
+                                display: 'inline-block'
+                              }}
+                            >
+                              {value}: {percentage}%
+                            </span>
+                          )
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
@@ -796,7 +833,10 @@ export default function ExpensesPage() {
                 <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>Monthly Expense Trend</h3>
                 {getMonthlyExpenseData().length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={getMonthlyExpenseData()}>
+                    <BarChart 
+                      data={getMonthlyExpenseData()}
+                      margin={{ top: 20, right: 10, left: 20, bottom: 60 }}
+                    >
                       <defs>
                         <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="rgba(28,124,99,0.8)" stopOpacity={0.8} />
@@ -804,8 +844,26 @@ export default function ExpensesPage() {
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#E7ECEA" />
-                      <XAxis dataKey="month" stroke="#667680" />
-                      <YAxis stroke="#667680" />
+                      <XAxis 
+                        dataKey="month" 
+                        stroke="#667680"
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        tick={{ fontSize: 11 }}
+                        interval={0}
+                      />
+                      <YAxis 
+                        stroke="#667680"
+                        width={50}
+                        tick={{ fontSize: 11 }}
+                        tickFormatter={(value) => {
+                          if (Math.abs(value) >= 1000) {
+                            return `$${(value / 1000).toFixed(1)}k`
+                          }
+                          return `$${value}`
+                        }}
+                      />
                       <Tooltip 
                         formatter={(value: any) => `$${value.toFixed(2)}`}
                         labelFormatter={(label) => label}
