@@ -136,6 +136,13 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
             <div className="text-center lg:text-left">
+              {/* Rating Badge */}
+              <div className="mb-4">
+                <p className="text-sm font-semibold" style={{ color: '#1C7C63' }}>
+                  Rated 4.8 ★ by 200+ Landlords
+                </p>
+              </div>
+              
               {/* Trust Indicator */}
               <div className="mb-4">
                 <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#1C7C63' }}>
@@ -202,40 +209,64 @@ export default function Home() {
                 {/* Background gradient for visual pop */}
                 <div className="absolute inset-0 bg-gradient-to-br from-teal-100/30 to-blue-100/20 rounded-3xl blur-3xl -z-10"></div>
                 
-                {/* Placeholder for hero image - laptop + phone view */}
+                {/* Tablet/Device Frame with Glow Effect */}
                 <div className="relative">
-                  {/* Laptop Frame */}
-                  <div className="relative bg-white rounded-lg shadow-2xl p-2" style={{ 
-                    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                  {/* Glow effect around the device */}
+                  <div className="absolute -inset-4 bg-gradient-to-r from-teal-400/20 via-blue-400/20 to-teal-400/20 rounded-2xl blur-2xl opacity-75"></div>
+                  
+                  {/* Tablet Frame */}
+                  <div className="relative bg-white rounded-xl shadow-2xl p-3" style={{ 
+                    boxShadow: '0 30px 80px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05), 0 0 40px rgba(28, 124, 99, 0.15)',
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
                   }}>
-                    <div className="bg-gray-100 rounded-t-lg h-8 flex items-center px-4">
-                      <div className="flex gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      </div>
+                    <div className="bg-gray-100 rounded-t-lg h-6 flex items-center justify-center">
+                      <div className="w-16 h-1 bg-gray-300 rounded-full"></div>
                     </div>
-                    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 rounded-b-lg aspect-video flex items-center justify-center relative overflow-hidden">
-                      {/* Blurred background pattern */}
-                      <div className="absolute inset-0 opacity-20" style={{
-                        backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(28, 124, 99, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
-                      }}></div>
-                      <div className="text-center p-8 relative z-10">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-lg flex items-center justify-center shadow-lg" style={{ backgroundColor: '#E7F2EF' }}>
-                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
+                    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 rounded-b-lg aspect-[4/3] relative overflow-hidden" style={{ filter: 'blur(2px)' }}>
+                      {/* Blurred Dashboard Preview - Simulating real UI */}
+                      <div className="absolute inset-0 p-4">
+                        {/* Simulated dashboard elements */}
+                        <div className="grid grid-cols-3 gap-3 mb-3">
+                          <div className="bg-white rounded-lg p-3 shadow-sm">
+                            <div className="h-2 bg-teal-200 rounded mb-2"></div>
+                            <div className="h-4 bg-teal-300 rounded w-3/4"></div>
+                          </div>
+                          <div className="bg-white rounded-lg p-3 shadow-sm">
+                            <div className="h-2 bg-blue-200 rounded mb-2"></div>
+                            <div className="h-4 bg-blue-300 rounded w-2/3"></div>
+                          </div>
+                          <div className="bg-white rounded-lg p-3 shadow-sm">
+                            <div className="h-2 bg-green-200 rounded mb-2"></div>
+                            <div className="h-4 bg-green-300 rounded w-4/5"></div>
+                          </div>
                         </div>
-                        <p className="text-sm font-medium text-gray-600">Dashboard Preview</p>
-                        <p className="text-xs text-gray-400 mt-1">Real UI screenshots coming soon</p>
+                        <div className="bg-white rounded-lg p-4 shadow-sm">
+                          <div className="h-3 bg-gray-200 rounded mb-3 w-1/2"></div>
+                          <div className="flex gap-2 mb-2">
+                            <div className="h-16 bg-teal-100 rounded-lg flex-1"></div>
+                            <div className="h-16 bg-red-100 rounded-lg w-1/3"></div>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded w-3/4"></div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-3">
+                          <div className="bg-white rounded-lg p-3 shadow-sm">
+                            <div className="h-2 bg-gray-200 rounded mb-2"></div>
+                            <div className="h-6 bg-green-200 rounded w-2/3"></div>
+                          </div>
+                          <div className="bg-white rounded-lg p-3 shadow-sm">
+                            <div className="h-2 bg-gray-200 rounded mb-2"></div>
+                            <div className="h-6 bg-red-200 rounded w-2/3"></div>
+                          </div>
+                        </div>
                       </div>
+                      {/* Overlay to enhance blur effect */}
+                      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
                     </div>
                   </div>
                   
                   {/* Phone Frame - Positioned to the right/bottom */}
                   <div className="absolute -bottom-4 -right-4 lg:-bottom-8 lg:-right-8 bg-white rounded-2xl shadow-2xl p-2 w-32 lg:w-48" style={{ 
-                    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05), 0 0 30px rgba(28, 124, 99, 0.1)',
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
                   }}>
                     <div className="bg-gray-100 rounded-t-xl h-4 lg:h-6 flex items-center justify-center">
@@ -284,9 +315,11 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Feature 1 */}
             <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ 
+                background: 'linear-gradient(135deg, #14B8A6 0%, #1C7C63 100%)'
+              }}>
+                <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Manage Properties Easily</h3>
@@ -296,21 +329,25 @@ export default function Home() {
             
             {/* Feature 2 */}
             <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ 
+                background: 'linear-gradient(135deg, #3B82F6 0%, #1C7C63 100%)'
+              }}>
+                <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Smart Expense Tracking</h3>
               <p className="text-sm mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>Organize transactions automatically for tax reporting.</p>
-              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>Every expense organized for year-end taxes automatically.</p>
+              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>Every expense logged for tax time — automatically.</p>
             </div>
             
             {/* Feature 3 */}
             <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ 
+                background: 'linear-gradient(135deg, #14B8A6 0%, #3B82F6 100%)'
+              }}>
+                <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Real-Time Reports & Analytics</h3>
@@ -320,14 +357,16 @@ export default function Home() {
             
             {/* Feature 4 */}
             <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ 
+                background: 'linear-gradient(135deg, #1C7C63 0%, #14B8A6 100%)'
+              }}>
+                <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Automated Reminders & Maintenance Tracking</h3>
               <p className="text-sm mb-2" style={{ color: '#0A2540', opacity: 0.8 }}>Never miss rent or repair deadlines again.</p>
-              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>Get alerts before payments or maintenance deadlines.</p>
+              <p className="text-xs" style={{ color: '#1C7C63', fontStyle: 'italic' }}>Stay ahead of rent and maintenance deadlines effortlessly.</p>
             </div>
           </div>
         </div>
@@ -448,6 +487,32 @@ export default function Home() {
               </div>
             </div>
           </div>
+          
+          {/* CTA After Testimonials */}
+          <div className="mt-12 text-center">
+            <p className="text-xl font-semibold mb-6" style={{ color: '#0A2540' }}>
+              Ready to see why 1,000+ landlords trust LandlordHub?
+            </p>
+            <Link
+              href="/signup"
+              className="inline-block text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+              style={{ 
+                background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                borderRadius: '8px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+                e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+                e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+              }}
+            >
+              Get Started Free →
+            </Link>
+          </div>
         </div>
 
         {/* Benefit Summary Band */}
@@ -479,7 +544,7 @@ export default function Home() {
                 <thead>
                   <tr style={{ backgroundColor: '#E7F2EF' }}>
                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#0A2540' }}>Feature</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: '#1C7C63' }}>LandlordHub</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: '#1C7C63', backgroundColor: 'rgba(231, 242, 239, 0.5)' }}>LandlordHub</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: '#0A2540' }}>Landlord Studio</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: '#0A2540' }}>Stessa</th>
                   </tr>
@@ -487,7 +552,7 @@ export default function Home() {
                 <tbody>
                   <tr className="border-b border-gray-200">
                     <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Designed for landlords with 1-20 units</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4 text-center" style={{ backgroundColor: 'rgba(231, 242, 239, 0.3)' }}>
                       <span className="text-2xl text-green-600">✅</span>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -499,7 +564,7 @@ export default function Home() {
                   </tr>
                   <tr className="border-b border-gray-200" style={{ backgroundColor: '#F9FAFB' }}>
                     <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Free plan available</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4 text-center" style={{ backgroundColor: 'rgba(231, 242, 239, 0.3)' }}>
                       <span className="text-2xl text-green-600">✅</span>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -511,7 +576,7 @@ export default function Home() {
                   </tr>
                   <tr className="border-b border-gray-200">
                     <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Track maintenance & vendor contacts</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4 text-center" style={{ backgroundColor: 'rgba(231, 242, 239, 0.3)' }}>
                       <span className="text-2xl text-green-600">✅</span>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -523,7 +588,7 @@ export default function Home() {
                   </tr>
                   <tr className="border-b border-gray-200" style={{ backgroundColor: '#F9FAFB' }}>
                     <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Built-in tax reports</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4 text-center" style={{ backgroundColor: 'rgba(231, 242, 239, 0.3)' }}>
                       <span className="text-2xl text-green-600">✅</span>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -535,7 +600,7 @@ export default function Home() {
                   </tr>
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Easy-to-use dashboard</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4 text-center" style={{ backgroundColor: 'rgba(231, 242, 239, 0.3)' }}>
                       <span className="text-2xl text-green-600">✅</span>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -543,6 +608,18 @@ export default function Home() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="text-xl font-bold text-yellow-600">–</span>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-gray-200" style={{ backgroundColor: '#F9FAFB' }}>
+                    <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Designed for Independent Landlords (Not Large Property Firms)</td>
+                    <td className="px-6 py-4 text-center" style={{ backgroundColor: 'rgba(231, 242, 239, 0.3)' }}>
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-red-500">❌</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-red-500">❌</span>
                     </td>
                   </tr>
                 </tbody>
@@ -612,31 +689,34 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/pricing"
-                  className="block w-full text-center text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
-                  style={{ 
-                    background: key === 'free' 
-                      ? 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)'
-                      : 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
-                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
-                    borderRadius: '8px'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (key !== 'free') {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
-                      e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (key !== 'free') {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
-                      e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
-                    }
-                  }}
-                >
-                  Start Free
-                </Link>
+                <div>
+                  <Link
+                    href="/pricing"
+                    className="block w-full text-center text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+                    style={{ 
+                      background: key === 'free' 
+                        ? 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)'
+                        : 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                      boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                      borderRadius: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (key !== 'free') {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+                        e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (key !== 'free') {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+                        e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                      }
+                    }}
+                  >
+                    Start Free
+                  </Link>
+                  <p className="text-xs text-center text-gray-500 mt-2">No credit card required</p>
+                </div>
               </div>
             ))}
           </div>
@@ -687,6 +767,9 @@ export default function Home() {
               <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>
                 About LandlordHub
               </h3>
+              <p className="text-sm font-semibold mb-3" style={{ color: '#1C7C63' }}>
+                Built by landlords, for landlords — designed to simplify your rental business.
+              </p>
               <p className="text-gray-700 leading-relaxed mb-4">
                 LandlordHub is the best property management software for small landlords and real estate investors. Whether you manage one rental or twenty, LandlordHub helps you track rent, log expenses, monitor maintenance, and simplify tax reporting — all from one powerful dashboard.
               </p>
