@@ -44,6 +44,19 @@ body {
   align-items: center;
   gap: clamp(24px, 4vw, 48px);
   min-height: 68vh;
+  position: relative;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 40%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle at 50% 50%, rgba(15, 110, 95, 0.15), transparent 70%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .hero h1 {
@@ -94,23 +107,26 @@ body {
   position: relative;
   aspect-ratio: 16 / 10;
   border-radius: 16px;
-  overflow: visible;
-  box-shadow: 0 25px 45px rgba(15, 42, 61, 0.14);
-  width: 115%;
+  overflow: hidden;
+  box-shadow: 0 25px 45px rgba(15, 42, 61, 0.15);
+  width: 130%;
   margin: 0 auto;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  transform: perspective(1000px) rotateY(-2deg) translateY(10px);
 }
 
 .hero-mock::before {
   content: "";
   position: absolute;
-  inset: -20px;
-  background: radial-gradient(circle at 60% 60%, rgba(15, 110, 95, 0.15), transparent 70%);
-  z-index: -1;
+  inset: 0;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  mix-blend-mode: overlay;
+  z-index: 3;
   border-radius: 16px;
+  pointer-events: none;
 }
 
 .hero-mock::after {
@@ -130,7 +146,7 @@ body {
   height: 100%;
   object-fit: contain;
   object-position: top center;
-  filter: brightness(1.03) saturate(1.05);
+  filter: brightness(1.05) contrast(1.08) saturate(1.1);
   opacity: 0.6;
   transform: translate(8px, 8px);
   border-radius: 16px;
@@ -144,7 +160,7 @@ body {
   height: 100%;
   object-fit: contain;
   object-position: top center;
-  filter: brightness(1.03) saturate(1.05);
+  filter: brightness(1.05) contrast(1.08) saturate(1.1);
   border-radius: 16px;
   z-index: 1;
 }
@@ -162,6 +178,7 @@ body {
     order: 2;
     width: 100%;
     overflow: hidden;
+    transform: none;
   }
   .trust-row {
     justify-content: center;

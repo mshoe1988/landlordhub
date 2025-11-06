@@ -222,9 +222,9 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" role="main">
         {/* Header/Hero Section with Gradient Background */}
         <section 
-          className="hero"
+          className="hero hero-section"
           style={{ 
-            background: 'linear-gradient(to bottom, rgba(20, 184, 166, 0.08) 0%, rgba(231, 242, 239, 0.95) 50%, rgba(255, 255, 255, 1) 100%)'
+            background: 'linear-gradient(115deg, #eaf5f3 0%, #dceceb 100%)'
           }}
         >
           <div className="text-center lg:text-left">
