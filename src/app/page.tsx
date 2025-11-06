@@ -282,18 +282,33 @@ export default function Home() {
           </div>
 
           <div className="hero-mock">
-            {/* 3D Layering Effect - Base layer (faint, offset) */}
-            <img 
-              src="/IMG_0614.png" 
-              alt="LandlordHub dashboard preview"
-              className="mock-base"
-            />
-            {/* Main layer (crisp, on top) */}
-            <img 
-              src="/IMG_0614.png" 
-              alt="LandlordHub dashboard preview showing property management features"
-              className="mock-float"
-            />
+            {/* Browser Frame */}
+            <div className="browser-frame">
+              {/* Browser Address Bar */}
+              <div className="browser-address-bar">
+                <div className="browser-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              {/* App Header Bar */}
+              <div className="browser-app-header">
+                <img 
+                  src="/landlord-hub-logo.svg" 
+                  alt="LandlordHub"
+                  className="browser-logo"
+                />
+              </div>
+              {/* Dashboard Content */}
+              <div className="browser-content">
+                <img 
+                  src="/IMG_0614.png" 
+                  alt="LandlordHub dashboard preview showing property management features"
+                  className="dashboard-screenshot"
+                />
+              </div>
+            </div>
           </div>
         </section>
 

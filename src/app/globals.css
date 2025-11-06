@@ -36,25 +36,29 @@ body {
 
 /* Hero Section Styles */
 .hero {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: clamp(80px, 8vw, 120px) clamp(20px, 4vw, 40px) clamp(60px, 6vw, 96px);
+  padding: clamp(80px, 8vw, 120px) clamp(20px, 4vw, 64px) clamp(60px, 6vw, 96px);
   display: grid;
   grid-template-columns: 1.1fr 1.1fr;
   align-items: center;
-  gap: clamp(24px, 4vw, 48px);
+  gap: clamp(48px, 6vw, 64px);
   min-height: 68vh;
   position: relative;
+}
+
+.hero > div:first-child {
+  max-width: 680px;
 }
 
 .hero-section::after {
   content: "";
   position: absolute;
-  right: 0;
-  top: 40%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle at 50% 50%, rgba(15, 110, 95, 0.15), transparent 70%);
+  right: 4%;
+  top: 38%;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(14, 104, 90, 0.16) 0%, rgba(14, 104, 90, 0) 70%);
   z-index: -1;
   pointer-events: none;
 }
@@ -105,64 +109,108 @@ body {
 
 .hero-mock {
   position: relative;
-  aspect-ratio: 16 / 10;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 25px 45px rgba(15, 42, 61, 0.15);
-  width: 130%;
+  width: 144%;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
   display: flex;
   align-items: flex-start;
   justify-content: center;
+}
+
+/* Browser Frame */
+.browser-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 
+    0 4px 10px rgba(7, 21, 33, 0.06),
+    0 22px 48px rgba(7, 21, 33, 0.12);
+  filter: brightness(1.05) contrast(1.06) saturate(1.03);
   transform: perspective(1000px) rotateY(-2deg) translateY(10px);
 }
 
-.hero-mock::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-  mix-blend-mode: overlay;
-  z-index: 3;
-  border-radius: 16px;
-  pointer-events: none;
+/* Browser Address Bar */
+.browser-address-bar {
+  height: 36px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.hero-mock::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(120% 100% at 100% 20%, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 60%, rgba(255, 255, 255, 0.4) 100%);
-  pointer-events: none;
-  z-index: 2;
-  border-radius: 16px;
+.browser-dots {
+  display: flex;
+  gap: 6px;
 }
 
-.hero-mock .mock-base {
-  position: absolute;
-  inset: 0;
+.browser-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d0d0d0;
+}
+
+.browser-dots span:nth-child(1) {
+  background: #ff5f56;
+}
+
+.browser-dots span:nth-child(2) {
+  background: #ffbd2e;
+}
+
+.browser-dots span:nth-child(3) {
+  background: #27c93f;
+}
+
+/* App Header Bar */
+.browser-app-header {
+  height: 56px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(16, 42, 61, 0.06);
+}
+
+.browser-logo {
+  height: 24px;
+  width: auto;
+}
+
+/* Browser Content */
+.browser-content {
+  position: relative;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.browser-content .dashboard-screenshot {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: top center;
-  filter: brightness(1.05) contrast(1.08) saturate(1.1);
-  opacity: 0.6;
-  transform: translate(8px, 8px);
-  border-radius: 16px;
-  z-index: 0;
+  height: auto;
+  display: block;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
 }
 
-.hero-mock .mock-float {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: top center;
-  filter: brightness(1.05) contrast(1.08) saturate(1.1);
-  border-radius: 16px;
-  z-index: 1;
+/* Text rendering for hero capture */
+.hero-capture * {
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dashboard Screenshot Capture Mode */
+body.screenshot-mode header.app-header,
+body.screenshot-mode [style*="background: radial-gradient(circle at top center"] {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(6px);
+}
+
+body.screenshot-mode .hero-capture * {
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
 }
 
 @media (max-width: 900px) {
@@ -177,7 +225,9 @@ body {
   .hero-mock {
     order: 2;
     width: 100%;
-    overflow: hidden;
+  }
+  
+  .browser-frame {
     transform: none;
   }
   .trust-row {
