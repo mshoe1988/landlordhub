@@ -196,8 +196,8 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   if (subscriptionId && stripe) {
     try {
       // Fetch the subscription to get current_period_end
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-      const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription
+      const currentPeriodEnd = (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : new Date()
       
       // Update subscription status and billing date
       await supabase

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { stripe } from '@/lib/stripe'
+import Stripe from 'stripe'
 
 function getPlanFromPriceId(priceId: string): string {
   if (priceId === process.env.STRIPE_BASIC_PRICE_ID) {
@@ -20,9 +21,9 @@ async function syncSubscriptionFromStripe(subscription: any): Promise<any> {
 
   try {
     // Fetch fresh data from Stripe
-    const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id)
+    const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id) as Stripe.Subscription
     
-    const currentPeriodEnd = new Date(stripeSubscription.current_period_end * 1000)
+    const currentPeriodEnd = (stripeSubscription as any).current_period_end ? new Date((stripeSubscription as any).current_period_end * 1000) : new Date()
     const priceId = stripeSubscription.items.data[0].price.id
     const plan = getPlanFromPriceId(priceId)
     
