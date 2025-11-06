@@ -900,6 +900,7 @@ export default function ExpensesPage() {
                       />
                     </BarChart>
                   </ResponsiveContainer>
+                  </div>
                 ) : (
                   <p className="text-gray-500 text-center py-8">No expenses to display</p>
                 )}
