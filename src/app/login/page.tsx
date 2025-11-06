@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
-  const [appleLoading, setAppleLoading] = useState(false)
+  const [facebookLoading, setFacebookLoading] = useState(false)
   const router = useRouter()
 
   const handleGoogleSignIn = async () => {
@@ -42,13 +42,13 @@ export default function LoginPage() {
     }
   }
 
-  const handleAppleSignIn = async () => {
-    setAppleLoading(true)
+  const handleFacebookSignIn = async () => {
+    setFacebookLoading(true)
     setError('')
     
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
+        provider: 'facebook',
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
         },
@@ -56,14 +56,14 @@ export default function LoginPage() {
       
       if (error) {
         setError(error.message)
-        setAppleLoading(false)
+        setFacebookLoading(false)
       } else {
-        trackLogin('apple')
+        trackLogin('facebook')
         // OAuth redirect will happen automatically
       }
     } catch (err: any) {
       setError(err.message)
-      setAppleLoading(false)
+      setFacebookLoading(false)
     }
   }
 
@@ -146,7 +146,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                disabled={googleLoading || loading || appleLoading}
+                disabled={googleLoading || loading || facebookLoading}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-lg text-base font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 style={{
                   background: '#ffffff',
@@ -154,13 +154,13 @@ export default function LoginPage() {
                   color: '#1f2937'
                 }}
                 onMouseEnter={(e) => {
-                  if (!googleLoading && !loading && !appleLoading) {
+                  if (!googleLoading && !loading && !facebookLoading) {
                     e.currentTarget.style.backgroundColor = '#f9fafb'
                     e.currentTarget.style.borderColor = '#9ca3af'
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!googleLoading && !loading && !appleLoading) {
+                  if (!googleLoading && !loading && !facebookLoading) {
                     e.currentTarget.style.backgroundColor = '#ffffff'
                     e.currentTarget.style.borderColor = '#cbd5d8'
                   }
@@ -184,36 +184,36 @@ export default function LoginPage() {
                 )}
               </button>
 
-              {/* Apple Sign-In Button */}
+              {/* Facebook Sign-In Button */}
               <button
                 type="button"
-                onClick={handleAppleSignIn}
-                disabled={appleLoading || loading || googleLoading}
+                onClick={handleFacebookSignIn}
+                disabled={facebookLoading || loading || googleLoading}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: '#000000',
+                  background: '#1877F2',
                   color: '#ffffff'
                 }}
                 onMouseEnter={(e) => {
-                  if (!appleLoading && !loading && !googleLoading) {
-                    e.currentTarget.style.backgroundColor = '#1a1a1a'
+                  if (!facebookLoading && !loading && !googleLoading) {
+                    e.currentTarget.style.backgroundColor = '#166FE5'
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!appleLoading && !loading && !googleLoading) {
-                    e.currentTarget.style.backgroundColor = '#000000'
+                  if (!facebookLoading && !loading && !googleLoading) {
+                    e.currentTarget.style.backgroundColor = '#1877F2'
                   }
                 }}
               >
-                {appleLoading ? (
+                {facebookLoading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 ) : (
                   <>
-                    {/* Apple Icon SVG */}
+                    {/* Facebook Icon SVG */}
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.562 3.993c-.946 1.068-2.489 1.785-3.834 1.68-.183-1.455.554-2.987 1.433-3.98.978-1.13 2.537-1.896 3.834-1.796.156 1.466-.436 2.958-1.433 4.096zm.916 1.425c-1.844.213-3.426-.982-4.32-.982-.927 0-2.298.967-3.79.967C4.13 5.403 2.5 4.16 1.2 4.16c-.078 0-.156 0-.234.01C2.3 1.378 5.104-.032 7.538.032c1.067 0 2.05.378 2.85.378.853 0 1.956-.422 3.29-.422 2.36 0 4.147 1.31 5.152 3.454-4.529 2.422-3.807 8.695.806 10.784-.608 1.255-1.344 2.554-2.325 2.554-.943 0-1.3-.607-2.43-.607-1.177 0-1.565.607-2.475.607-1.046 0-1.787-1.353-2.44-2.625-1.634-2.858-2.298-5.632-2.27-5.782.018-.076.06-.146.122-.197.063-.051.144-.082.228-.082 2.532.193 4.893 1.248 6.66 2.954.084-.646.25-1.27.483-1.858z"/>
+                      <path d="M18 9a9 9 0 1 0-10.406 8.89v-6.288H5.309V9h2.285V7.017c0-2.255 1.343-3.501 3.4-3.501.985 0 2.014.175 2.014.175v2.215h-1.135c-1.118 0-1.467.694-1.467 1.406V9h2.496l-.399 2.602h-2.097v6.288A9.001 9.001 0 0 0 18 9z"/>
                     </svg>
-                    <span>Continue with Apple</span>
+                    <span>Continue with Facebook</span>
                   </>
                 )}
               </button>
