@@ -195,10 +195,10 @@ export default function Home() {
               },
               {
                 "@type": "Question",
-                "name": "Do I need a credit card to get started?",
+                "name": "How do I get started?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No credit card is required to create a LandlordHub account. You can start free and upgrade anytime as your portfolio grows."
+                  "text": "You can start free and upgrade anytime as your portfolio grows."
                 }
               },
               {
@@ -295,7 +295,7 @@ export default function Home() {
               <Link
                 href="/pricing"
                 className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
-                style={{ 
+              style={{ 
                   background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
                   boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
                   borderRadius: '8px'
@@ -683,7 +683,7 @@ export default function Home() {
               Best landlord software for small portfolios — start free, upgrade as you grow
             </p>
             <p className="text-sm" style={{ color: '#1C7C63' }}>
-              No credit card required — upgrade anytime
+              Start free — upgrade anytime
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -753,7 +753,6 @@ export default function Home() {
                   >
                     Start Free
                   </Link>
-                  <p className="text-xs text-center text-gray-500 mt-2">No credit card required</p>
                 </div>
               </div>
             ))}
@@ -809,11 +808,11 @@ export default function Home() {
             {/* FAQ Item 2 */}
             <details className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 cursor-pointer transition-all hover:shadow-md">
               <summary className="font-bold text-lg cursor-pointer list-none flex justify-between items-center" style={{ color: '#0A2540' }}>
-                <span>Is there a free plan? Do I need a credit card?</span>
+                <span>Is there a free plan?</span>
                 <span className="faq-icon text-2xl" style={{ color: '#1C7C63' }}></span>
               </summary>
               <div className="mt-4 text-gray-700 leading-relaxed">
-                Yes—our <strong>Free</strong> plan supports one property with income/expense tracking, maintenance tasks, and secure documents. <strong>No credit card required</strong>. Upgrade anytime as you grow.
+                Yes—our <strong>Free</strong> plan supports one property with income/expense tracking, maintenance tasks, and secure documents. Upgrade anytime as you grow.
               </div>
             </details>
 

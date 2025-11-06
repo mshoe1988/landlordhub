@@ -332,7 +332,7 @@ export default function PricingPage() {
                   Is there a free trial?
                 </h3>
                 <p className="text-gray-600">
-                  Our free plan allows you to manage 1 property with full features. No credit card required.
+                  Our free plan allows you to manage 1 property with full features.
                 </p>
               </div>
             </div>

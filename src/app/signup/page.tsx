@@ -428,7 +428,7 @@ export default function SignupPage() {
               
               {/* Reassurance Text */}
               <p className="mt-4 text-center text-xs" style={{ color: '#6b7280' }}>
-                No credit card required • Cancel anytime
+                Cancel anytime
               </p>
             </div>
 
