@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import SocialShare from '@/components/SocialShare'
+import { PRICING_PLANS } from '@/lib/stripe'
+import { Check } from 'lucide-react'
 
 // Disable caching for the homepage to ensure latest content
 export const dynamic = 'force-dynamic'
@@ -12,6 +14,8 @@ export const dynamic = 'force-dynamic'
 export default function Home() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
+  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
   useEffect(() => {
     if (!loading) {
@@ -20,6 +24,37 @@ export default function Home() {
       }
     }
   }, [user, loading, router])
+
+  // Scroll animation observer - runs after DOM is ready
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => new Set(prev).add(entry.target.id))
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+
+    // Use setTimeout to ensure refs are set after render
+    const timeoutId = setTimeout(() => {
+      const refs = Object.values(sectionRefs.current).filter(Boolean) as HTMLDivElement[]
+      refs.forEach((ref) => {
+        if (ref) observer.observe(ref)
+      })
+    }, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+      const refs = Object.values(sectionRefs.current).filter(Boolean) as HTMLDivElement[]
+      refs.forEach((ref) => {
+        if (ref) observer.unobserve(ref)
+      })
+      observer.disconnect()
+    }
+  }, [])
 
   if (loading) {
     return (
@@ -50,8 +85,13 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" role="main">
-        {/* Header/Hero Section */}
-        <div className="pt-20 pb-16 lg:pt-32 lg:pb-24">
+        {/* Header/Hero Section with Gradient Background */}
+        <div 
+          className="pt-20 pb-16 lg:pt-32 lg:pb-24 relative"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 0%, rgba(231, 242, 239, 1) 100%)'
+          }}
+        >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
             <div className="text-center lg:text-left">
@@ -67,7 +107,7 @@ export default function Home() {
                 Simplify Life. Maximize Rentals. Save 10+ Hours a Month.
               </p>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#0A2540' }}>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#0A2540', fontWeight: 700 }}>
                 All-in-One Property Management Software for Small Landlords
               </h1>
               <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed" style={{ color: '#0A2540', opacity: 0.9 }}>
@@ -76,10 +116,11 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href="/signup"
-                  className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                  className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
                   style={{ 
                     background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
-                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                    borderRadius: '8px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
@@ -94,10 +135,11 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                  className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
                   style={{ 
                     background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
-                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                    borderRadius: '8px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
@@ -162,11 +204,24 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Trust Bar */}
+        <div className="bg-white/80 backdrop-blur-sm py-4 border-y border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-sm font-semibold" style={{ color: '#1C7C63' }}>
+              Trusted by Independent Landlords Nationwide
+            </p>
+          </div>
+        </div>
+
         {/* Features Section */}
-        <div className="mt-20 mb-20">
+        <div 
+          id="features"
+          ref={(el) => (sectionRefs.current['features'] = el)}
+          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('features') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540' }}>
-              Everything You Need to Manage Your Properties
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
+              Everything You Need to Manage Your Rental Properties
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -217,9 +272,13 @@ export default function Home() {
         </div>
 
         {/* Testimonials Section */}
-        <div className="mt-20 mb-20">
+        <div 
+          id="testimonials"
+          ref={(el) => (sectionRefs.current['testimonials'] = el)}
+          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('testimonials') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540' }}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
               What Our Users Say
             </h2>
           </div>
@@ -272,9 +331,13 @@ export default function Home() {
         </div>
 
         {/* Comparison Section */}
-        <div className="mt-20 mb-20">
+        <div 
+          id="comparison"
+          ref={(el) => (sectionRefs.current['comparison'] = el)}
+          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('comparison') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540' }}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
               Why Choose LandlordHub?
             </h2>
             <p className="text-lg" style={{ color: '#0A2540', opacity: 0.8 }}>
@@ -359,6 +422,84 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Pricing CTA Section */}
+        <div 
+          id="pricing"
+          ref={(el) => (sectionRefs.current['pricing'] = el)}
+          className={`mt-20 mb-20 transition-all duration-700 ${visibleSections.has('pricing') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540', fontWeight: 700 }}>
+              Choose Your Rental Property Management Plan
+            </h2>
+            <p className="text-lg" style={{ color: '#0A2540', opacity: 0.8 }}>
+              Best landlord software for small portfolios — start free, upgrade as you grow
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Object.entries(PRICING_PLANS).map(([key, plan]) => (
+              <div
+                key={key}
+                className={`bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                  key === 'basic' ? 'ring-2 ring-blue-600 scale-105' : ''
+                }`}
+              >
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold mb-2" style={{ color: '#0A2540', fontWeight: 700 }}>
+                    {plan.name}
+                  </h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold" style={{ color: '#0A2540' }}>
+                      ${plan.price}
+                    </span>
+                    {plan.price > 0 && (
+                      <span className="text-gray-600">/month</span>
+                    )}
+                  </div>
+                  {plan.description && (
+                    <p className="text-sm text-gray-600 mb-4">
+                      {plan.description}
+                    </p>
+                  )}
+                </div>
+                <ul className="space-y-3 mb-6">
+                  {plan.features.slice(0, 4).map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <Check className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/signup"
+                  className="block w-full text-center text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+                  style={{ 
+                    background: key === 'free' 
+                      ? 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)'
+                      : 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                    boxShadow: '0 4px 14px 0 rgba(28, 124, 99, 0.3)',
+                    borderRadius: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (key !== 'free') {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
+                      e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (key !== 'free') {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
+                      e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                    }
+                  }}
+                >
+                  Start Free
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Social Sharing Section */}
         <div className="mt-16 text-center">
           <SocialShare 
@@ -367,6 +508,48 @@ export default function Home() {
           />
         </div>
       </main>
+
+      {/* SEO-Optimized Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>
+                About LandlordHub
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                LandlordHub is the best property management software for small landlords and real estate investors. Whether you manage one rental or twenty, LandlordHub helps you track rent, log expenses, monitor maintenance, and simplify tax reporting — all from one powerful dashboard.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: '#0A2540', fontWeight: 600 }}>
+                Popular Keywords
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  'Property Management App',
+                  'Landlord Software',
+                  'Rent Tracking',
+                  'Rental Accounting',
+                  'Maintenance Tracking',
+                  'Small Landlord Tools',
+                  'Real Estate Investors'
+                ].map((keyword, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  >
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-200 pt-8 text-center text-sm text-gray-600">
+            <p>&copy; {new Date().getFullYear()} LandlordHub. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
