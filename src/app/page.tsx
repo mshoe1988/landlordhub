@@ -55,11 +55,23 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
             <div className="text-center lg:text-left">
+              {/* Trust Indicator */}
+              <div className="mb-4">
+                <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#1C7C63' }}>
+                  Trusted by 1,000+ landlords
+                </p>
+              </div>
+              
+              {/* Tagline */}
+              <p className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#1C7C63' }}>
+                Simplify Life. Maximize Rentals. Save 10+ Hours a Month.
+              </p>
+              
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#0A2540' }}>
                 All-in-One Property Management Software for Small Landlords
               </h1>
               <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed" style={{ color: '#0A2540', opacity: 0.9 }}>
-                Track rent, expenses, maintenance, and reports — all in one easy dashboard built for landlords with 1–20 units.
+                Manage rent, expenses, and maintenance in minutes — not hours. LandlordHub helps landlords with 1–20 units stay organized, profitable, and stress-free.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
@@ -150,36 +162,200 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ color: '#1C7C63' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>Property Management</h2>
-            <p style={{ color: '#0A2540' }}>Manage multiple properties with ease. Track rent collection, tenant information, and property details.</p>
+        {/* Features Section */}
+        <div className="mt-20 mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540' }}>
+              Everything You Need to Manage Your Properties
+            </h2>
           </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ color: '#1C7C63' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-              </svg>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Feature 1 */}
+            <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Manage Properties Easily</h3>
+              <p style={{ color: '#0A2540', opacity: 0.8 }}>Track rent, tenants, and property data in one place.</p>
             </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>Expense Tracking</h2>
-            <p style={{ color: '#0A2540' }}>Keep detailed records of all property-related expenses for tax purposes and financial planning.</p>
+            
+            {/* Feature 2 */}
+            <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Smart Expense Tracking</h3>
+              <p style={{ color: '#0A2540', opacity: 0.8 }}>Organize transactions automatically for tax reporting.</p>
+            </div>
+            
+            {/* Feature 3 */}
+            <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Real-Time Reports & Analytics</h3>
+              <p style={{ color: '#0A2540', opacity: 0.8 }}>Visualize cash flow, ROI, and income vs. expenses instantly.</p>
+            </div>
+            
+            {/* Feature 4 */}
+            <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#0A2540' }}>Automated Reminders & Maintenance Tracking</h3>
+              <p style={{ color: '#0A2540', opacity: 0.8 }}>Never miss rent or repair deadlines again.</p>
+            </div>
           </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#E7F2EF' }}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ color: '#1C7C63' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
+        </div>
+
+        {/* Testimonials Section */}
+        <div className="mt-20 mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540' }}>
+              What Our Users Say
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Testimonial 1 */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <div className="mb-4">
+                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63', opacity: 0.3 }}>
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                </svg>
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                "Finally, a property management tool that's simple but powerful enough for independent landlords."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>
+                – Sarah L., Tampa, FL
+              </p>
             </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: '#0A2540' }}>Reports & Analytics</h2>
-            <p style={{ color: '#0A2540' }}>Generate comprehensive reports for tax filing, financial analysis, and property performance tracking.</p>
+            
+            {/* Testimonial 2 */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <div className="mb-4">
+                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63', opacity: 0.3 }}>
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                </svg>
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                "LandlordHub has saved me hours every month. The expense tracking alone is worth it for tax season."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>
+                – Mike R., Austin, TX
+              </p>
+            </div>
+            
+            {/* Testimonial 3 */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <div className="mb-4">
+                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#1C7C63', opacity: 0.3 }}>
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                </svg>
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                "As someone managing 8 units, this tool keeps everything organized. The maintenance tracking is a game-changer."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#0A2540' }}>
+                – Jennifer K., Portland, OR
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Comparison Section */}
+        <div className="mt-20 mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#0A2540' }}>
+              Why Choose LandlordHub?
+            </h2>
+            <p className="text-lg" style={{ color: '#0A2540', opacity: 0.8 }}>
+              See how we compare to other property management tools
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr style={{ backgroundColor: '#E7F2EF' }}>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#0A2540' }}>Feature</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: '#1C7C63' }}>LandlordHub</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: '#0A2540' }}>Landlord Studio</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: '#0A2540' }}>Stessa</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-200">
+                    <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Designed for landlords with 1-20 units</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-red-500">❌</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-yellow-500">⚠️</span>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-gray-200" style={{ backgroundColor: '#F9FAFB' }}>
+                    <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Free plan available</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-yellow-500">⚠️</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-gray-200">
+                    <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Track maintenance & vendor contacts</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-yellow-500">⚠️</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-red-500">❌</span>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-gray-200" style={{ backgroundColor: '#F9FAFB' }}>
+                    <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Built-in tax reports</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 text-sm font-medium" style={{ color: '#0A2540' }}>Easy-to-use dashboard</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-green-600">✅</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-red-500">❌</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-2xl text-yellow-500">⚠️</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
