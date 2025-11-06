@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { trackSignUp } from '@/lib/analytics'
+import { supabase } from '@/lib/supabase'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -16,8 +17,34 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true)
+    setError('')
+    
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      })
+      
+      if (error) {
+        setError(error.message)
+        setGoogleLoading(false)
+      } else {
+        trackSignUp('google')
+        // OAuth redirect will happen automatically
+      }
+    } catch (err: any) {
+      setError(err.message)
+      setGoogleLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,8 +80,7 @@ export default function SignupPage() {
       <div 
         className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
         style={{ 
-          background: 'linear-gradient(135deg, rgba(231, 242, 239, 0.95) 0%, rgba(255, 255, 255, 1) 50%, rgba(240, 253, 250, 0.9) 100%)',
-          backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(28, 124, 99, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(20, 184, 166, 0.05) 0%, transparent 50%)'
+          background: 'radial-gradient(circle at 50% 30%, #e8f4f3 0%, #dceceb 100%)'
         }}
       >
         <div className="max-w-md w-full">
@@ -112,8 +138,7 @@ export default function SignupPage() {
     <div 
       className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       style={{ 
-        background: 'linear-gradient(135deg, rgba(231, 242, 239, 0.95) 0%, rgba(255, 255, 255, 1) 50%, rgba(240, 253, 250, 0.9) 100%)',
-        backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(28, 124, 99, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(20, 184, 166, 0.05) 0%, transparent 50%)'
+        background: 'radial-gradient(circle at 50% 30%, #e8f4f3 0%, #dceceb 100%)'
       }}
     >
       <div className="max-w-md w-full">
@@ -352,25 +377,25 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center items-center py-4 px-6 border border-transparent text-base font-semibold rounded-lg text-white focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                className="group relative w-full flex justify-center items-center py-4 px-6 border border-transparent text-base font-semibold rounded-lg text-white focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 style={{ 
-                  background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
-                  boxShadow: loading ? '0 4px 14px 0 rgba(28, 124, 99, 0.2)' : '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                  background: 'linear-gradient(180deg, #0f6e5f 0%, #0d5b52 100%)',
+                  boxShadow: loading ? '0 4px 12px rgba(15,110,95,0.18)' : '0 4px 12px rgba(15,110,95,0.18)'
                 }}
                 onMouseEnter={(e) => {
                   if (!loading) {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #155a47 0%, #0f4537 100%)'
-                    e.currentTarget.style.boxShadow = '0 6px 20px 0 rgba(28, 124, 99, 0.4)'
+                    e.currentTarget.style.transform = 'translateY(-1px)'
+                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(15,110,95,0.25)'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!loading) {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)'
-                    e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,110,95,0.18)'
                   }
                 }}
-                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 4px rgba(28, 124, 99, 0.2), 0 4px 14px 0 rgba(28, 124, 99, 0.3)'}
-                onBlur={(e) => e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(28, 124, 99, 0.3)'}
+                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 4px rgba(15,110,95,0.2), 0 4px 12px rgba(15,110,95,0.18)'}
+                onBlur={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,110,95,0.18)'}
               >
                 {loading ? 'Creating account...' : 'Get Started Free'}
               </button>
@@ -379,6 +404,62 @@ export default function SignupPage() {
               <p className="mt-4 text-center text-xs" style={{ color: '#6b7280' }}>
                 No credit card required • Cancel anytime
               </p>
+            </div>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t" style={{ borderColor: '#e5e7eb' }}></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span style={{ color: '#6b7280', backgroundColor: '#ffffff', padding: '0 1rem' }}>
+                  or
+                </span>
+              </div>
+            </div>
+
+            {/* Google Sign-In Button */}
+            <div>
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading || loading}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-lg text-base font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                style={{
+                  background: '#ffffff',
+                  borderColor: '#cbd5d8',
+                  color: '#1f2937'
+                }}
+                onMouseEnter={(e) => {
+                  if (!googleLoading && !loading) {
+                    e.currentTarget.style.backgroundColor = '#f9fafb'
+                    e.currentTarget.style.borderColor = '#9ca3af'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!googleLoading && !loading) {
+                    e.currentTarget.style.backgroundColor = '#ffffff'
+                    e.currentTarget.style.borderColor = '#cbd5d8'
+                  }
+                }}
+              >
+                {googleLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: '#1f2937' }}></div>
+                ) : (
+                  <>
+                    {/* Google Icon SVG */}
+                    <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                      <g fill="none" fillRule="evenodd">
+                        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+                        <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.348 6.173 0 7.55 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                      </g>
+                    </svg>
+                    <span>Continue with Google</span>
+                  </>
+                )}
+              </button>
             </div>
           </form>
         </div>
