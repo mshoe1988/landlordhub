@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CheckCircle2 } from 'lucide-react'
 
-export default function RentSuccessPage() {
+function RentSuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
 
@@ -36,5 +37,17 @@ export default function RentSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+        <div className="text-sm text-slate-500">Loading payment details...</div>
+      </div>
+    }>
+      <RentSuccessContent />
+    </Suspense>
   )
 }
