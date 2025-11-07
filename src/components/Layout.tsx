@@ -136,7 +136,7 @@ export default function Layout({ children }: LayoutProps) {
       <div 
         className="py-2 px-4 md:px-6 shadow-lg relative" 
         style={{ 
-          background: 'radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(180deg, #1E7D9A 0%, #0F5C70 100%)', 
+          background: '#0F5C70', 
           color: '#0A2540', 
           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)', 
           borderBottom: '1px solid rgba(0,0,0,0.05)' 
@@ -145,19 +145,12 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex items-center justify-center relative">
           <Link 
             href="/dashboard" 
-            className="transition-all duration-300 relative z-10" 
-            style={{ filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.3))' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.filter = 'drop-shadow(0 0 20px rgba(255,255,255,0.5))'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.filter = 'drop-shadow(0 0 15px rgba(255,255,255,0.3))'
-            }}
+            className="transition-all duration-300 relative z-10"
           >
             <img 
               src="/logo_trans.svg" 
               alt="LandlordHub" 
-              className="h-10 md:h-12 w-auto"
+              className="h-16 md:h-20 w-auto"
             />
           </Link>
         </div>

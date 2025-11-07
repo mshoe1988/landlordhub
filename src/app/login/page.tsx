@@ -112,7 +112,7 @@ export default function LoginPage() {
               <img
                 src="/logo_trans.svg"
                 alt="LandlordHub logo"
-                className="h-12 sm:h-14 w-auto"
+                className="h-16 sm:h-18 w-auto"
               />
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#0A2540', fontWeight: 700 }}>

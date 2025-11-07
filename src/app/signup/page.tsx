@@ -120,7 +120,7 @@ export default function SignupPage() {
               <img
                 src="/landlord-hub-logo.svg?v=15"
                 alt="LandlordHub Logo"
-                className="w-auto h-auto max-w-[200px] sm:max-w-[240px] drop-shadow-lg"
+                className="w-auto h-auto max-w-[260px] sm:max-w-[300px] drop-shadow-lg"
                 style={{ 
                   background: 'transparent',
                   backgroundColor: 'transparent',
@@ -180,7 +180,7 @@ export default function SignupPage() {
             <img
               src="/logo_trans.svg"
               alt="LandlordHub logo"
-              className="h-12 sm:h-14 w-auto"
+              className="h-16 sm:h-18 w-auto"
             />
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#0A2540', fontWeight: 700 }}>
