@@ -31,6 +31,12 @@ export async function POST(request: NextRequest) {
 
   try {
     switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session, event.account)
+        break
+      case 'checkout.session.expired':
+        await handleCheckoutSessionExpired(event.data.object as Stripe.Checkout.Session)
+        break
       case 'customer.subscription.created':
         await handleSubscriptionCreated(event.data.object as Stripe.Subscription)
         break
@@ -45,6 +51,9 @@ export async function POST(request: NextRequest) {
         break
       case 'invoice.payment_failed':
         await handlePaymentFailed(event.data.object as Stripe.Invoice)
+        break
+      case 'invoice.finalized':
+        await handleInvoiceFinalized(event.data.object as Stripe.Invoice)
         break
       default:
         console.log(`Unhandled event type: ${event.type}`)
@@ -221,6 +230,8 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
         .eq('stripe_subscription_id', subscriptionId)
     }
   }
+
+  await syncRentCollectionFromInvoice(invoice, 'paid')
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
@@ -234,6 +245,8 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
       })
       .eq('stripe_subscription_id', subscriptionId)
   }
+
+  await syncRentCollectionFromInvoice(invoice, 'past_due')
 }
 
 function getPlanFromPriceId(priceId: string): string {
@@ -270,5 +283,121 @@ function getPlanDisplayName(plan: string): string {
       return 'LandlordHub Pro'
     default:
       return 'Free'
+  }
+}
+
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, accountId?: string | null) {
+  const rentSessionId = session.metadata?.rent_collection_session_id
+  if (!rentSessionId) {
+    return
+  }
+
+  const updates: Record<string, any> = {
+    status: 'paid',
+    stripe_checkout_session_id: session.id,
+    stripe_payment_intent_id: typeof session.payment_intent === 'string' ? session.payment_intent : (session.payment_intent as Stripe.PaymentIntent)?.id,
+    stripe_subscription_id: typeof session.subscription === 'string' ? session.subscription : null,
+    stripe_invoice_id: typeof session.invoice === 'string' ? session.invoice : undefined,
+    stripe_account_id: accountId || null,
+  }
+
+  await supabase
+    .from('rent_collection_sessions')
+    .update(updates)
+    .eq('id', rentSessionId)
+
+  const { data: rentSession } = await supabase
+    .from('rent_collection_sessions')
+    .select('*')
+    .eq('id', rentSessionId)
+    .maybeSingle()
+
+  if (rentSession) {
+    await markRentAsPaidFromSession(rentSession, new Date())
+  }
+}
+
+async function handleCheckoutSessionExpired(session: Stripe.Checkout.Session) {
+  const rentSessionId = session.metadata?.rent_collection_session_id
+  if (!rentSessionId) return
+
+  await supabase
+    .from('rent_collection_sessions')
+    .update({ status: 'expired' })
+    .eq('id', rentSessionId)
+}
+
+async function handleInvoiceFinalized(invoice: Stripe.Invoice) {
+  await syncRentCollectionFromInvoice(invoice, undefined)
+}
+
+async function syncRentCollectionFromInvoice(invoice: Stripe.Invoice, status?: 'paid' | 'past_due') {
+  const rentSessionId =
+    invoice.metadata?.rent_collection_session_id ||
+    invoice.lines?.data?.[0]?.metadata?.rent_collection_session_id
+
+  let sessionRecord = null
+
+  if (rentSessionId) {
+    const { data } = await supabase
+      .from('rent_collection_sessions')
+      .select('*')
+      .eq('id', rentSessionId)
+      .maybeSingle()
+    sessionRecord = data
+  } else if (invoice.subscription) {
+    const { data } = await supabase
+      .from('rent_collection_sessions')
+      .select('*')
+      .eq('stripe_subscription_id', invoice.subscription as string)
+      .maybeSingle()
+    sessionRecord = data
+  }
+
+  if (!sessionRecord) {
+    return
+  }
+
+  const updates: Record<string, any> = {
+    stripe_invoice_id: invoice.id,
+  }
+
+  if (status) {
+    updates.status = status
+  }
+
+  await supabase
+    .from('rent_collection_sessions')
+    .update(updates)
+    .eq('id', sessionRecord.id)
+
+  if (status === 'paid') {
+    const paidAt = invoice.status_transitions?.paid_at
+      ? new Date(invoice.status_transitions.paid_at * 1000)
+      : new Date()
+    await markRentAsPaidFromSession(sessionRecord, paidAt)
+  }
+}
+
+async function markRentAsPaidFromSession(sessionRecord: any, paymentDate: Date) {
+  try {
+    const dueDate = sessionRecord.due_date ? new Date(sessionRecord.due_date) : paymentDate
+    const month = dueDate.getMonth() + 1
+    const year = dueDate.getFullYear()
+
+    await supabase
+      .from('rent_payments')
+      .upsert({
+        user_id: sessionRecord.user_id,
+        property_id: sessionRecord.property_id,
+        month,
+        year,
+        amount: sessionRecord.amount,
+        status: 'paid',
+        payment_date: paymentDate.toISOString().split('T')[0],
+        notes: 'Paid via Stripe Checkout',
+      }, { onConflict: 'property_id,month,year' })
+  } catch (error) {
+    console.error('Failed to mark rent payment from session:', error)
   }
 }

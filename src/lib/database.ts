@@ -1,5 +1,15 @@
 import { supabase } from './supabase'
-import { Property, MaintenanceTask, Expense, Document, Contact, RentPayment, DashboardStats } from './types'
+import {
+  Property,
+  MaintenanceTask,
+  Expense,
+  Document,
+  Contact,
+  RentPayment,
+  DashboardStats,
+  StripeConnectAccount,
+  RentCollectionSession
+} from './types'
 
 // Properties
 export const getProperties = async (userId: string): Promise<Property[]> => {
@@ -642,4 +652,105 @@ export const getCurrentMonthRentStatus = async (userId: string): Promise<Record<
   }
 
   return statusMap
+}
+
+// Stripe Connect Accounts
+export const getStripeConnectAccount = async (userId: string): Promise<StripeConnectAccount | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('stripe_connect_accounts')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (error) {
+      // If table not created yet, treat as no account
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        console.warn('stripe_connect_accounts table not found yet')
+        return null
+      }
+      throw error
+    }
+
+    return data
+  } catch (error) {
+    console.error('Error fetching Stripe connect account:', error)
+    throw error
+  }
+}
+
+export const upsertStripeConnectAccount = async (
+  account: StripeConnectAccount
+): Promise<StripeConnectAccount> => {
+  const { data, error } = await supabase
+    .from('stripe_connect_accounts')
+    .upsert(account)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// Rent collection sessions
+export const getRentCollectionSessions = async (
+  userId: string,
+  propertyId?: string
+): Promise<RentCollectionSession[]> => {
+  try {
+    let query = supabase
+      .from('rent_collection_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (propertyId) {
+      query = query.eq('property_id', propertyId)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        console.warn('rent_collection_sessions table not found yet')
+        return []
+      }
+      throw error
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error fetching rent collection sessions:', error)
+    throw error
+  }
+}
+
+export const getRentCollectionSessionById = async (
+  userId: string,
+  sessionId: string
+): Promise<RentCollectionSession | null> => {
+  const { data, error } = await supabase
+    .from('rent_collection_sessions')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('id', sessionId)
+    .maybeSingle()
+
+  if (error) throw error
+  return data
+}
+
+export const updateRentCollectionSession = async (
+  sessionId: string,
+  updates: Partial<RentCollectionSession>
+): Promise<RentCollectionSession> => {
+  const { data, error } = await supabase
+    .from('rent_collection_sessions')
+    .update(updates)
+    .eq('id', sessionId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
 }

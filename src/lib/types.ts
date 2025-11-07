@@ -94,3 +94,36 @@ export interface DashboardStats {
   recentExpenses: Expense[]
   upcomingMaintenance: MaintenanceTask[]
 }
+
+export interface StripeConnectAccount {
+  user_id: string
+  stripe_account_id: string
+  details_submitted: boolean
+  charges_enabled: boolean
+  payouts_enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface RentCollectionSession {
+  id: string
+  user_id: string
+  property_id: string
+  amount: number
+  currency: string
+  due_date?: string
+  description?: string
+  tenant_email?: string
+  tenant_phone?: string
+  is_recurring: boolean
+  status: 'open' | 'paid' | 'expired' | 'canceled' | 'past_due'
+  stripe_checkout_session_id?: string
+  stripe_payment_link_url?: string
+  stripe_payment_intent_id?: string
+  stripe_subscription_id?: string
+  stripe_invoice_id?: string
+  stripe_account_id?: string
+  email_sent_at?: string
+  created_at: string
+  updated_at: string
+}

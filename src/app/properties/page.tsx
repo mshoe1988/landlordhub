@@ -3,18 +3,26 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { getProperties, deleteProperty, updateProperty, getCurrentMonthRentStatus } from '@/lib/database'
-import { Property, RentPayment } from '@/lib/types'
+import { getProperties, deleteProperty, updateProperty, getCurrentMonthRentStatus, getRentCollectionSessions } from '@/lib/database'
+import { Property, RentPayment, RentCollectionSession } from '@/lib/types'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Layout from '@/components/Layout'
 import PropertyLimitModal from '@/components/PropertyLimitModal'
 import EmptyState from '@/components/EmptyState'
 import RentPaymentStatus from '@/components/RentPaymentStatus'
-import { Plus, Trash2, Edit, Upload, Search, CheckCircle2, XCircle, Settings, ChevronDown, Mail, Phone } from 'lucide-react'
+import CollectRentModal, { CollectRentFormValues } from '@/components/CollectRentModal'
+import { Plus, Trash2, Edit, Upload, Search, CheckCircle2, XCircle, Settings, ChevronDown, Mail, Phone, CreditCard, RefreshCw, Copy, ExternalLink, Repeat, AlertTriangle, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 import { uploadFile } from '@/lib/storage'
 import { canAddProperty } from '@/lib/stripe'
+
+const formatMoney = (value: number, currency: string = 'USD') =>
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+  }).format(value || 0)
 
 export default function PropertiesPage() {
   const { user } = useAuth()
@@ -43,13 +51,26 @@ export default function PropertiesPage() {
   const [rentPayments, setRentPayments] = useState<Record<string, RentPayment | null>>({})
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'rent' | 'tenant' | 'lease'>('rent')
+  const [stripeStatus, setStripeStatus] = useState({
+    loading: true,
+    connected: false,
+    account: null as any,
+    requirements: null as any
+  })
+  const [checkingStripe, setCheckingStripe] = useState(false)
+  const [rentCollectionSessions, setRentCollectionSessions] = useState<RentCollectionSession[]>([])
+  const [rentCollectionLoading, setRentCollectionLoading] = useState(false)
+  const [collectModalOpen, setCollectModalOpen] = useState(false)
+  const [collectModalProperty, setCollectModalProperty] = useState<Property | null>(null)
 
   useEffect(() => {
-    if (user) {
-      loadProperties()
-      loadSubscription()
-    }
-  }, [user])
+     if (user) {
+       loadProperties()
+       loadSubscription()
+       loadStripeStatus()
+       loadRentCollectionSessions()
+     }
+   }, [user])
 
   const loadProperties = async () => {
     try {
@@ -71,6 +92,127 @@ export default function PropertiesPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const getAccessToken = async (): Promise<string> => {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession()
+    if (!session?.access_token) {
+      throw new Error('Your session expired. Please sign in again.')
+    }
+    return session.access_token
+  }
+
+  const loadStripeStatus = async () => {
+    if (!user) return
+    try {
+      setStripeStatus((prev) => ({ ...prev, loading: true }))
+      const token = await getAccessToken()
+      const response = await fetch('/api/stripe/connect/status', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        setStripeStatus({ loading: false, connected: false, account: null, requirements: null })
+        return
+      }
+
+      const data = await response.json()
+      setStripeStatus({
+        loading: false,
+        connected: Boolean(data.connected),
+        account: data.account || null,
+        requirements: data.requirements || null
+      })
+    } catch (error) {
+      console.error('Error loading Stripe status:', error)
+      setStripeStatus({ loading: false, connected: false, account: null, requirements: null })
+    }
+  }
+
+  const handleConnectStripe = async () => {
+    try {
+      setCheckingStripe(true)
+      const token = await getAccessToken()
+      const response = await fetch('/api/stripe/connect/create-account-link', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || 'Unable to create Stripe onboarding link')
+      }
+
+      window.location.href = data.url
+    } catch (error: any) {
+      const message = error?.message || 'Failed to start Stripe onboarding.'
+      toast.error(message)
+    } finally {
+      setCheckingStripe(false)
+    }
+  }
+
+  const loadRentCollectionSessions = async () => {
+    if (!user) return
+    try {
+      setRentCollectionLoading(true)
+      const sessions = await getRentCollectionSessions(user.id)
+      setRentCollectionSessions(sessions)
+    } catch (error) {
+      console.error('Error loading rent collection sessions:', error)
+    } finally {
+      setRentCollectionLoading(false)
+    }
+  }
+
+  const openCollectRentModal = (property: Property) => {
+    if (!stripeStatus.connected) {
+      toast.error('Connect Stripe to start collecting rent online.')
+      return
+    }
+    setCollectModalProperty(property)
+    setCollectModalOpen(true)
+  }
+
+  const closeCollectRentModal = () => {
+    setCollectModalOpen(false)
+    setCollectModalProperty(null)
+  }
+
+  const handleCollectRentSubmit = async (values: CollectRentFormValues) => {
+    if (!collectModalProperty) {
+      throw new Error('No property selected for rent collection')
+    }
+
+    const token = await getAccessToken()
+    const response = await fetch('/api/rent/collect', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        propertyId: collectModalProperty.id,
+        ...values
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to create rent checkout session')
+    }
+
+    await Promise.all([loadRentCollectionSessions(), refreshRentPayments()])
+
+    return data as { checkoutUrl: string }
   }
 
   const refreshRentPayments = async () => {
@@ -395,7 +537,73 @@ export default function PropertiesPage() {
                 </div>
               </div>
             )}
-            
+
+            {!stripeStatus.loading && !stripeStatus.connected && (
+              <div className="mb-6 p-5 rounded-xl border border-emerald-200 bg-emerald-50" style={{ boxShadow: '0 6px 18px rgba(28, 124, 99, 0.12)' }}>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 text-emerald-800 font-semibold text-sm uppercase tracking-wide">
+                      <CreditCard className="h-4 w-4" />
+                      Stripe rent collection
+                    </div>
+                    <h3 className="text-lg font-semibold text-emerald-900 mt-1">Collect rent online in minutes</h3>
+                    <p className="text-sm text-emerald-800 mt-2 max-w-2xl">
+                      Set up Stripe Connect once. Generate secure checkout links for each lease and let tenants pay online—funds land directly in your bank.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleConnectStripe}
+                      disabled={checkingStripe}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-sm"
+                      style={{
+                        background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                        boxShadow: '0 6px 16px rgba(28, 124, 99, 0.35)'
+                      }}
+                    >
+                      {checkingStripe ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Redirecting…
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-4 w-4" />
+                          Connect Stripe
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={loadStripeStatus}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-200 text-emerald-700 text-sm font-medium bg-white hover:bg-emerald-100"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Refresh status
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!stripeStatus.loading && stripeStatus.connected && (
+              <div className="mb-6 p-4 rounded-lg border border-emerald-100 bg-emerald-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3 text-emerald-800">
+                  <CheckCircle2 className="h-5 w-5" />
+                  <div>
+                    <p className="text-sm font-semibold">Stripe account connected</p>
+                    <p className="text-sm text-emerald-700">Generate checkout links to let tenants pay securely online.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={loadStripeStatus}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white text-sm font-medium text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Sync status
+                </button>
+              </div>
+            )}
+ 
             {/* Search and Filter Bar */}
             {properties.length > 0 && (
               <div className="flex flex-col sm:flex-row gap-3 mt-4">
@@ -652,6 +860,26 @@ export default function PropertiesPage() {
                   const now = new Date()
                   const isOverdue = !isPaid && !isPartial && property.rent_due_date && now.getDate() > property.rent_due_date
                   const paymentStatus = isPaid ? 'paid' : isPartial ? 'partial' : isOverdue ? 'overdue' : 'unpaid'
+                  const propertySessions = rentCollectionSessions
+                    .filter(session => session.property_id === property.id)
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    .slice(0, 3)
+                  const getSessionStatusStyles = (status: RentCollectionSession['status']) => {
+                    switch (status) {
+                      case 'paid':
+                        return { bg: '#DFF7E4', color: '#1C7C63', label: 'Paid' }
+                      case 'open':
+                        return { bg: '#E0F2FF', color: '#0369A1', label: 'Pending' }
+                      case 'expired':
+                        return { bg: '#F1F5F9', color: '#475569', label: 'Expired' }
+                      case 'canceled':
+                        return { bg: '#F8FAFC', color: '#64748B', label: 'Canceled' }
+                      case 'past_due':
+                        return { bg: '#FEF3C7', color: '#B45309', label: 'Past due' }
+                      default:
+                        return { bg: '#E0F2FF', color: '#0369A1', label: status }
+                    }
+                  }
                   
                   return (
                     <div 
@@ -705,6 +933,28 @@ export default function PropertiesPage() {
                           </div>
                           {property.nickname && (
                             <p className="text-sm mt-1" style={{ color: '#647474', fontSize: '13px' }}>{property.address}</p>
+                          )}
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <button
+                            onClick={() => openCollectRentModal(property)}
+                            disabled={!stripeStatus.connected}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 disabled:opacity-60"
+                            style={{
+                              background: 'linear-gradient(135deg, #1C7C63 0%, #155a47 100%)',
+                              color: '#ffffff',
+                              boxShadow: stripeStatus.connected ? '0 4px 12px rgba(28, 124, 99, 0.25)' : 'none',
+                              cursor: stripeStatus.connected ? 'pointer' : 'not-allowed'
+                            }}
+                          >
+                            <CreditCard className="h-4 w-4" />
+                            Collect Rent
+                          </button>
+                          {!stripeStatus.connected && (
+                            <div className="flex items-center gap-1 text-xs" style={{ color: '#b45309' }}>
+                              <AlertTriangle className="h-3.5 w-3.5" />
+                              Connect Stripe to enable
+                            </div>
                           )}
                         </div>
                       </div>
@@ -969,15 +1219,105 @@ export default function PropertiesPage() {
                               </div>
                             </div>
                             {property.lease_end_date && (
-                              <div>
-                                <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Lease Ends</p>
-                                <p className="font-semibold" style={{ color: '#0A2540', fontSize: '14px' }}>
-                                  {new Date(property.lease_end_date + 'T00:00:00').toLocaleDateString()}
-                                </p>
+                               <div>
+                                 <p className="text-sm mb-1" style={{ color: '#647474', fontSize: '13px' }}>Lease Ends</p>
+                                 <p className="font-semibold" style={{ color: '#0A2540', fontSize: '14px' }}>
+                                   {new Date(property.lease_end_date + 'T00:00:00').toLocaleDateString()}
+                                 </p>
+                               </div>
+                             )}
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+                                  <CreditCard className="h-4 w-4" />
+                                  Rent collection
+                                </div>
+                                <button
+                                  onClick={() => openCollectRentModal(property)}
+                                  className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 px-3 py-1.5 rounded-lg bg-white border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                                  disabled={!stripeStatus.connected}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                  New link
+                                </button>
                               </div>
-                            )}
-                    </div>
 
+                              {rentCollectionLoading && (
+                                <div className="flex items-center gap-2 text-xs text-slate-500 mt-3">
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  Syncing Stripe sessions…
+                                </div>
+                              )}
+
+                              {propertySessions.length === 0 && !rentCollectionLoading && (
+                                <p className="text-xs text-slate-500 mt-3">
+                                  No checkout links yet. Use <strong>Collect Rent</strong> to send a Stripe payment link to this tenant.
+                                </p>
+                              )}
+
+                              {propertySessions.length > 0 && (
+                                <div className="mt-3 space-y-3">
+                                  {propertySessions.map((session) => {
+                                    const styles = getSessionStatusStyles(session.status)
+                                    const sentAt = new Date(session.created_at)
+                                    const dueDate = session.due_date ? new Date(session.due_date + 'T00:00:00') : null
+                                    return (
+                                      <div key={session.id} className="rounded-lg bg-white border border-slate-200 px-3 py-3">
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div>
+                                            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                                              {formatMoney(session.amount, (session.currency || 'usd').toUpperCase())}
+                                              {session.is_recurring && (
+                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                                                  <Repeat className="h-3 w-3" />
+                                                  Recurring
+                                                </span>
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-slate-500 mt-1">
+                                              Sent {sentAt.toLocaleDateString()} · {session.tenant_email || 'Tenant email pending'}
+                                              {dueDate && ` · Due ${dueDate.toLocaleDateString()}`}
+                                            </p>
+                                          </div>
+                                          <span
+                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                                            style={{ backgroundColor: styles.bg, color: styles.color }}
+                                          >
+                                            {styles.label}
+                                          </span>
+                                        </div>
+                                        {session.stripe_payment_link_url && (
+                                          <div className="flex flex-wrap items-center gap-2 mt-3">
+                                            <button
+                                              onClick={() => {
+                                                navigator.clipboard.writeText(session.stripe_payment_link_url!)
+                                                  .then(() => toast.success('Link copied to clipboard'))
+                                                  .catch(() => toast.error('Unable to copy link'))
+                                              }}
+                                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-100"
+                                            >
+                                              <Copy className="h-3.5 w-3.5" />
+                                              Copy link
+                                            </button>
+                                            <a
+                                              href={session.stripe_payment_link_url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-emerald-700 bg-emerald-100 hover:bg-emerald-200"
+                                            >
+                                              <ExternalLink className="h-3.5 w-3.5" />
+                                              View checkout
+                                            </a>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+ 
                           {/* Quick Actions */}
                           <div className="flex gap-2 mt-6 pt-4 border-t" style={{ borderColor: '#E7ECEA', borderTopWidth: '1px' }}>
                             <button
@@ -1053,6 +1393,13 @@ export default function PropertiesPage() {
             currentCount={properties.length}
           />
         </div>
+
+        <CollectRentModal
+          open={collectModalOpen}
+          property={collectModalProperty}
+          onClose={closeCollectRentModal}
+          onSubmit={handleCollectRentSubmit}
+        />
       </Layout>
     </ProtectedRoute>
   )
