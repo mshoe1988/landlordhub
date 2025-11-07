@@ -178,16 +178,9 @@ export default function SignupPage() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
             <img
-              src="/landlord-hub-logo.svg?v=15"
+              src="/Logo_transparent.png"
               alt="LandlordHub Logo"
-                className="w-auto h-auto max-w-[200px] sm:max-w-[240px] drop-shadow-lg"
-              style={{ 
-                background: 'transparent',
-                backgroundColor: 'transparent',
-                backgroundImage: 'none',
-                maxWidth: '100%',
-                height: 'auto'
-              }}
+              className="h-12 sm:h-14 w-auto"
             />
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#0A2540', fontWeight: 700 }}>

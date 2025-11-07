@@ -46,7 +46,7 @@ export default function Home() {
             "@type": "SoftwareApplication",
             "name": "LandlordHub",
             "url": "https://landlordhubapp.com",
-            "image": "https://landlordhubapp.com/landlord-hub-logo.png",
+            "image": "https://landlordhubapp.com/Logo_transparent.png",
             "applicationCategory": "BusinessApplication",
             "applicationSubCategory": "Property Management Software",
             "operatingSystem": "Web",
@@ -296,7 +296,7 @@ export default function Home() {
                 {/* App Header Bar */}
                 <div className="browser-app-header">
                   <img 
-                    src="/landlord-hub-logo.svg" 
+                    src="/Logo_transparent.png" 
                     alt="LandlordHub"
                     className="browser-logo"
                   />

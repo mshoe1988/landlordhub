@@ -154,22 +154,10 @@ export default function Layout({ children }: LayoutProps) {
               e.currentTarget.style.filter = 'drop-shadow(0 0 15px rgba(255,255,255,0.3))'
             }}
           >
-            <Image
-              src="/landlord-hub-logo.svg?v=21"
-              alt="LandlordHub Logo"
-              width={650}
-              height={260}
-              className="w-auto h-auto max-w-[280px] sm:max-w-[350px] md:max-w-[450px] lg:max-w-[650px] cursor-pointer"
-              priority
-              quality={100}
-              unoptimized
-              style={{ 
-                background: 'transparent !important',
-                backgroundColor: 'transparent !important',
-                backgroundImage: 'none !important',
-                maxWidth: '100%',
-                height: 'auto'
-              }}
+            <img 
+              src="/Logo_transparent.png" 
+              alt="LandlordHub" 
+              className="h-10 md:h-12 w-auto"
             />
           </Link>
         </div>
