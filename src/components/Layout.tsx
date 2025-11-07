@@ -148,9 +148,9 @@ export default function Layout({ children }: LayoutProps) {
             className="transition-all duration-300 relative z-10"
           >
             <img 
-              src="/logo_trans.svg" 
+              src="/Logo_transparent.png" 
               alt="LandlordHub" 
-              className="h-16 md:h-20 w-auto"
+              className="h-20 md:h-24 w-auto"
             />
           </Link>
         </div>

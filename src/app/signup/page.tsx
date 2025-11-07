@@ -178,7 +178,7 @@ export default function SignupPage() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
             <img
-              src="/logo_trans.svg"
+              src="/Logo_transparent.png"
               alt="LandlordHub logo"
               className="h-16 sm:h-18 w-auto"
             />
