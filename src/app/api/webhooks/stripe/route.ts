@@ -345,13 +345,16 @@ async function syncRentCollectionFromInvoice(invoice: Stripe.Invoice, status?: '
       .eq('id', rentSessionId)
       .maybeSingle()
     sessionRecord = data
-  } else if (invoice.subscription) {
-    const { data } = await supabase
-      .from('rent_collection_sessions')
-      .select('*')
-      .eq('stripe_subscription_id', invoice.subscription as string)
-      .maybeSingle()
-    sessionRecord = data
+  } else {
+    const subscriptionId = (invoice as any).subscription as string | undefined
+    if (subscriptionId) {
+      const { data } = await supabase
+        .from('rent_collection_sessions')
+        .select('*')
+        .eq('stripe_subscription_id', subscriptionId)
+        .maybeSingle()
+      sessionRecord = data
+    }
   }
 
   if (!sessionRecord) {
