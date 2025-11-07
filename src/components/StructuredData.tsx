@@ -6,7 +6,7 @@ export default function StructuredData() {
     "@type": "Organization",
     "name": "LandlordHub",
     "url": baseUrl,
-    "logo": `${baseUrl}/Logo_transparent.png`,
+    "logo": `${baseUrl}/logo_trans.svg`,
     "description": "Property management software for landlords. Track income, expenses, maintenance, and generate tax reports.",
     "sameAs": [
       "https://www.linkedin.com/company/landlordhub",

@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     description: 'Simplify rent collection, expenses, and maintenance in one app. LandlordHub makes property management easy for small landlords — start free today.',
     site: '@landlordhubapp',
     creator: '@landlordhubapp',
-    images: ['/Logo_transparent.png']
+    images: ['/logo_trans.svg']
   },
   robots: {
     index: true,

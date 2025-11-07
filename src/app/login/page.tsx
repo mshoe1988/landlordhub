@@ -110,7 +110,7 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
               <img
-                src="/Logo_transparent.png"
+                src="/logo_trans.svg"
                 alt="LandlordHub logo"
                 className="h-12 sm:h-14 w-auto"
               />

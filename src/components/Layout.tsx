@@ -155,7 +155,7 @@ export default function Layout({ children }: LayoutProps) {
             }}
           >
             <img 
-              src="/Logo_transparent.png" 
+              src="/logo_trans.svg" 
               alt="LandlordHub" 
               className="h-10 md:h-12 w-auto"
             />
